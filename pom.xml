@@ -99,7 +99,7 @@
 				<configuration>
 					<formats>XML</formats>
 					<excludes>
-						<exclude>LoginApplication</exclude>
+						<exclude>mdch/login/login/LoginApplication</exclude>
 						<exclude>mdch/login/login/dto/*</exclude>
 					</excludes>
 				</configuration>
