@@ -97,9 +97,9 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<version>0.8.10</version>
 				<configuration>
-					<formats>XML</formats>
+					<formats>XML,CSV</formats>
 					<excludes>
-						<exclude>mdch/login/login/LoginApplication</exclude>
+						<exclude>mdch/login/login/LoginApplication.class</exclude>
 						<exclude>mdch/login/login/dto/*</exclude>
 					</excludes>
 				</configuration>
