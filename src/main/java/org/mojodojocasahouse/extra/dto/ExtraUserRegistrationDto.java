@@ -10,14 +10,14 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class UsuarioRegistroDto {
+public class ExtraUserRegistrationDto {
 
     @NotBlank
     @NotNull
-    private String nombre;
+    private String firstName;
     @NotBlank
     @NotNull
-    private String apellido;
+    private String lastName;
     @Email
     @NotBlank
     @NotNull
@@ -26,18 +26,13 @@ public class UsuarioRegistroDto {
     @NotNull
     private String password;
 
-    public UsuarioRegistroDto(String nombre, String apellido, String email, String password) {
-        this.nombre = nombre;
-        this.apellido = apellido;
+    public ExtraUserRegistrationDto(String firstName, String lastName, String email, String password) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.password = password;
     }
 
-    public UsuarioRegistroDto(String email) {
-        this.email = email;
-    }
-
-    public UsuarioRegistroDto() {
-    }
+    public ExtraUserRegistrationDto(){}
 
 }

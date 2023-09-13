@@ -1,15 +1,15 @@
 package org.mojodojocasahouse.extra.model;
 
-import org.mojodojocasahouse.extra.model.impl.Usuario;
+import org.mojodojocasahouse.extra.model.impl.ExtraUser;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 
-class UsuarioTest {
+class ExtraUserTest {
 
     @Test
     void testGettingIdOfMichaelJordanReturnsNull() {
-        Usuario unmanagedUser = new Usuario(
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",
@@ -20,32 +20,32 @@ class UsuarioTest {
     }
 
     @Test
-    void testGettingNombreOfMichaelJordanReturnsMichael() {
-        Usuario unmanagedUser = new Usuario(
+    void testGettingFirstNameOfMichaelJordanReturnsMichael() {
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",
                 "somepassword"
         );
 
-        Assertions.assertThat(unmanagedUser.getNombre()).isEqualTo("Michael");
+        Assertions.assertThat(unmanagedUser.getFirstName()).isEqualTo("Michael");
     }
 
     @Test
-    void testGettingApellidoOfMichaelJordanReturnsJordan() {
-        Usuario unmanagedUser = new Usuario(
+    void testGettingLastNameOfMichaelJordanReturnsJordan() {
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",
                 "somepassword"
         );
 
-        Assertions.assertThat(unmanagedUser.getApellido()).isEqualTo("Jordan");
+        Assertions.assertThat(unmanagedUser.getLastName()).isEqualTo("Jordan");
     }
 
     @Test
     void testGettingEmailOfMichaelJordanReturnsMichaelJAtGmailDotCom() {
-        Usuario unmanagedUser = new Usuario(
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",
@@ -57,7 +57,7 @@ class UsuarioTest {
 
     @Test
     void testGettingPasswordOfMichaelJordanReturnsSomePassword() {
-        Usuario unmanagedUser = new Usuario(
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",
@@ -68,36 +68,36 @@ class UsuarioTest {
     }
 
     @Test
-    void testSettingNombreOfMichaelJordanToMikeActuallyChangesIt() {
-        Usuario unmanagedUser = new Usuario(
+    void testSettingFirstNameOfMichaelJordanToMikeActuallyChangesIt() {
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",
                 "somepassword"
         );
 
-        unmanagedUser.setNombre("Mike");
+        unmanagedUser.setFirstName("Mike");
 
-        Assertions.assertThat(unmanagedUser.getNombre()).isEqualTo("Mike");
+        Assertions.assertThat(unmanagedUser.getFirstName()).isEqualTo("Mike");
     }
 
     @Test
-    void testSettingApellidoOfMichaelJordanToScottActuallyChangesIt() {
-        Usuario unmanagedUser = new Usuario(
+    void testSettingLastNameOfMichaelJordanToScottActuallyChangesIt() {
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",
                 "somepassword"
         );
 
-        unmanagedUser.setApellido("Scott");
+        unmanagedUser.setLastName("Scott");
 
-        Assertions.assertThat(unmanagedUser.getApellido()).isEqualTo("Scott");
+        Assertions.assertThat(unmanagedUser.getLastName()).isEqualTo("Scott");
     }
 
     @Test
     void testSettingEmailOfMichaelJordanToMJAtMeDotComActuallyChangesIt() {
-        Usuario unmanagedUser = new Usuario(
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",
@@ -111,7 +111,7 @@ class UsuarioTest {
 
     @Test
     void testSettingPasswordOfMichaelJordanToAnotherPasswordActuallyChangesIt() {
-        Usuario unmanagedUser = new Usuario(
+        ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "michaelj@gmail.com",

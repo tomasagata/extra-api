@@ -1,10 +1,10 @@
 package org.mojodojocasahouse.extra.service;
 
-import org.mojodojocasahouse.extra.dto.UsuarioRegistroDto;
-import org.mojodojocasahouse.extra.dto.UsuarioRegistroResponseDto;
-import org.mojodojocasahouse.extra.model.impl.Usuario;
-import org.mojodojocasahouse.extra.repository.UsuarioRepository;
-import org.mojodojocasahouse.extra.service.impl.UsuarioServiceImpl;
+import org.mojodojocasahouse.extra.dto.ExtraUserRegistrationDto;
+import org.mojodojocasahouse.extra.dto.ExtraUserRegistrationResponseDto;
+import org.mojodojocasahouse.extra.model.impl.ExtraUser;
+import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
+import org.mojodojocasahouse.extra.service.impl.ExtraUserServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,37 +16,37 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-public class UsuarioServiceTest {
+public class ExtraUserServiceTest {
 
     @Mock
-    private UsuarioRepository repo;
+    private ExtraUserRepository repo;
 
     @InjectMocks
-    private UsuarioServiceImpl serv;
+    private ExtraUserServiceImpl serv;
 
     @Test
     public void testPassingAUserRegistrationRequestReturnsASuccessfulResponse() {
         // Setup - data
-        Usuario mj = new Usuario(
+        ExtraUser mj = new ExtraUser(
                 "Michael",
                 "Jordan",
                 "mj@me.com",
                 "somepassword"
         );
-        UsuarioRegistroDto mjDto = new UsuarioRegistroDto(
+        ExtraUserRegistrationDto mjDto = new ExtraUserRegistrationDto(
                 "Michael",
                 "Jordan",
                 "mj@me.com",
                 "somepassword");
-        UsuarioRegistroResponseDto successfulResponse= new UsuarioRegistroResponseDto(
-                "Usuario creado satisfactoriamente"
+        ExtraUserRegistrationResponseDto successfulResponse= new ExtraUserRegistrationResponseDto(
+                "ExtraUser created successfully"
         );
 
         // Setup – expectations
-        given(repo.save(any(Usuario.class))).willReturn(mj);
+        given(repo.save(any(ExtraUser.class))).willReturn(mj);
 
         // exercise
-        UsuarioRegistroResponseDto response = serv.registrarUsuario(mjDto);
+        ExtraUserRegistrationResponseDto response = serv.registrarUsuario(mjDto);
 
         // verify
         Assertions.assertThat(response).isNotNull();

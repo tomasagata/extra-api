@@ -1,9 +1,9 @@
 package org.mojodojocasahouse.extra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.mojodojocasahouse.extra.dto.UsuarioRegistroDto;
-import org.mojodojocasahouse.extra.dto.UsuarioRegistroResponseDto;
-import org.mojodojocasahouse.extra.service.UsuarioService;
+import org.mojodojocasahouse.extra.dto.ExtraUserRegistrationDto;
+import org.mojodojocasahouse.extra.dto.ExtraUserRegistrationResponseDto;
+import org.mojodojocasahouse.extra.service.ExtraUserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,15 +22,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class RegistroUsuarioControllerTest {
+class ExtraUserRegistrationControllerTest {
 
     private MockMvc mvc;
 
     @Mock
-    public UsuarioService service;
+    public ExtraUserService service;
 
     @InjectMocks
-    public RegistroUsuarioController controller;
+    public ExtraUserRegistrationController controller;
 
     public static String asJsonString(final Object obj) {
         try {
@@ -48,14 +48,14 @@ class RegistroUsuarioControllerTest {
     @Test
     public void testPostingUnregisteredUserShouldReturnSuccessResponse() throws Exception {
         // Setup - data
-        UsuarioRegistroDto unregisteredUserDto = new UsuarioRegistroDto(
+        ExtraUserRegistrationDto unregisteredUserDto = new ExtraUserRegistrationDto(
                 "Michael",
                 "Jordan",
                 "mj@me.com",
                 "somepassword"
         );
-        UsuarioRegistroResponseDto responseDto = new UsuarioRegistroResponseDto(
-                "Usuario creado satisfactoriamente"
+        ExtraUserRegistrationResponseDto responseDto = new ExtraUserRegistrationResponseDto(
+                "ExtraUser creado satisfactoriamente"
         );
 
         // Setup - expectations
@@ -63,7 +63,7 @@ class RegistroUsuarioControllerTest {
 
         // exercise
         MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
-                    post("/registro")
+                    post("/register")
                     .content(asJsonString(unregisteredUserDto))
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.ALL))
@@ -78,7 +78,7 @@ class RegistroUsuarioControllerTest {
     @Test
     public void testRegisteringANewUserWithAWrongEmailReturnsBadRequest() throws Exception {
         // Setup - data
-        UsuarioRegistroDto unregisteredUserDto = new UsuarioRegistroDto(
+        ExtraUserRegistrationDto unregisteredUserDto = new ExtraUserRegistrationDto(
                 "Michael",
                 "Jordan",
                 "notEmail",
@@ -87,7 +87,7 @@ class RegistroUsuarioControllerTest {
 
         // exercise
         MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
-                        post("/registro")
+                        post("/register")
                         .content(asJsonString(unregisteredUserDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -98,9 +98,9 @@ class RegistroUsuarioControllerTest {
     }
 
     @Test
-    public void testRegisteringANewUserWithEmptyNombreReturnsBadRequest() throws Exception {
+    public void testRegisteringANewUserWithEmptyFirstNameReturnsBadRequest() throws Exception {
         // Setup - data
-        UsuarioRegistroDto unregisteredUserDto = new UsuarioRegistroDto(
+        ExtraUserRegistrationDto unregisteredUserDto = new ExtraUserRegistrationDto(
                 "",
                 "Jordan",
                 "mj@me.com",
@@ -109,7 +109,7 @@ class RegistroUsuarioControllerTest {
 
         // exercise
         MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
-                        post("/registro")
+                        post("/register")
                         .content(asJsonString(unregisteredUserDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -121,9 +121,9 @@ class RegistroUsuarioControllerTest {
 
 
     @Test
-    public void testRegisteringANewUserWithEmptyApellidoReturnsBadRequest() throws Exception {
+    public void testRegisteringANewUserWithEmptyLastNameReturnsBadRequest() throws Exception {
         // Setup - data
-        UsuarioRegistroDto unregisteredUserDto = new UsuarioRegistroDto(
+        ExtraUserRegistrationDto unregisteredUserDto = new ExtraUserRegistrationDto(
                 "Michael",
                 "",
                 "mj@me.com",
@@ -132,7 +132,7 @@ class RegistroUsuarioControllerTest {
 
         // exercise
         MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
-                        post("/registro")
+                        post("/register")
                         .content(asJsonString(unregisteredUserDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -145,7 +145,7 @@ class RegistroUsuarioControllerTest {
     @Test
     public void testRegisteringANewUserWithEmptyEmailReturnsBadRequest() throws Exception {
         // Setup - data
-        UsuarioRegistroDto unregisteredUserDto = new UsuarioRegistroDto(
+        ExtraUserRegistrationDto unregisteredUserDto = new ExtraUserRegistrationDto(
                 "Michael",
                 "Jordan",
                 "",
@@ -154,7 +154,7 @@ class RegistroUsuarioControllerTest {
 
         // exercise
         MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
-                        post("/registro")
+                        post("/register")
                         .content(asJsonString(unregisteredUserDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -167,7 +167,7 @@ class RegistroUsuarioControllerTest {
     @Test
     public void testRegisteringANewUserWithEmptyPasswordReturnsBadRequest() throws Exception {
         // Setup - data
-        UsuarioRegistroDto unregisteredUserDto = new UsuarioRegistroDto(
+        ExtraUserRegistrationDto unregisteredUserDto = new ExtraUserRegistrationDto(
                 "Michael",
                 "Jordan",
                 "mj@me.com",
@@ -176,7 +176,7 @@ class RegistroUsuarioControllerTest {
 
         // exercise
         MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
-                        post("/registro")
+                        post("/register")
                         .content(asJsonString(unregisteredUserDto))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
@@ -198,13 +198,13 @@ class RegistroUsuarioControllerTest {
 //    @Test
 //    public void testRegisteringMichaelJordanIsSuccessful(){
 //        // Setup - data
-//        UsuarioRegistroDto unregisteredUserDto = new UsuarioRegistroDto(
+//        ExtraUserRegistrationDto unregisteredUserDto = new ExtraUserRegistrationDto(
 //                "Michael",
 //                "Jordan",
 //                "mj@me.com",
 //                "somepassword"
 //        );
-//        Usuario registeredUser = new Usuario(
+//        ExtraUser registeredUser = new ExtraUser(
 //                "Michael",
 //                "Jordan",
 //                "mj@me.com",
