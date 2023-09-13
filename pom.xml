@@ -98,7 +98,10 @@
 				<version>0.8.10</version>
 				<configuration>
 					<formats>XML</formats>
-					<excludes>LoginApplication</excludes>
+					<excludes>
+						<exclude>LoginApplication</exclude>
+						<exclude>mdch/login/login/dto/*</exclude>
+					</excludes>
 				</configuration>
 				<executions>
 					<execution>
