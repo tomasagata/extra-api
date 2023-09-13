@@ -1,10 +1,10 @@
-package mdch.login.login.service;
+package org.mojodojocasahouse.extra.service;
 
-import mdch.login.login.dto.UsuarioRegistroDto;
-import mdch.login.login.dto.UsuarioRegistroResponseDto;
-import mdch.login.login.model.impl.Usuario;
-import mdch.login.login.repository.UsuarioRepository;
-import mdch.login.login.service.impl.UsuarioServiceImpl;
+import org.mojodojocasahouse.extra.dto.UsuarioRegistroDto;
+import org.mojodojocasahouse.extra.dto.UsuarioRegistroResponseDto;
+import org.mojodojocasahouse.extra.model.impl.Usuario;
+import org.mojodojocasahouse.extra.repository.UsuarioRepository;
+import org.mojodojocasahouse.extra.service.impl.UsuarioServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

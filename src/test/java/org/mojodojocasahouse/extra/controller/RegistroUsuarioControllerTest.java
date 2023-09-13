@@ -1,10 +1,9 @@
-package mdch.login.login.controller;
+package org.mojodojocasahouse.extra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import mdch.login.login.dto.UsuarioRegistroDto;
-import mdch.login.login.dto.UsuarioRegistroResponseDto;
-import mdch.login.login.model.impl.Usuario;
-import mdch.login.login.service.UsuarioService;
+import org.mojodojocasahouse.extra.dto.UsuarioRegistroDto;
+import org.mojodojocasahouse.extra.dto.UsuarioRegistroResponseDto;
+import org.mojodojocasahouse.extra.service.UsuarioService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

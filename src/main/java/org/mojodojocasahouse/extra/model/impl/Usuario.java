@@ -1,9 +1,9 @@
-package mdch.login.login.model.impl;
+package org.mojodojocasahouse.extra.model.impl;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import mdch.login.login.model.UsuarioEntity;
+import org.mojodojocasahouse.extra.model.UsuarioEntity;
 
 @Entity
 @Table(name = "usuario", uniqueConstraints = @UniqueConstraint(columnNames = "email"))

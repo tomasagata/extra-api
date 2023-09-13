@@ -1,17 +1,15 @@
-package mdch.login.login.controller;
+package org.mojodojocasahouse.extra.controller;
 
-import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
-import mdch.login.login.dto.UsuarioRegistroResponseDto;
-import mdch.login.login.service.UsuarioService;
+import org.mojodojocasahouse.extra.dto.UsuarioRegistroResponseDto;
+import org.mojodojocasahouse.extra.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import mdch.login.login.dto.UsuarioRegistroDto;
-import org.springframework.web.server.ResponseStatusException;
+import org.mojodojocasahouse.extra.dto.UsuarioRegistroDto;
 
 @Controller
 public class RegistroUsuarioController {

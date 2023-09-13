@@ -1,7 +1,7 @@
-package mdch.login.login.repository;
+package org.mojodojocasahouse.extra.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import mdch.login.login.model.impl.Usuario;
+import org.mojodojocasahouse.extra.model.impl.Usuario;
 import org.springframework.stereotype.Repository;
 
 @Repository

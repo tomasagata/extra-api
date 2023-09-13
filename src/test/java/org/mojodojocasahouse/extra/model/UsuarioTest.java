@@ -1,6 +1,6 @@
-package mdch.login.login.model;
+package org.mojodojocasahouse.extra.model;
 
-import mdch.login.login.model.impl.Usuario;
+import org.mojodojocasahouse.extra.model.impl.Usuario;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 

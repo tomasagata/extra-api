@@ -1,4 +1,4 @@
-name: GitHub Actions Test
+name: Coveralls CI
 on: [push, pull_request]
 jobs:
   Run-Coverage:

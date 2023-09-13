@@ -1,4 +1,4 @@
-package mdch.login.login.dto;
+package org.mojodojocasahouse.extra.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -1,12 +1,11 @@
-package mdch.login.login.service.impl;
+package org.mojodojocasahouse.extra.service.impl;
 
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
-import mdch.login.login.dto.UsuarioRegistroDto;
-import mdch.login.login.dto.UsuarioRegistroResponseDto;
-import mdch.login.login.model.impl.Usuario;
-import mdch.login.login.repository.UsuarioRepository;
-import mdch.login.login.service.UsuarioService;
+import org.mojodojocasahouse.extra.dto.UsuarioRegistroDto;
+import org.mojodojocasahouse.extra.dto.UsuarioRegistroResponseDto;
+import org.mojodojocasahouse.extra.model.impl.Usuario;
+import org.mojodojocasahouse.extra.repository.UsuarioRepository;
+import org.mojodojocasahouse.extra.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
