@@ -1,14 +1,15 @@
-package org.mojodojocasahouse.extra.model.impl;
+package org.mojodojocasahouse.extra.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.mojodojocasahouse.extra.model.UserEntity;
+import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
+import org.mojodojocasahouse.extra.exception.MismatchingPasswordsException;
 
 @Entity
-@Table(name = "USERS", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
+@Table(name = "USERS")
 @Getter
-public class ExtraUser implements UserEntity {
+public class ExtraUser {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,5 +40,15 @@ public class ExtraUser implements UserEntity {
         this.email = email;
         this.password = password;
     }
-    
+
+    public static ExtraUser from(UserRegistrationRequest userRegistrationDto)
+                                            throws MismatchingPasswordsException {
+        userRegistrationDto.validateMatchingPasswords();
+        return new ExtraUser(
+                userRegistrationDto.getFirstName(),
+                userRegistrationDto.getLastName(),
+                userRegistrationDto.getEmail(),
+                userRegistrationDto.getPassword()
+                );
+    }
 }

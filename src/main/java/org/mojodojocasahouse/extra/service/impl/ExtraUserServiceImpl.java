@@ -1,9 +1,10 @@
 package org.mojodojocasahouse.extra.service.impl;
 
-import jakarta.validation.ConstraintViolationException;
-import org.mojodojocasahouse.extra.dto.ExtraUserRegistrationDto;
-import org.mojodojocasahouse.extra.dto.ExtraUserRegistrationResponseDto;
-import org.mojodojocasahouse.extra.model.impl.ExtraUser;
+import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
+import org.mojodojocasahouse.extra.dto.UserRegistrationResponse;
+import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
+import org.mojodojocasahouse.extra.exception.MismatchingPasswordsException;
+import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.service.ExtraUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,11 +20,26 @@ public class ExtraUserServiceImpl implements ExtraUserService {
         this.userRepository = userRepository;
     }
 
-    public ExtraUserRegistrationResponseDto registrarUsuario(ExtraUserRegistrationDto userRegistrationDto)
-                                                            throws ConstraintViolationException {
-        ExtraUser usuario = new ExtraUser(userRegistrationDto.getFirstName(), userRegistrationDto.getLastName(), userRegistrationDto.getEmail(), userRegistrationDto.getPassword());
-        ExtraUser registeredUser = userRepository.save(usuario);
-        // Do something with registered user
-        return new ExtraUserRegistrationResponseDto("ExtraUser created successfully");
+    public UserRegistrationResponse registerUser(UserRegistrationRequest userRegistrationDto)
+        throws MismatchingPasswordsException, ExistingUserEmailException {
+
+        checkForExistingUserEmail(userRegistrationDto);
+
+        // create user entity from request data
+        ExtraUser newUser = ExtraUser.from(userRegistrationDto);
+
+        // Save new user
+        ExtraUser savedUser = userRepository.save(newUser);
+
+        return new UserRegistrationResponse("User created successfully");
     }
+
+    private void checkForExistingUserEmail(UserRegistrationRequest userRequest) throws ExistingUserEmailException{
+        userRepository
+                .findByEmail(userRequest.getEmail())
+                .ifPresent(
+                        s -> {throw new ExistingUserEmailException();}
+                );
+    }
+
 }

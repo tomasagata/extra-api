@@ -3,20 +3,20 @@ package org.mojodojocasahouse.extra.dto;
 import lombok.Data;
 
 @Data
-public class ExtraUserRegistrationResponseDto {
+public class UserRegistrationResponse {
     String message;
     String error;
     String reason;
 
-    public ExtraUserRegistrationResponseDto(String message){
+    public UserRegistrationResponse(String message){
         this.message = message;
     }
 
-    public ExtraUserRegistrationResponseDto(String error, String reason){
+    public UserRegistrationResponse(String error, String reason){
         this.error = error;
         this.reason = reason;
     }
 
-    public ExtraUserRegistrationResponseDto(){}
+    public UserRegistrationResponse(){}
 
 }
