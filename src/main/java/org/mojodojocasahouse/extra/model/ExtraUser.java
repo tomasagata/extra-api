@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
-import org.mojodojocasahouse.extra.exception.MismatchingPasswordsException;
 
 @Entity
 @Table(name = "USERS")
@@ -41,14 +40,12 @@ public class ExtraUser {
         this.password = password;
     }
 
-    public static ExtraUser from(UserRegistrationRequest userRegistrationDto)
-                                            throws MismatchingPasswordsException {
-        userRegistrationDto.validateMatchingPasswords();
+    public static ExtraUser from(UserRegistrationRequest userRegistrationDto, String encodedPassword){
         return new ExtraUser(
                 userRegistrationDto.getFirstName(),
                 userRegistrationDto.getLastName(),
                 userRegistrationDto.getEmail(),
-                userRegistrationDto.getPassword()
+                encodedPassword
                 );
     }
 }

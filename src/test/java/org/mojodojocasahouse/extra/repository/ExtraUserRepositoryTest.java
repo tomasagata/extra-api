@@ -36,7 +36,7 @@ class ExtraUserRepositoryTest {
     }
 
     @Test
-    void testSavingASuerWithANonUniqueEmailAddressThrowsDataIntegrityViolationException() {
+    void testSavingAUserWithANonUniqueEmailAddressThrowsDataIntegrityViolationException() {
         // Setup - data
         ExtraUser firstSavedUser = repo.save(
                 new ExtraUser(
@@ -56,7 +56,26 @@ class ExtraUserRepositoryTest {
 
         // execute and verify
         Assertions
-                .assertThatThrownBy(() -> {repo.save(userWithExistingEmail);})
+                .assertThatThrownBy(() -> repo.save(userWithExistingEmail))
                 .isInstanceOf(DataIntegrityViolationException.class);
+    }
+
+    @Test
+    void testFindingAUserByEmailAndPasswordIsSuccessfulWhenBothFieldsAreCorrect() {
+        // Setup - data
+        ExtraUser savedUser = repo.save(
+                new ExtraUser(
+                        "Some",
+                        "User",
+                        "mj@me.com",
+                        "a_password"
+                )
+        );
+
+
+        // execute and verify
+        Assertions.assertThat(repo.findOneByEmailAndPassword("mj@me.com", "another_Password")).isEmpty();
+        Assertions.assertThat(repo.findOneByEmailAndPassword("AnotherEmail@Me.com", "a_password")).isEmpty();
+        Assertions.assertThat(repo.findOneByEmailAndPassword("mj@me.com", "a_password")).isEqualTo(Optional.of(savedUser));
     }
 }

@@ -1,11 +1,13 @@
 package org.mojodojocasahouse.extra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.mojodojocasahouse.extra.dto.UserAuthenticationRequest;
+import org.mojodojocasahouse.extra.dto.UserAuthenticationResponse;
 import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
 import org.mojodojocasahouse.extra.dto.UserRegistrationResponse;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
-import org.mojodojocasahouse.extra.exception.MismatchingPasswordsException;
-import org.mojodojocasahouse.extra.exception.handler.UserRegistrationExceptionHandler;
+import org.mojodojocasahouse.extra.exception.InvalidCredentialsException;
+import org.mojodojocasahouse.extra.exception.handler.UserAuthenticationExceptionHandler;
 import org.mojodojocasahouse.extra.exception.handler.helper.ApiError;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mojodojocasahouse.extra.service.impl.ExtraUserServiceImpl;
+import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,17 +31,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 @ExtendWith(MockitoExtension.class)
-class UserRegistrationControllerTest {
+class AuthenticationControllerTest {
 
     private MockMvc mvc;
 
     private JacksonTester<ApiError> jsonApiError;
 
+    private JacksonTester<UserAuthenticationResponse> jsonAuthResponse;
+
+    private JacksonTester<UserRegistrationResponse> jsonRegistrationResponse;
+
     @Mock
-    public ExtraUserServiceImpl service;
+    public AuthenticationService service;
 
     @InjectMocks
-    public UserRegistrationController controller;
+    public AuthenticationController controller;
 
     public static String asJsonString(final Object obj) {
         try {
@@ -55,7 +61,7 @@ class UserRegistrationControllerTest {
 
         mvc = MockMvcBuilders
                 .standaloneSetup(controller)
-                .setControllerAdvice(new UserRegistrationExceptionHandler())
+                .setControllerAdvice(new UserAuthenticationExceptionHandler())
                 .build();
     }
 
@@ -81,7 +87,7 @@ class UserRegistrationControllerTest {
 
         // verify
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-        Assertions.assertThat(response.getContentAsString()).isEqualTo(asJsonString(registrationResponse));
+        Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonRegistrationResponse.write(registrationResponse).getJson());
     }
 
     @Test
@@ -412,17 +418,113 @@ class UserRegistrationControllerTest {
         ApiError apiError = new ApiError(
                 HttpStatus.BAD_REQUEST,
                 "Data validation error",
-                "passwordRepeat: Passwords must match"
+                "userRegistrationRequest: Passwords must match"
         );
-
-        // Setup - expectations
-        given(service.registerUser(any(UserRegistrationRequest.class))).willThrow(MismatchingPasswordsException.class);
 
         // exercise
         MockHttpServletResponse response = postUserRegistrationRequestToController(userRegistrationRequest);
 
         // verify
         assertThatResponseReturnsError(response, apiError);
+    }
+
+    @Test
+    public void testAuthenticatingAsARegisteredUserReturnsASuccessfulResponse() throws Exception {
+        // Setup - data
+        UserAuthenticationRequest request = new UserAuthenticationRequest(
+                "mj@me.com",
+                "SomePassword1!"
+        );
+        UserAuthenticationResponse expectedResponse = new UserAuthenticationResponse(
+                "Login Success",
+                true
+        );
+
+        // Setup - expectations
+        given(service.authenticateUser(request)).willReturn(expectedResponse);
+
+        // exercise
+        MockHttpServletResponse response = postUserAuthenticationRequestToController(request);
+
+        // Verify
+        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonAuthResponse.write(expectedResponse).getJson());
+    }
+
+    @Test
+    public void testAuthenticatingAsAnUnregisteredUserReturnsUnauthorizedResponse() throws Exception {
+        // Setup - data
+        UserAuthenticationRequest request = new UserAuthenticationRequest(
+                "mj@me.com",
+                "SomePassword1!"
+        );
+        ApiError expectedError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                "User Authentication Error",
+                "Invalid Authentication Credentials"
+        );
+
+        // Setup - expectations
+        given(service.authenticateUser(request)).willThrow(new InvalidCredentialsException());
+
+        // exercise
+        MockHttpServletResponse response = postUserAuthenticationRequestToController(request);
+
+        // Verify
+        assertThatResponseReturnsError(response, expectedError);
+    }
+
+    @Test
+    public void testPostingAMalformedRequestToAuthenticationEndpointThrowsError() throws Exception {
+        // Setup - data
+        String malformedRequest = "{exampleMalformedRequest";
+        ApiError expectedError = new ApiError(
+                HttpStatus.BAD_REQUEST,
+                "Failed to read request",
+                "Malformed Request"
+        );
+
+        // exercise
+        MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
+                        post("/login")
+                        .content(malformedRequest)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andReturn().getResponse();
+
+        // Verify
+        assertThatResponseReturnsError(response, expectedError);
+    }
+
+    @Test
+    public void testPostingAMalformedRequestToRegistrationEndpointThrowsError() throws Exception {
+        // Setup - data
+        String malformedRequest = "{exampleMalformedRequest";
+        ApiError expectedError = new ApiError(
+                HttpStatus.BAD_REQUEST,
+                "Failed to read request",
+                "Malformed Request"
+        );
+
+        // exercise
+        MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
+                        post("/register")
+                        .content(malformedRequest)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andReturn().getResponse();
+
+        // Verify
+        assertThatResponseReturnsError(response, expectedError);
+    }
+
+    private MockHttpServletResponse postUserAuthenticationRequestToController(UserAuthenticationRequest userAuthenticationRequest) throws Exception {
+        return mvc.perform(MockMvcRequestBuilders.
+                        post("/login")
+                        .content(asJsonString(userAuthenticationRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andReturn().getResponse();
     }
 
     private MockHttpServletResponse postUserRegistrationRequestToController(UserRegistrationRequest userRegistrationRequest) throws Exception {

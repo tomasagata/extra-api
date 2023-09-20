@@ -4,11 +4,12 @@ import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
-import org.mojodojocasahouse.extra.exception.MismatchingPasswordsException;
+import org.mojodojocasahouse.extra.validation.constraint.FieldsValueMatch;
 
 @Data
 @Getter
 @Setter
+@FieldsValueMatch(field = "password", fieldMatch = "passwordRepeat", message = "Passwords must match")
 public class UserRegistrationRequest {
 
     @NotNull(message = "First name is mandatory")
@@ -41,12 +42,5 @@ public class UserRegistrationRequest {
     }
 
     public UserRegistrationRequest(){}
-
-    public void validateMatchingPasswords() throws MismatchingPasswordsException{
-        if(this.password.equals(this.passwordRepeat)){
-            return;
-        }
-        throw new MismatchingPasswordsException();
-    }
 
 }
