@@ -1,5 +1,7 @@
 package org.mojodojocasahouse.extra.service;
 
+import jakarta.servlet.http.Cookie;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.mojodojocasahouse.extra.dto.UserAuthenticationRequest;
 import org.mojodojocasahouse.extra.dto.UserAuthenticationResponse;
 import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
@@ -7,6 +9,7 @@ import org.mojodojocasahouse.extra.dto.UserRegistrationResponse;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidCredentialsException;
 import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.model.SessionToken;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -14,9 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mojodojocasahouse.extra.repository.SessionTokenRepository;
+import org.springframework.data.util.Pair;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -28,7 +34,7 @@ public class AuthenticationServiceTest {
     private ExtraUserRepository repo;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private SessionTokenRepository tokenRepository;
 
     @InjectMocks
     private AuthenticationService serv;
@@ -55,7 +61,6 @@ public class AuthenticationServiceTest {
 
         // Setup – expectations
         given(repo.save(any(ExtraUser.class))).willReturn(mj);
-        given(passwordEncoder.encode(any(String.class))).willReturn(mj.getPassword());
 
         // exercise
         UserRegistrationResponse response = serv.registerUser(mjDto);
@@ -79,7 +84,7 @@ public class AuthenticationServiceTest {
                 "Some",
                 "User",
                 "mj@me.com",
-                "a_password"
+                "a_hashed_password"
         );
 
         // Setup - expectations
@@ -103,19 +108,30 @@ public class AuthenticationServiceTest {
                 "Some",
                 "User",
                 "mj@me.com",
-                "a_hashed_password"
+                DigestUtils.sha256Hex(request.getPassword())
         );
-        UserAuthenticationResponse expectedResponse = new UserAuthenticationResponse("Login Success", true);
+        SessionToken token = new SessionToken(
+                UUID.fromString("123e4567-e89b-12d3-a456-426655440000"),
+                existingUser
+        );
+        UserAuthenticationResponse expectedResponse = new UserAuthenticationResponse(
+                "Login Success"
+        );
+        Cookie expectedCookie = new Cookie(
+                "JSESSIONID",
+                "123e4567-e89b-12d3-a456-426655440000"
+        );
+        Pair<UserAuthenticationResponse, Cookie> expectedResponseCookiePair = Pair.of(expectedResponse, expectedCookie);
 
         // Setup - expectations
         given(repo.findOneByEmailAndPassword(any(String.class), any(String.class))).willReturn(Optional.of(existingUser));
-        given(passwordEncoder.encode(any(String.class))).willReturn("a_hashed_password");
+        given(tokenRepository.save(any(SessionToken.class))).willReturn(token);
 
         // exercise
-        UserAuthenticationResponse response = serv.authenticateUser(request);
+        Pair<UserAuthenticationResponse, Cookie> actualResponseCookiePair = serv.authenticateUser(request);
 
         // verify
-        Assertions.assertThat(response).isEqualTo(expectedResponse);
+        Assertions.assertThat(actualResponseCookiePair).isEqualTo(expectedResponseCookiePair);
     }
 
     @Test
@@ -128,7 +144,6 @@ public class AuthenticationServiceTest {
 
         // Setup - expectations
         given(repo.findOneByEmailAndPassword(any(String.class), any(String.class))).willReturn(Optional.empty());
-        given(passwordEncoder.encode(any(String.class))).willReturn("a_hashed_password");
 
         // exercise and verify
         Assertions

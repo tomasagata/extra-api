@@ -4,6 +4,8 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.UUID;
+
 @Data
 @Getter
 @Setter
@@ -11,10 +13,9 @@ public class UserAuthenticationResponse {
 
     String message;
 
-    Boolean status;
+    UUID session;
 
-    public UserAuthenticationResponse(String message, Boolean status) {
+    public UserAuthenticationResponse(String message) {
         this.message = message;
-        this.status = status;
     }
 }

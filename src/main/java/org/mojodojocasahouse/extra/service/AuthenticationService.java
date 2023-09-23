@@ -1,26 +1,33 @@
 package org.mojodojocasahouse.extra.service;
 
+import jakarta.servlet.http.Cookie;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.mojodojocasahouse.extra.dto.UserAuthenticationRequest;
 import org.mojodojocasahouse.extra.dto.UserAuthenticationResponse;
 import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
 import org.mojodojocasahouse.extra.dto.UserRegistrationResponse;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidCredentialsException;
+import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
 import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.model.SessionToken;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.mojodojocasahouse.extra.repository.SessionTokenRepository;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 @Service
 public class AuthenticationService {
 
     private final ExtraUserRepository userRepository;
 
-    private final PasswordEncoder passwordEncoder;
+    private final SessionTokenRepository sessionRepository;
 
-    public AuthenticationService(ExtraUserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthenticationService(ExtraUserRepository userRepository, SessionTokenRepository sessionRepository) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
+        this.sessionRepository = sessionRepository;
     }
 
     public UserRegistrationResponse registerUser(UserRegistrationRequest userRegistrationRequest)
@@ -30,7 +37,7 @@ public class AuthenticationService {
         validateEmailUniqueness(userRegistrationRequest);
 
         // Create encoded password
-        String encodedPassword = passwordEncoder.encode(userRegistrationRequest.getPassword());
+        String encodedPassword = DigestUtils.sha256Hex(userRegistrationRequest.getPassword());
 
         // create user entity from request data
         ExtraUser newUser = ExtraUser.from(userRegistrationRequest, encodedPassword);
@@ -42,11 +49,11 @@ public class AuthenticationService {
     }
 
 
-    public UserAuthenticationResponse authenticateUser(UserAuthenticationRequest userAuthenticationRequest)
+    public Pair<UserAuthenticationResponse, Cookie> authenticateUser(UserAuthenticationRequest userAuthenticationRequest)
             throws InvalidCredentialsException{
 
         // Encode receiving password
-        String encodedPassword = passwordEncoder.encode(userAuthenticationRequest.getPassword());
+        String encodedPassword = DigestUtils.sha256Hex(userAuthenticationRequest.getPassword());
 
         // Get user from database with credentials or else throw InvalidCredentialsException
         ExtraUser existingUser = userRepository
@@ -55,9 +62,30 @@ public class AuthenticationService {
                         encodedPassword
                 ).orElseThrow(InvalidCredentialsException::new);
 
+        Cookie cookie = createNewSession(existingUser);
+
         // Return successful response if user found
-        return new UserAuthenticationResponse("Login Success", true);
+        return Pair.of(
+                new UserAuthenticationResponse("Login Success"),
+                cookie
+        );
     }
+
+    public Cookie createNewSession(ExtraUser linkedUser){
+        UUID sessionId = sessionRepository.save(
+                new SessionToken(linkedUser)
+        ).getId();
+
+        return new Cookie("JSESSIONID", sessionId.toString());
+    }
+
+    public void validateAuthentication(UUID sessionId) throws InvalidSessionTokenException {
+        SessionToken token = sessionRepository.findById(sessionId).orElseThrow(InvalidSessionTokenException::new);
+        token.validate();
+    }
+
+//    public void validateAuthorization(UUID sessionId) throws AccessForbiddenException {
+//    }
 
     private void validateEmailUniqueness(UserRegistrationRequest userRequest) throws ExistingUserEmailException{
         userRepository

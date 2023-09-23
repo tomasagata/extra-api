@@ -19,7 +19,7 @@ public class UserAuthenticationRequest {
     private String email;
 
     @NotNull(message = "Password is mandatory")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?]+$", message = "Password can only contain letters, numbers or the following: @$!%*#?")
+    @Pattern(regexp = "^([A-Za-z]|\\d|[@$!%*#?&])+$", message = "Password can only contain letters, numbers or the following: @$!%*#?")
     private String password;
 
     public UserAuthenticationRequest() {

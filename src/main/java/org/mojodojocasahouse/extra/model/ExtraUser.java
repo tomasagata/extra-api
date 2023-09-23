@@ -15,19 +15,19 @@ public class ExtraUser {
     private Long id;
 
     @Setter
-    @Column(name = "FIRST_NAME")
+    @Column(name = "FIRST_NAME", nullable = false)
     private String firstName;
 
     @Setter
-    @Column(name = "LAST_NAME")
+    @Column(name = "LAST_NAME", nullable = false)
     private String lastName;
 
     @Setter
-    @Column(name = "EMAIL", unique = true)
+    @Column(name = "EMAIL", nullable = false, unique = true)
     private String email;
 
     @Setter
-    @Column(name = "PASSWORD")
+    @Column(name = "PASSWORD", nullable = false)
     private String password;
 
 

@@ -1,12 +1,14 @@
 package org.mojodojocasahouse.extra.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import org.mojodojocasahouse.extra.dto.UserAuthenticationRequest;
 import org.mojodojocasahouse.extra.dto.UserAuthenticationResponse;
 import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
 import org.mojodojocasahouse.extra.dto.UserRegistrationResponse;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidCredentialsException;
+import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
 import org.mojodojocasahouse.extra.exception.handler.UserAuthenticationExceptionHandler;
 import org.mojodojocasahouse.extra.exception.handler.helper.ApiError;
 import org.assertj.core.api.Assertions;
@@ -18,6 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -26,9 +29,11 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
 class AuthenticationControllerTest {
@@ -436,12 +441,15 @@ class AuthenticationControllerTest {
                 "SomePassword1!"
         );
         UserAuthenticationResponse expectedResponse = new UserAuthenticationResponse(
-                "Login Success",
-                true
+                "Login Success"
+        );
+        Cookie expectedCookie = new Cookie(
+                "JSESSIONID",
+                "123e4567-e89b-12d3-a456-426655440000"
         );
 
         // Setup - expectations
-        given(service.authenticateUser(request)).willReturn(expectedResponse);
+        given(service.authenticateUser(request)).willReturn(Pair.of(expectedResponse, expectedCookie));
 
         // exercise
         MockHttpServletResponse response = postUserAuthenticationRequestToController(request);
@@ -516,6 +524,72 @@ class AuthenticationControllerTest {
 
         // Verify
         assertThatResponseReturnsError(response, expectedError);
+    }
+
+    @Test
+    public void testAccessingProtectedResourceWithNoCookieThrowsError() throws Exception {
+        // Setup - data
+        ApiError expectedError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                "Authorization Error",
+                "Required cookie 'JSESSIONID' for method parameter type UUID is not present"
+        );
+
+        // exercise
+        MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
+                        get("/protected")
+                        .accept(MediaType.ALL))
+                .andReturn().getResponse();
+
+        // Verify
+        assertThatResponseReturnsError(response, expectedError);
+    }
+
+    @Test
+    public void testAccessingProtectedResourceWithInvalidCredentialsThrowsError() throws Exception {
+        // Setup - data
+        Cookie sessionCookie = new Cookie(
+                "JSESSIONID",
+                "123e4567-e89b-12d3-a456-426655440000"
+        );
+        ApiError expectedError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                "User Authentication Error",
+                "Session is invalid or expired"
+        );
+
+        // Setup - expectations
+        doThrow(new InvalidSessionTokenException()).when(service).validateAuthentication(any());
+
+        // exercise
+        MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
+                        get("/protected")
+                        .cookie(sessionCookie)
+                        .accept(MediaType.ALL))
+                .andReturn().getResponse();
+
+        // Verify
+        assertThatResponseReturnsError(response, expectedError);
+    }
+
+
+    @Test
+    public void testAccessingProtectedResourceWithValidCredentialsIsSuccessful() throws Exception {
+        // Setup - data
+        Cookie sessionCookie = new Cookie(
+                "JSESSIONID",
+                "123e4567-e89b-12d3-a456-426655440000"
+        );
+
+        // exercise
+        MockHttpServletResponse response = mvc.perform(MockMvcRequestBuilders.
+                        get("/protected")
+                        .cookie(sessionCookie)
+                        .accept(MediaType.ALL))
+                .andReturn().getResponse();
+
+        // Verify
+        Assertions.assertThat(response.getContentAsString()).isEqualTo("Authenticated and authorized!");
     }
 
     private MockHttpServletResponse postUserAuthenticationRequestToController(UserAuthenticationRequest userAuthenticationRequest) throws Exception {
