@@ -2,10 +2,7 @@ package org.mojodojocasahouse.extra.service;
 
 import jakarta.servlet.http.Cookie;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.mojodojocasahouse.extra.dto.UserAuthenticationRequest;
-import org.mojodojocasahouse.extra.dto.UserAuthenticationResponse;
-import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
-import org.mojodojocasahouse.extra.dto.UserRegistrationResponse;
+import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidCredentialsException;
 import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
@@ -16,6 +13,7 @@ import org.mojodojocasahouse.extra.repository.SessionTokenRepository;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,7 +28,7 @@ public class AuthenticationService {
         this.sessionRepository = sessionRepository;
     }
 
-    public UserRegistrationResponse registerUser(UserRegistrationRequest userRegistrationRequest)
+    public ApiResponse registerUser(UserRegistrationRequest userRegistrationRequest)
         throws ExistingUserEmailException {
 
         // validate email
@@ -45,11 +43,11 @@ public class AuthenticationService {
         // Save new user
         ExtraUser savedUser = userRepository.save(newUser);
 
-        return new UserRegistrationResponse("User created successfully");
+        return new ApiResponse("User created successfully");
     }
 
 
-    public Pair<UserAuthenticationResponse, Cookie> authenticateUser(UserAuthenticationRequest userAuthenticationRequest)
+    public Pair<ApiResponse, Cookie> authenticateUser(UserAuthenticationRequest userAuthenticationRequest)
             throws InvalidCredentialsException{
 
         // Encode receiving password
@@ -66,7 +64,7 @@ public class AuthenticationService {
 
         // Return successful response if user found
         return Pair.of(
-                new UserAuthenticationResponse("Login Success"),
+                new ApiResponse("Login Success"),
                 cookie
         );
     }
@@ -84,8 +82,6 @@ public class AuthenticationService {
         token.validate();
     }
 
-//    public void validateAuthorization(UUID sessionId) throws AccessForbiddenException {
-//    }
 
     private void validateEmailUniqueness(UserRegistrationRequest userRequest) throws ExistingUserEmailException{
         userRepository
@@ -93,6 +89,12 @@ public class AuthenticationService {
                 .ifPresent(
                         s -> {throw new ExistingUserEmailException();}
                 );
+    }
+
+    public ExtraUser getUserBySessionToken(UUID cookie) throws InvalidSessionTokenException{
+        Optional<SessionToken> sessionToken = sessionRepository.findById(cookie);
+        sessionToken.orElseThrow(InvalidSessionTokenException::new);
+        return sessionToken.get().getLinkedUser();
     }
 
 

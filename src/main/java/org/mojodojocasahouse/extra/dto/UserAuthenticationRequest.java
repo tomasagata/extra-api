@@ -9,8 +9,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Data
-@Getter
-@Setter
 public class UserAuthenticationRequest {
 
     @NotBlank(message = "Email must not be left blank")
@@ -22,10 +20,11 @@ public class UserAuthenticationRequest {
     @Pattern(regexp = "^([A-Za-z]|\\d|[@$!%*#?&])+$", message = "Password can only contain letters, numbers or the following: @$!%*#?")
     private String password;
 
-    public UserAuthenticationRequest() {
-    }
     public UserAuthenticationRequest(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    public UserAuthenticationRequest() {
     }
 }

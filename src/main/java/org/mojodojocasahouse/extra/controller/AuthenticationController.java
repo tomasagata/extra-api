@@ -3,17 +3,13 @@ package org.mojodojocasahouse.extra.controller;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.mojodojocasahouse.extra.dto.UserAuthenticationRequest;
-import org.mojodojocasahouse.extra.dto.UserAuthenticationResponse;
-import org.mojodojocasahouse.extra.dto.UserRegistrationResponse;
+import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
 
 import java.util.UUID;
 
@@ -29,10 +25,10 @@ public class AuthenticationController {
 
 
     @PostMapping(value = "/register", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<UserRegistrationResponse> registerUserAccount(
+    public ResponseEntity<ApiResponse> registerUserAccount(
             @Valid @RequestBody UserRegistrationRequest userRegistrationRequest)
     {
-            UserRegistrationResponse response = userService.registerUser(userRegistrationRequest);
+            ApiResponse response = userService.registerUser(userRegistrationRequest);
             return new ResponseEntity<>(
                     response,
                     HttpStatus.CREATED
@@ -40,12 +36,12 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/login", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<UserAuthenticationResponse> loginEmployee(
+    public ResponseEntity<ApiResponse> loginUser(
             @Valid @RequestBody UserAuthenticationRequest userAuthenticationRequest,
             HttpServletResponse servletResponse)
     {
         // Authenticate new user
-        Pair<UserAuthenticationResponse, Cookie> responseCookiePair = userService.authenticateUser(userAuthenticationRequest);
+        Pair<ApiResponse, Cookie> responseCookiePair = userService.authenticateUser(userAuthenticationRequest);
 
         // Add new JSESSIONID cookie to prevent session-fixation
         servletResponse.addCookie(
@@ -60,12 +56,11 @@ public class AuthenticationController {
     }
 
     @GetMapping(path = "/protected", produces = "application/json")
-    public ResponseEntity<Object> protectedResource(@CookieValue("JSESSIONID") UUID cookie)
+    public ResponseEntity<ApiResponse> protectedResource(@CookieValue("JSESSIONID") UUID cookie)
     {
         userService.validateAuthentication(cookie);
-//        userService.validateAuthorization(cookie);
         return new ResponseEntity<>(
-                "Authenticated and authorized!",
+                new ApiResponse("Authenticated and authorized!"),
                 HttpStatus.OK
         );
     }

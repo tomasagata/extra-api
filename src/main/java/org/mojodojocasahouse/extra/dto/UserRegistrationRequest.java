@@ -7,8 +7,6 @@ import lombok.Setter;
 import org.mojodojocasahouse.extra.validation.constraint.FieldsValueMatch;
 
 @Data
-@Getter
-@Setter
 @FieldsValueMatch(field = "password", fieldMatch = "passwordRepeat", message = "Passwords must match")
 public class UserRegistrationRequest {
 

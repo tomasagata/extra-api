@@ -3,7 +3,13 @@ package org.mojodojocasahouse.extra.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Set;
+
 import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "USERS")
@@ -29,7 +35,6 @@ public class ExtraUser {
     @Setter
     @Column(name = "PASSWORD", nullable = false)
     private String password;
-
 
     public ExtraUser() {}
 

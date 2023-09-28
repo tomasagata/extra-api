@@ -1,10 +1,9 @@
 package org.mojodojocasahouse.extra.exception.handler;
 
-import org.mojodojocasahouse.extra.exception.AccessForbiddenException;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidCredentialsException;
 import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
-import org.mojodojocasahouse.extra.exception.handler.helper.ApiError;
+import org.mojodojocasahouse.extra.dto.ApiError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -71,16 +70,6 @@ public class UserAuthenticationExceptionHandler extends ResponseEntityExceptionH
         ApiError apiError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
                 "User Authentication Error",
-                ex.getMessage()
-        );
-        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
-    }
-
-    @ExceptionHandler(AccessForbiddenException.class)
-    protected ResponseEntity<Object> handleAccessForbidden(AccessForbiddenException ex, WebRequest request){
-        ApiError apiError = new ApiError(
-                HttpStatus.FORBIDDEN,
-                "Access Control Error",
                 ex.getMessage()
         );
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);

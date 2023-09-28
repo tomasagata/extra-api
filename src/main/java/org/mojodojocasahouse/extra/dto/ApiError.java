@@ -1,12 +1,12 @@
-package org.mojodojocasahouse.extra.exception.handler.helper;
+package org.mojodojocasahouse.extra.dto;
 
-import lombok.Getter;
+import lombok.Data;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
 import java.util.List;
 
-@Getter
+@Data
 public class ApiError {
 
     private HttpStatus status;
@@ -14,14 +14,12 @@ public class ApiError {
     private List<String> errors;
 
     public ApiError(HttpStatus status, String message, List<String> errors) {
-        super();
         this.status = status;
         this.message = message;
         this.errors = errors;
     }
 
     public ApiError(HttpStatus status, String message, String error) {
-        super();
         this.status = status;
         this.message = message;
         this.errors = Arrays.asList(error);
