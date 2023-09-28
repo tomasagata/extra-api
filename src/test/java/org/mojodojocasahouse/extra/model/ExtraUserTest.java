@@ -1,6 +1,5 @@
 package org.mojodojocasahouse.extra.model;
 
-import org.mojodojocasahouse.extra.model.impl.ExtraUser;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
