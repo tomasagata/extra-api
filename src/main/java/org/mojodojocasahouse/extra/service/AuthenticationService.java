@@ -1,6 +1,8 @@
 package org.mojodojocasahouse.extra.service;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.validation.Valid;
+
 import org.apache.commons.codec.digest.DigestUtils;
 import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
@@ -95,6 +97,18 @@ public class AuthenticationService {
         Optional<SessionToken> sessionToken = sessionRepository.findById(cookie);
         sessionToken.orElseThrow(InvalidSessionTokenException::new);
         return sessionToken.get().getLinkedUser();
+    }
+
+    public ApiResponse changePassword(ExtraUser user, @Valid UserChangePasswordRequest userChangePasswordRequest) {
+        //function that , given the correct old password, sets a new one for the given user
+        //if the old password is incorrect, it returns an error
+        String newPassword = DigestUtils.sha256Hex(userChangePasswordRequest.getNewPassword());
+        String encodedPassword = DigestUtils.sha256Hex(userChangePasswordRequest.getLastPassword());
+        ExtraUser changingUser = userRepository.findOneByEmailAndPassword(user.getEmail(),encodedPassword).orElseThrow(InvalidCredentialsException::new);
+        changingUser.setPassword(newPassword);
+        userRepository.save(changingUser);
+        return new ApiResponse("Password changed successfully");
+        
     }
 
 
