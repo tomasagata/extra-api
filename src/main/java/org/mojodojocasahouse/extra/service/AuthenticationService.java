@@ -103,7 +103,7 @@ public class AuthenticationService {
         //function that , given the correct old password, sets a new one for the given user
         //if the old password is incorrect, it returns an error
         String newPassword = DigestUtils.sha256Hex(userChangePasswordRequest.getNewPassword());
-        String encodedPassword = DigestUtils.sha256Hex(userChangePasswordRequest.getLastPassword());
+        String encodedPassword = DigestUtils.sha256Hex(userChangePasswordRequest.getCurrentPassword());
         ExtraUser changingUser = userRepository.findOneByEmailAndPassword(user.getEmail(),encodedPassword).orElseThrow(InvalidCredentialsException::new);
         changingUser.setPassword(newPassword);
         userRepository.save(changingUser);
