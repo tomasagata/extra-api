@@ -28,7 +28,6 @@ public class UserRegistrationRequest {
     private String password;
 
     @NotNull(message = "Repeating password is mandatory")
-    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?]{8,}$", message = "Password must contain eight characters, one letter, one number and one of the following: @$!%*#?")
     private String passwordRepeat;
 
     public UserRegistrationRequest(String firstName, String lastName, String email, String password, String passwordRepeat) {
