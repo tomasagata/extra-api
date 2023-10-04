@@ -36,12 +36,13 @@ public class ExtraExpense{
 
     public ExtraExpense(){}
 
-    public ExtraExpense(ExtraUser user, String concept, BigDecimal amount, Date date, String category){
+    public ExtraExpense(ExtraUser user, String concept, BigDecimal amount, Date date, String category, Integer iconId){
         this.userId = user;
         this.concept = concept;
         this.amount = amount;
         this.date = date;
         this.category = category;
+        this.iconId = iconId;
     }
 
     public static ExtraExpense from(ExpenseAddingRequest expenseAddingRequest, ExtraUser user) {
@@ -50,8 +51,8 @@ public class ExtraExpense{
                 expenseAddingRequest.getConcept(),
                 expenseAddingRequest.getAmount(),
                 expenseAddingRequest.getDate(),
-                expenseAddingRequest.getCategory()
-        );
+                expenseAddingRequest.getCategory(),
+                expenseAddingRequest.getIconId()
     }
 
 }
