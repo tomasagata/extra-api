@@ -76,10 +76,10 @@ public class ExpensesControllerListingTest {
                 "Somepassword"
         );
         List<ExtraExpense> expectedExpensesList = List.of(
-                new ExtraExpense(linkedUser, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"))
+                new ExtraExpense(linkedUser, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), "Test")
         );
         List<ExpenseDTO> expectedResponse = List.of(
-                new ExpenseDTO(null, null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"))
+                new ExpenseDTO(null, null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), "Test")
         );
 
         // Setup - Expectations

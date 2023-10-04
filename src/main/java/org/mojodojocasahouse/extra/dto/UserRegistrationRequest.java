@@ -2,8 +2,7 @@ package org.mojodojocasahouse.extra.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
+
 import org.mojodojocasahouse.extra.validation.constraint.FieldsValueMatch;
 
 @Data

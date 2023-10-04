@@ -2,8 +2,6 @@ package org.mojodojocasahouse.extra.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -20,14 +18,22 @@ public class ExpenseAddingRequest {
     private BigDecimal amount;
 
     private Date date;
+
+    @NotNull(message = "Category is mandatory")
+    @Size(max = 50, message = "Category cannot exceed 50 characters")
+    @Pattern(regexp = "^[A-Za-z\\d\\s]+$", message = "Category must only contain letters or numbers")
+    private String category;
     
-    public ExpenseAddingRequest(String concept, BigDecimal amount, Date date) {
+    public ExpenseAddingRequest(String concept, BigDecimal amount, Date date ,String category) {
         this.concept = concept;
         this.amount = amount;
         this.date = date;
+        this.category = category;
     }
     
     public ExpenseAddingRequest() {
     }
+
+
 
 }

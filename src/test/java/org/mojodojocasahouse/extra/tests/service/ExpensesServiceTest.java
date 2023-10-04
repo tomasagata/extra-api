@@ -40,8 +40,8 @@ public class ExpensesServiceTest {
                 "Somepassword1!"
         );
         List<ExtraExpense> expectedExpenses = List.of(
-                new ExtraExpense(user, "A Concept", new BigDecimal("10.10"), Date.valueOf("2023-09-12")),
-                new ExtraExpense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"))
+                new ExtraExpense(user, "A Concept", new BigDecimal("10.10"), Date.valueOf("2023-09-12"), "test"),
+                new ExtraExpense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test")
         );
 
         // Setup - expectations
@@ -80,7 +80,8 @@ public class ExpensesServiceTest {
         ExpenseAddingRequest request = new ExpenseAddingRequest(
                 "A Concept",
                 new BigDecimal("10.12"),
-                Date.valueOf("2023-09-19")
+                Date.valueOf("2023-09-19"),
+                "test"
         );
         ExtraUser user = new ExtraUser(
                 "Michael",

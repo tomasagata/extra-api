@@ -6,7 +6,6 @@ import jakarta.validation.Valid;
 import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +18,6 @@ public class AuthenticationController {
 
     private final AuthenticationService userService;
 
-    @Autowired
     public AuthenticationController(AuthenticationService userService) {
         this.userService = userService;
     }

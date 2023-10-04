@@ -21,7 +21,8 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test"
         );
 
         Assertions.assertThat(unmanagedExpense.getId()).isNull();
@@ -39,7 +40,8 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test"
         );
 
         Assertions.assertThat(unmanagedExpense.getUserId()).isEqualTo(unmanagedUser);
@@ -56,7 +58,8 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test"
         );
 
         Assertions.assertThat(unmanagedExpense.getConcept()).isEqualTo("Madrid trip");
@@ -73,7 +76,8 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test"
         );
 
         Assertions.assertThat(unmanagedExpense.getAmount()).isEqualTo(new BigDecimal(100));
@@ -90,7 +94,8 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test"
         );
 
         Assertions.assertThat(unmanagedExpense.getDate()).isEqualTo(Date.valueOf("2018-12-9"));

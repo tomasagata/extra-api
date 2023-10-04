@@ -37,7 +37,8 @@ class ExtraExpenseRepositoryTest {
                     user,
                     "concept",
                     new BigDecimal(100),
-                    Date.valueOf("2018-12-9")
+                    Date.valueOf("2018-12-9"),
+                    "test"
                 )
         );
 
