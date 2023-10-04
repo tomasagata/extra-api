@@ -1,10 +1,12 @@
-package org.mojodojocasahouse.extra.model;
+package org.mojodojocasahouse.extra.tests.model;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mojodojocasahouse.extra.model.ExtraExpense;
+import org.mojodojocasahouse.extra.model.ExtraUser;
 
 public class ExtraExpenseTest {
     @Test

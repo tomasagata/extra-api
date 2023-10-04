@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.controller;
+package org.mojodojocasahouse.extra.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mojodojocasahouse.extra.controller.ExpensesController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
@@ -110,7 +111,7 @@ public class ExpensesControllerAddingTest {
         );
         ApiError expectedError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "User Authentication Error",
+                "Authentication Error",
                 "Session is invalid or expired"
         );
 
@@ -135,7 +136,7 @@ public class ExpensesControllerAddingTest {
         );
         ApiError expectedError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "Authorization Error",
+                "Authentication Error",
                 "Required cookie 'JSESSIONID' for method parameter type UUID is not present"
         );
 

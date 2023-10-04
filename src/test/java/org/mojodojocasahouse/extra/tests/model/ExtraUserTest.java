@@ -1,7 +1,8 @@
-package org.mojodojocasahouse.extra.model;
+package org.mojodojocasahouse.extra.tests.model;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mojodojocasahouse.extra.model.ExtraUser;
 
 
 class ExtraUserTest {

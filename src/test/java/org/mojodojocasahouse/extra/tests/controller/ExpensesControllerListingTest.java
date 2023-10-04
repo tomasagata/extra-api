@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.controller;
+package org.mojodojocasahouse.extra.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -9,9 +9,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mojodojocasahouse.extra.controller.ExpensesController;
 import org.mojodojocasahouse.extra.dto.ApiError;
-import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
 import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
 import org.mojodojocasahouse.extra.exception.handler.UserAuthenticationExceptionHandler;
@@ -105,7 +104,7 @@ public class ExpensesControllerListingTest {
         );
         ApiError expectedError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "User Authentication Error",
+                "Authentication Error",
                 "Session is invalid or expired"
         );
 
@@ -125,7 +124,7 @@ public class ExpensesControllerListingTest {
         // Setup - data
         ApiError expectedError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "Authorization Error",
+                "Authentication Error",
                 "Required cookie 'JSESSIONID' for method parameter type UUID is not present"
         );
 
@@ -158,13 +157,5 @@ public class ExpensesControllerListingTest {
         Assertions.assertThat(actualApiError.getMessage()).isEqualTo(expectedApiError.getMessage());
         Assertions.assertThat(actualApiError.getStatus()).isEqualTo(expectedApiError.getStatus());
         Assertions.assertThat(actualApiError.getErrors().toArray()).containsExactlyInAnyOrder(expectedApiError.getErrors().toArray());
-    }
-
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

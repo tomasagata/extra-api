@@ -8,6 +8,7 @@ import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidCredentialsException;
 import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
+import org.mojodojocasahouse.extra.exception.SessionAlreadyRevokedException;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.model.SessionToken;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
@@ -43,7 +44,7 @@ public class AuthenticationService {
         ExtraUser newUser = ExtraUser.from(userRegistrationRequest, encodedPassword);
 
         // Save new user
-        ExtraUser savedUser = userRepository.save(newUser);
+        userRepository.save(newUser);
 
         return new ApiResponse("User created successfully");
     }
@@ -76,7 +77,15 @@ public class AuthenticationService {
                 new SessionToken(linkedUser)
         ).getId();
 
-        return new Cookie("JSESSIONID", sessionId.toString());
+        Cookie sessionCookie =  new Cookie("JSESSIONID", sessionId.toString());
+        sessionCookie.setMaxAge(1199);
+        return sessionCookie;
+    }
+
+    public void revokeCredentials(UUID sessionId) throws InvalidSessionTokenException, SessionAlreadyRevokedException {
+        SessionToken token = sessionRepository.findById(sessionId).orElseThrow(InvalidSessionTokenException::new);
+        token.revoke();
+        sessionRepository.save(token);
     }
 
     public void validateAuthentication(UUID sessionId) throws InvalidSessionTokenException {

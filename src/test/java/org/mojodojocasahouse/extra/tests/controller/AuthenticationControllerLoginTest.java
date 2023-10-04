@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.controller;
+package org.mojodojocasahouse.extra.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mojodojocasahouse.extra.controller.AuthenticationController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.UserAuthenticationRequest;
@@ -91,7 +92,7 @@ public class AuthenticationControllerLoginTest {
         );
         ApiError expectedError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "User Authentication Error",
+                "Authentication Error",
                 "Invalid Authentication Credentials"
         );
 

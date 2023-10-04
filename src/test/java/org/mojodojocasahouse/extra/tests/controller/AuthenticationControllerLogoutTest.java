@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.controller;
+package org.mojodojocasahouse.extra.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mojodojocasahouse.extra.controller.AuthenticationController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
@@ -26,7 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
-public class AuthenticationControllerProtectedTest {
+public class AuthenticationControllerLogoutTest {
 
     private MockMvc mvc;
 
@@ -51,35 +52,38 @@ public class AuthenticationControllerProtectedTest {
                 .build();
     }
 
-
     @Test
-    public void testAccessingProtectedResourceWithValidCredentialsIsSuccessful() throws Exception {
+    public void testLoggingOutOfAnExistingSessionIsSuccessful() throws Exception{
         // Setup - data
-        Cookie sessionCookie = new Cookie(
+        Cookie requestCookie = new Cookie(
                 "JSESSIONID",
                 "123e4567-e89b-12d3-a456-426655440000"
         );
-        ApiResponse expectedResponse = new ApiResponse(
-                "Authenticated and authorized!"
-        );
+        ApiResponse expectedResponse = new ApiResponse("User logout successful");
+        Cookie expectedCookie = new Cookie("JSESSIONID", null);
+        expectedCookie.setMaxAge(0);
+
+        // Setup - expectations
 
         // exercise
-        MockHttpServletResponse response = getProtectedResourceWithCookie(sessionCookie);
+        MockHttpServletResponse response = requestLogoutToControllerWithCookie(requestCookie);
 
         // Verify
+        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
         Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonApiResponse.write(expectedResponse).getJson());
+        Assertions.assertThat(response.getCookie("JSESSIONID")).isEqualTo(expectedCookie);
     }
 
     @Test
-    public void testAccessingProtectedResourceWithInvalidCredentialsThrowsError() throws Exception {
+    public void testLoggingOutOfAnInvalidSessionReturnsError() throws Exception{
         // Setup - data
-        Cookie sessionCookie = new Cookie(
+        Cookie requestCookie = new Cookie(
                 "JSESSIONID",
                 "123e4567-e89b-12d3-a456-426655440000"
         );
-        ApiError expectedError = new ApiError(
+        ApiError expectedResponse = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "User Authentication Error",
+                "Authentication Error",
                 "Session is invalid or expired"
         );
 
@@ -87,39 +91,42 @@ public class AuthenticationControllerProtectedTest {
         doThrow(new InvalidSessionTokenException()).when(service).validateAuthentication(any());
 
         // exercise
-        MockHttpServletResponse response = getProtectedResourceWithCookie(sessionCookie);
+        MockHttpServletResponse response = requestLogoutToControllerWithCookie(requestCookie);
 
         // Verify
-        assertThatResponseReturnsError(response, expectedError);
+        assertThatResponseReturnsError(response, expectedResponse);
     }
 
     @Test
-    public void testAccessingProtectedResourceWithNoCookieThrowsError() throws Exception {
+    public void testLoggingOutWithNoCredentialsReturnsError() throws Exception{
         // Setup - data
-        ApiError expectedError = new ApiError(
+        ApiError expectedResponse = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "Authorization Error",
+                "Authentication Error",
                 "Required cookie 'JSESSIONID' for method parameter type UUID is not present"
         );
 
+        // Setup - expectations
+
         // exercise
-        MockHttpServletResponse response = getProtectedResourceNoCookie();
+        MockHttpServletResponse response = requestLogoutToControllerNoCookie();
 
         // Verify
-        assertThatResponseReturnsError(response, expectedError);
+        assertThatResponseReturnsError(response, expectedResponse);
     }
 
-    private MockHttpServletResponse getProtectedResourceNoCookie() throws Exception {
+
+    private MockHttpServletResponse requestLogoutToControllerWithCookie(Cookie cookie) throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
-                        get("/protected")
+                        get("/logout")
+                        .cookie(cookie)
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();
     }
 
-    private MockHttpServletResponse getProtectedResourceWithCookie(Cookie cookie) throws Exception {
+    private MockHttpServletResponse requestLogoutToControllerNoCookie() throws Exception{
         return mvc.perform(MockMvcRequestBuilders.
-                        get("/protected")
-                        .cookie(cookie)
+                        get("/logout")
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();
     }
@@ -130,14 +137,6 @@ public class AuthenticationControllerProtectedTest {
         Assertions.assertThat(actualApiError.getMessage()).isEqualTo(expectedApiError.getMessage());
         Assertions.assertThat(actualApiError.getStatus()).isEqualTo(expectedApiError.getStatus());
         Assertions.assertThat(actualApiError.getErrors().toArray()).containsExactlyInAnyOrder(expectedApiError.getErrors().toArray());
-    }
-
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 
 }

@@ -59,7 +59,7 @@ public class UserAuthenticationExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleInvalidCredentials(InvalidCredentialsException ex, WebRequest request){
         ApiError apiError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "User Authentication Error",
+                "Authentication Error",
                 ex.getMessage()
         );
         return  handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
@@ -69,7 +69,7 @@ public class UserAuthenticationExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleInvalidSessionToken(InvalidSessionTokenException ex, WebRequest request){
         ApiError apiError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "User Authentication Error",
+                "Authentication Error",
                 ex.getMessage()
         );
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
@@ -79,7 +79,7 @@ public class UserAuthenticationExceptionHandler extends ResponseEntityExceptionH
     protected ResponseEntity<Object> handleMissingRequestCookie(MissingRequestCookieException ex, WebRequest request){
         ApiError apiError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "Authorization Error",
+                "Authentication Error",
                 ex.getMessage()
         );
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);

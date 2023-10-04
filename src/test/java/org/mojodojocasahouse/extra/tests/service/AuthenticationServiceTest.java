@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.service;
+package org.mojodojocasahouse.extra.tests.service;
 
 import jakarta.servlet.http.Cookie;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -6,6 +6,7 @@ import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidCredentialsException;
 import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
+import org.mojodojocasahouse.extra.exception.SessionAlreadyRevokedException;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.model.SessionToken;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
@@ -16,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mojodojocasahouse.extra.repository.SessionTokenRepository;
+import org.mojodojocasahouse.extra.service.AuthenticationService;
+import org.mojodojocasahouse.extra.testmodels.TestSessionToken;
 import org.springframework.data.util.Pair;
 
 import java.util.Optional;
@@ -23,8 +26,6 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class AuthenticationServiceTest {
@@ -109,8 +110,10 @@ public class AuthenticationServiceTest {
                 "mj@me.com",
                 DigestUtils.sha256Hex(request.getPassword())
         );
-        SessionToken token = new SessionToken(
+        TestSessionToken token = new TestSessionToken(
                 UUID.fromString("123e4567-e89b-12d3-a456-426655440000"),
+                false,
+                200,
                 existingUser
         );
         ApiResponse expectedResponse = new ApiResponse(
@@ -120,6 +123,7 @@ public class AuthenticationServiceTest {
                 "JSESSIONID",
                 "123e4567-e89b-12d3-a456-426655440000"
         );
+        expectedCookie.setMaxAge(1199);
         Pair<ApiResponse, Cookie> expectedResponseCookiePair = Pair.of(expectedResponse, expectedCookie);
 
         // Setup - expectations
@@ -161,8 +165,10 @@ public class AuthenticationServiceTest {
                 "mj@me.com",
                 "somepassword"
         );
-        SessionToken linkedSessionToken = new SessionToken(
+        TestSessionToken linkedSessionToken = new TestSessionToken(
                 validSessionId,
+                false,
+                200,
                 user
         );
 
@@ -188,6 +194,32 @@ public class AuthenticationServiceTest {
     }
 
     @Test
+    public void testValidatingSessionTokenOfRevokedSessionThrowsInvalidSessionTokenException(){
+        // Setup - data
+        UUID validSessionId = UUID.fromString("123e4567-e89b-12d3-a456-426655440000");
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jordan",
+                "mj@me.com",
+                "somepassword"
+        );
+        TestSessionToken linkedSessionToken = new TestSessionToken(
+                validSessionId,
+                true,
+                200,
+                user
+        );
+
+
+        // Setup - expectations
+        given(tokenRepository.findById(any())).willReturn(Optional.of(linkedSessionToken));
+
+        // assertions
+        Assertions.assertThatThrownBy(() -> serv.validateAuthentication(validSessionId)).isInstanceOf(InvalidSessionTokenException.class);
+
+    }
+
+    @Test
     public void testGettingUserByValidSessionIdReturnsUser(){
         // Setup - data
         UUID validSessionId = UUID.fromString("123e4567-e89b-12d3-a456-426655440000");
@@ -197,8 +229,10 @@ public class AuthenticationServiceTest {
                 "mj@me.com",
                 "somepassword"
         );
-        SessionToken linkedSessionToken = new SessionToken(
+        TestSessionToken linkedSessionToken = new TestSessionToken(
                 validSessionId,
+                false,
+                200,
                 user
         );
 
@@ -222,5 +256,95 @@ public class AuthenticationServiceTest {
 
         // exercise and verify
         Assertions.assertThatThrownBy(() -> serv.getUserBySessionToken(validSessionId)).isInstanceOf(InvalidSessionTokenException.class);
+    }
+
+    @Test
+    public void testRevokingExistingSessionThrowsNoErrors(){
+        // Setup - data
+        UUID validSessionId = UUID.fromString("123e4567-e89b-12d3-a456-426655440000");
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jordan",
+                "mj@me.com",
+                "somepassword"
+        );
+        TestSessionToken linkedSessionToken = new TestSessionToken(
+                validSessionId,
+                false,
+                200,
+                user
+        );
+
+        // Setup - expectations
+        given(tokenRepository.findById(any())).willReturn(Optional.of(linkedSessionToken));
+
+        // assertions
+        Assertions.assertThatNoException().isThrownBy(() -> serv.revokeCredentials(validSessionId));
+
+    }
+
+    @Test
+    public void testRevokingNonExistingSessionThrowsInvalidSessionTokenException(){
+        // Setup - data
+        UUID validSessionId = UUID.fromString("123e4567-e89b-12d3-a456-426655440000");
+
+        // Setup - expectations
+        given(tokenRepository.findById(any())).willReturn(Optional.empty());
+
+        // assertions
+        Assertions.assertThatThrownBy(() -> serv.revokeCredentials(validSessionId)).isInstanceOf(InvalidSessionTokenException.class);
+
+    }
+
+    @Test
+    public void testRevokingAlreadyRevokedSessionThrowsSessionAlreadyRevokedException(){
+        // Setup - data
+        UUID validSessionId = UUID.fromString("123e4567-e89b-12d3-a456-426655440000");
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jordan",
+                "mj@me.com",
+                "somepassword"
+        );
+        TestSessionToken linkedSessionToken = new TestSessionToken(
+                validSessionId,
+                true,
+                200,
+                user
+        );
+
+
+        // Setup - expectations
+        given(tokenRepository.findById(any())).willReturn(Optional.of(linkedSessionToken));
+
+        // assertions
+        Assertions.assertThatThrownBy(() -> serv.revokeCredentials(validSessionId)).isInstanceOf(SessionAlreadyRevokedException.class);
+
+    }
+
+    @Test
+    public void testRevokingExpiredSessionThrowsInvalidSessionTokenException(){
+        // Setup - data
+        UUID validSessionId = UUID.fromString("123e4567-e89b-12d3-a456-426655440000");
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jordan",
+                "mj@me.com",
+                "somepassword"
+        );
+        TestSessionToken linkedSessionToken = new TestSessionToken(
+                validSessionId,
+                true,
+                -200,
+                user
+        );
+
+
+        // Setup - expectations
+        given(tokenRepository.findById(any())).willReturn(Optional.of(linkedSessionToken));
+
+        // assertions
+        Assertions.assertThatThrownBy(() -> serv.revokeCredentials(validSessionId)).isInstanceOf(SessionAlreadyRevokedException.class);
+
     }
 }

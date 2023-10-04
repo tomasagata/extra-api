@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.service;
+package org.mojodojocasahouse.extra.tests.service;
 
 
 import org.assertj.core.api.Assertions;
@@ -12,6 +12,7 @@ import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.model.ExtraExpense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraExpenseRepository;
+import org.mojodojocasahouse.extra.service.ExpenseService;
 
 import java.math.BigDecimal;
 import java.sql.Date;
