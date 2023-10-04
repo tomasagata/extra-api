@@ -66,7 +66,7 @@ public class AuthenticationController {
         );
     }
 
-    @PostMapping(path = "/changePassword", consumes = "application/json", produces = "application/json")
+    @PostMapping(path = "/auth/password/change", consumes = "application/json", produces = "application/json")
         public ResponseEntity<ApiResponse> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest,@CookieValue("JSESSIONID") UUID cookie){
                 userService.validateAuthentication(cookie);
                 ExtraUser user = userService.getUserBySessionToken(cookie);
