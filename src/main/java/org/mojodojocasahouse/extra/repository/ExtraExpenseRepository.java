@@ -21,4 +21,6 @@ public interface ExtraExpenseRepository extends JpaRepository<ExtraExpense, Long
 
     @Query("SELECT DISTINCT e.category FROM ExtraExpense e WHERE e.userId = :userId")
     List<String> findAllDistinctCategoriesByUserId(@Param("userId") ExtraUser user);
+
+    Optional<ExtraExpense> findByCategory(String category);
 }

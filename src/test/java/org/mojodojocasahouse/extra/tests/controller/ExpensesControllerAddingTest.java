@@ -70,7 +70,8 @@ public class ExpensesControllerAddingTest {
             "test",
             new BigDecimal(100),
             Date.valueOf("2018-12-09"),
-            "test"
+            "test",
+            (short) 1
         );
         Cookie sessionCookie = new Cookie(
                 "JSESSIONID",
@@ -105,7 +106,8 @@ public class ExpensesControllerAddingTest {
                 "test",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-09"),
-                "test"
+                "test",
+                (short) 1
         );
         Cookie sessionCookie = new Cookie(
                 "JSESSIONID",
@@ -135,7 +137,8 @@ public class ExpensesControllerAddingTest {
                 "test",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-09"),
-                "Test"
+                "Test",
+                (short) 1
         );
         ApiError expectedError = new ApiError(
                 HttpStatus.UNAUTHORIZED,

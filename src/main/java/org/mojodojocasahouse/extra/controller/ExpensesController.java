@@ -53,13 +53,14 @@ public class ExpensesController {
         // Convert ExtraExpense entities to ExpenseDTO
         List<ExpenseDTO> expenseDTOs = new ArrayList<>();
         for (ExtraExpense expense : listOfExpenses) {
-            ExpenseDTO expenseDTO = new ExpenseDTO(null, null, null, null, null, null);
+            ExpenseDTO expenseDTO = new ExpenseDTO(null, null, null, null, null, null,null);
             expenseDTO.setId(expense.getId());
             expenseDTO.setUserId(expense.getUserId().getId());
             expenseDTO.setConcept(expense.getConcept());
             expenseDTO.setAmount(expense.getAmount());
             expenseDTO.setDate(expense.getDate());
             expenseDTO.setCategory(expense.getCategory());
+            expenseDTO.setIconId(expense.getIconId());
             expenseDTOs.add(expenseDTO);
         }
     
@@ -75,13 +76,14 @@ public class ExpensesController {
         // Convert ExtraExpense entities to ExpenseDTO
         List<ExpenseDTO> expenseDTOs = new ArrayList<>();
         for (ExtraExpense expense : listOfExpenses) {
-            ExpenseDTO expenseDTO = new ExpenseDTO(null, null, null, null, null, null);
+            ExpenseDTO expenseDTO = new ExpenseDTO(null, null, null, null, null, null,null);
             expenseDTO.setId(expense.getId());
             expenseDTO.setUserId(expense.getUserId().getId());
             expenseDTO.setConcept(expense.getConcept());
             expenseDTO.setAmount(expense.getAmount());
             expenseDTO.setDate(expense.getDate());
             expenseDTO.setCategory(expense.getCategory());
+            expenseDTO.setIconId(expense.getIconId());
             expenseDTOs.add(expenseDTO);
         }
         return ResponseEntity.ok(expenseDTOs);
