@@ -6,8 +6,6 @@ import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
-
 import java.math.BigDecimal;
 import java.sql.Date;
 
@@ -33,13 +31,21 @@ public class ExtraExpense{
     @Column(name="DATE", nullable = false)
     private Date date;
 
+    @Column(name="CATEGORY", nullable = false)
+    private String category;
+
+    @Column(name="ICON_ID", nullable = false)
+    private Short iconId;
+
     public ExtraExpense(){}
 
-    public ExtraExpense(ExtraUser user, String concept, BigDecimal amount, Date date){
+    public ExtraExpense(ExtraUser user, String concept, BigDecimal amount, Date date, String category, Short iconId){
         this.userId = user;
         this.concept = concept;
         this.amount = amount;
         this.date = date;
+        this.category = category;
+        this.iconId= iconId;
     }
 
     public static ExtraExpense from(ExpenseAddingRequest expenseAddingRequest, ExtraUser user) {
@@ -47,7 +53,9 @@ public class ExtraExpense{
                 user,
                 expenseAddingRequest.getConcept(),
                 expenseAddingRequest.getAmount(),
-                expenseAddingRequest.getDate()
+                expenseAddingRequest.getDate(),
+                expenseAddingRequest.getCategory(),
+                expenseAddingRequest.getIconId()
         );
     }
 

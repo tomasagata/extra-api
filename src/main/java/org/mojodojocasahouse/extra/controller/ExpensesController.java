@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.ExpenseFilteringRequest;
 import org.mojodojocasahouse.extra.model.ExtraExpense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
@@ -52,16 +53,47 @@ public class ExpensesController {
         // Convert ExtraExpense entities to ExpenseDTO
         List<ExpenseDTO> expenseDTOs = new ArrayList<>();
         for (ExtraExpense expense : listOfExpenses) {
-            ExpenseDTO expenseDTO = new ExpenseDTO(null, null, null, null, null);
+            ExpenseDTO expenseDTO = new ExpenseDTO(null, null, null, null, null, null,null);
             expenseDTO.setId(expense.getId());
             expenseDTO.setUserId(expense.getUserId().getId());
             expenseDTO.setConcept(expense.getConcept());
             expenseDTO.setAmount(expense.getAmount());
             expenseDTO.setDate(expense.getDate());
+            expenseDTO.setCategory(expense.getCategory());
+            expenseDTO.setIconId(expense.getIconId());
             expenseDTOs.add(expenseDTO);
         }
     
         return ResponseEntity.ok(expenseDTOs);
     }
+    @PostMapping(path = "/getMyExpensesByCategory", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<List<ExpenseDTO>> getMyExpensesByCategory(@CookieValue ("JSESSIONID") UUID cookie, @Valid @RequestBody ExpenseFilteringRequest expenseFilteringRequest){
+        userService.validateAuthentication(cookie);
+        ExtraUser user = userService.getUserBySessionToken(cookie);
+        String category = expenseFilteringRequest.getCategory();
+
+        List <ExtraExpense> listOfExpenses = expenseService.getAllExpensesByCategoryByUserId(user, category);
+        // Convert ExtraExpense entities to ExpenseDTO
+        List<ExpenseDTO> expenseDTOs = new ArrayList<>();
+        for (ExtraExpense expense : listOfExpenses) {
+            ExpenseDTO expenseDTO = new ExpenseDTO(null, null, null, null, null, null,null);
+            expenseDTO.setId(expense.getId());
+            expenseDTO.setUserId(expense.getUserId().getId());
+            expenseDTO.setConcept(expense.getConcept());
+            expenseDTO.setAmount(expense.getAmount());
+            expenseDTO.setDate(expense.getDate());
+            expenseDTO.setCategory(expense.getCategory());
+            expenseDTO.setIconId(expense.getIconId());
+            expenseDTOs.add(expenseDTO);
+        }
+        return ResponseEntity.ok(expenseDTOs);
+    }
+    @GetMapping(path = "/getAllCategories", produces = "application/json")
+    public ResponseEntity<List<String>> getMyCategories (@CookieValue ("JSESSIONID") UUID cookie){
+        userService.validateAuthentication(cookie);
+        ExtraUser user = userService.getUserBySessionToken(cookie);
+        return ResponseEntity.ok(expenseService.getAllCategories(user));
+    }
+    
 }
 

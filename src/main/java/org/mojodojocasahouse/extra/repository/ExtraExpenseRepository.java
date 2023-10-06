@@ -1,4 +1,5 @@
 package org.mojodojocasahouse.extra.repository;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -16,4 +17,10 @@ public interface ExtraExpenseRepository extends JpaRepository<ExtraExpense, Long
 
     Optional<ExtraExpense> findByConcept(String string);
 
+    List<ExtraExpense> findAllExpensesByUserIdAndCategory(ExtraUser user, String category);
+
+    @Query("SELECT DISTINCT e.category FROM ExtraExpense e WHERE e.userId = :userId")
+    List<String> findAllDistinctCategoriesByUserId(@Param("userId") ExtraUser user);
+
+    Optional<ExtraExpense> findByCategory(String category);
 }

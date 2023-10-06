@@ -9,7 +9,6 @@ import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraExpenseRepository;
 import org.springframework.stereotype.Service;
 
-import jakarta.validation.Valid;
 
 @Service
 public class ExpenseService {
@@ -29,5 +28,13 @@ public class ExpenseService {
     //get all expenses of the user that is making the request
     public List<ExtraExpense> getAllExpensesByUserId(ExtraUser user) {
         return expenseRepository.findAllExpensesByUserId(user);
+    }
+
+    public List<ExtraExpense> getAllExpensesByCategoryByUserId(ExtraUser user, String category) {
+        return expenseRepository.findAllExpensesByUserIdAndCategory(user, category);
+    }
+
+    public List<String> getAllCategories(ExtraUser user) {
+        return expenseRepository.findAllDistinctCategoriesByUserId(user);
     }
 }

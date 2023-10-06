@@ -37,12 +37,41 @@ class ExtraExpenseRepositoryTest {
                     user,
                     "concept",
                     new BigDecimal(100),
-                    Date.valueOf("2018-12-9")
+                    Date.valueOf("2018-12-9"),
+                    "test",
+                    (short) 1
                 )
         );
 
         // execute
         Optional<ExtraExpense> foundExpense = repo.findByConcept("concept");
+
+        // verify
+        Assertions.assertThat(foundExpense).isEqualTo(Optional.of(savedExpense));
+    }
+    @Test
+    void testFindingAnExpenseByCategoryReturnsOne() {
+        // Setup - data
+        ExtraUser user = new ExtraUser(
+                        "Some",
+                        "User",
+                        "mj@me.com",
+                        "a_password"
+                );
+        userRepo.save(user);
+        ExtraExpense savedExpense = repo.save(
+                new ExtraExpense(
+                    user,
+                    "concept",
+                    new BigDecimal(100),
+                    Date.valueOf("2018-12-9"),
+                    "test",
+                    (short) 1
+                )
+        );
+
+        // execute
+        Optional<ExtraExpense> foundExpense = repo.findByCategory("test");
 
         // verify
         Assertions.assertThat(foundExpense).isEqualTo(Optional.of(savedExpense));
