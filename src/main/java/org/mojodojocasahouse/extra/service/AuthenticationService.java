@@ -5,13 +5,18 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
+import org.mojodojocasahouse.extra.exception.InvalidPasswordResetTokenException;
 import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
+import org.mojodojocasahouse.extra.repository.PasswordResetTokenRepository;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +25,10 @@ public class AuthenticationService {
     private final ExtraUserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
+
+    private final JavaMailSender mailSender;
+
+    private final PasswordResetTokenRepository tokenRepository;
 
 
     public ApiResponse registerUser(UserRegistrationRequest userRegistrationRequest)
@@ -59,6 +68,45 @@ public class AuthenticationService {
         ExtraUser changingUser = userRepository
                 .findOneByEmailAndPassword(user.getEmail(),encodedPassword)
                 .orElseThrow(() -> new BadCredentialsException("Bad credentials"));
+        changingUser.setPassword(newPassword);
+        userRepository.save(changingUser);
+
+        return new ApiResponse("Password changed successfully");
+    }
+
+    public ApiResponse sendPasswordResetEmail(ForgotPasswordRequest request){
+        Optional<ExtraUser> foundUser = userRepository.findByEmail(request.getEmail());
+
+        if(foundUser.isPresent()){
+            ExtraUser user = foundUser.get();
+            PasswordResetToken token = tokenRepository.save(
+                    new PasswordResetToken(user)
+            );
+
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("noreply.extraapp@gmail.com");
+            message.setTo(user.getEmail());
+            message.setSubject("Extraapp - Password recovery");
+            message.setText(
+                    "Please tap the following link on your phone " +
+                    "with the app installed to reset your password: \n" +
+                            "extra://reset-password/" + token.getId() + " \nLink is valid for only 15 minutes.");
+
+            mailSender.send(message);
+        }
+
+        return new ApiResponse("If user is registered, an email was sent. Check inbox");
+    }
+
+    public ApiResponse resetPassword(PasswordResetRequest request) throws InvalidPasswordResetTokenException{
+        PasswordResetToken
+                token = tokenRepository
+                            .findById(request.getToken())
+                            .orElseThrow(InvalidPasswordResetTokenException::new);
+
+        token.assertValid();
+        String newPassword = passwordEncoder.encode(request.getNewPassword());
+        ExtraUser changingUser = token.getUser();
         changingUser.setPassword(newPassword);
         userRepository.save(changingUser);
 

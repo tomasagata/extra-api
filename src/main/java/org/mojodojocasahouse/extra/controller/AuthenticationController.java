@@ -68,4 +68,22 @@ public class AuthenticationController {
         );
     }
 
+    @PostMapping(path = "/auth/forgotten")
+    public ResponseEntity<ApiResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request){
+        ApiResponse response = userService.sendPasswordResetEmail(request);
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.OK
+        );
+    }
+
+    @PostMapping(path = "/auth/forgotten/reset")
+    public ResponseEntity<ApiResponse> resetPassword(@Valid @RequestBody PasswordResetRequest request){
+        ApiResponse response = userService.resetPassword(request);
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.OK
+        );
+    }
+
 }
