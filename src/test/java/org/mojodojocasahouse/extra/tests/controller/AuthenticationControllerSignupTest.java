@@ -4,54 +4,60 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.AuthenticationController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
-import org.mojodojocasahouse.extra.exception.handler.UserAuthenticationExceptionHandler;
+import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
+import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
+import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(AuthenticationController.class)
+@Import({
+        DelegatingBasicAuthenticationEntryPoint.class,
+        SecurityConfiguration.class,
+        ExtraUserDetailsService.class
+})
 public class AuthenticationControllerSignupTest {
 
+    @Autowired
     private MockMvc mvc;
 
     private JacksonTester<ApiError> jsonApiError;
 
     private JacksonTester<ApiResponse> jsonApiResponse;
 
-    @Mock
+    @MockBean
+    public ExtraUserRepository userRepository;
+
+    @MockBean
     public AuthenticationService service;
 
-    @InjectMocks
+    @Autowired
     public AuthenticationController controller;
 
 
     @BeforeEach
     public void setup() {
         JacksonTester.initFields(this, new ObjectMapper());
-
-        mvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setControllerAdvice(new UserAuthenticationExceptionHandler())
-                .build();
     }
 
 

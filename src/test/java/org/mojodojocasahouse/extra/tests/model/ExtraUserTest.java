@@ -2,7 +2,10 @@ package org.mojodojocasahouse.extra.tests.model;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mojodojocasahouse.extra.model.Authority;
 import org.mojodojocasahouse.extra.model.ExtraUser;
+
+import java.util.Set;
 
 
 class ExtraUserTest {
@@ -65,6 +68,20 @@ class ExtraUserTest {
         );
 
         Assertions.assertThat(unmanagedUser.getPassword()).isEqualTo("somepassword");
+    }
+
+    @Test
+    void testGettingAuthoritiesOfMichaelJordanReturnsSetOfUser() {
+        Authority userAuthority = new Authority("USER");
+        ExtraUser unmanagedUser = new ExtraUser(
+                "Michael",
+                "Jordan",
+                "michaelj@gmail.com",
+                "somepassword",
+                Set.of(userAuthority)
+        );
+
+        Assertions.assertThat(unmanagedUser.getAuthorities()).containsExactlyInAnyOrder(userAuthority);
     }
 
     @Test

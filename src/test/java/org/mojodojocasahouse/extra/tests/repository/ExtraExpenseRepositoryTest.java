@@ -44,7 +44,7 @@ class ExtraExpenseRepositoryTest {
         );
 
         // execute
-        Optional<ExtraExpense> foundExpense = repo.findByConcept("concept");
+        Optional<ExtraExpense> foundExpense = repo.findFirstByConcept("concept");
 
         // verify
         Assertions.assertThat(foundExpense).isEqualTo(Optional.of(savedExpense));

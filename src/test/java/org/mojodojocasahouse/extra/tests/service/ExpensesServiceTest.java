@@ -1,7 +1,9 @@
 package org.mojodojocasahouse.extra.tests.service;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -9,10 +11,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
+import org.mojodojocasahouse.extra.dto.ExpenseDTO;
 import org.mojodojocasahouse.extra.model.ExtraExpense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraExpenseRepository;
 import org.mojodojocasahouse.extra.service.ExpenseService;
+import org.springframework.boot.test.json.JacksonTester;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -24,11 +28,19 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 public class ExpensesServiceTest {
 
+    private JacksonTester<List<ExpenseDTO>> jsonExpenseDtoList;
+
     @Mock
     private ExtraExpenseRepository expenseRepository;
 
     @InjectMocks
     private ExpenseService expenseService;
+
+    @BeforeEach
+    public void setup() {
+        JacksonTester.initFields(this, new ObjectMapper());
+    }
+
 
     @Test
     public void testGettingAllExpensesByExistingUserIdReturnsList() {
@@ -39,19 +51,23 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
+        ExtraExpense savedExpense1 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test",(short) 1);
+        ExtraExpense savedExpense2 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.12"), Date.valueOf("2023-09-12"), "test",(short) 1);
+
         List<ExtraExpense> expectedExpenses = List.of(
-                new ExtraExpense(user, "A Concept", new BigDecimal("10.10"), Date.valueOf("2023-09-12"), "test",(short) 1),
-                new ExtraExpense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test",(short) 1)
+                savedExpense1, savedExpense2
         );
 
         // Setup - expectations
-        given(expenseRepository.findAllExpensesByUserId(any())).willReturn(expectedExpenses);
+        given(expenseRepository.findAllExpensesByUser(any())).willReturn(expectedExpenses);
 
         // exercise
-        List<ExtraExpense> foundExpenses = expenseService.getAllExpensesByUserId(user);
+        List<ExpenseDTO> foundExpenseDtos = expenseService.getAllExpensesByUserId(user);
 
         // verify
-        Assertions.assertThat(foundExpenses).isEqualTo(expectedExpenses);
+        Assertions
+                .assertThat(foundExpenseDtos)
+                .containsExactlyInAnyOrder(savedExpense1.asDto(), savedExpense2.asDto());
     }
 
     @Test
@@ -65,10 +81,10 @@ public class ExpensesServiceTest {
         );
 
         // Setup - expectations
-        given(expenseRepository.findAllExpensesByUserId(any())).willReturn(List.of());
+        given(expenseRepository.findAllExpensesByUser(any())).willReturn(List.of());
 
         // exercise
-        List<ExtraExpense> foundExpenses = expenseService.getAllExpensesByUserId(user);
+        List<ExpenseDTO> foundExpenses = expenseService.getAllExpensesByUserId(user);
 
         // verify
         Assertions.assertThat(foundExpenses).isEqualTo(List.of());

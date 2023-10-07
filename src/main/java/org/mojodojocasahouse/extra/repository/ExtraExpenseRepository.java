@@ -12,15 +12,14 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ExtraExpenseRepository extends JpaRepository<ExtraExpense, Long>{
-//    @Query("SELECT e FROM ExtraExpense e WHERE e.userId = :userId")
-    List<ExtraExpense> findAllExpensesByUserId(@Param("userId") ExtraUser user);
+    List<ExtraExpense> findAllExpensesByUser(@Param("userId") ExtraUser user);
 
-    Optional<ExtraExpense> findByConcept(String string);
+    Optional<ExtraExpense> findFirstByConcept(String string);
 
-    List<ExtraExpense> findAllExpensesByUserIdAndCategory(ExtraUser user, String category);
+    List<ExtraExpense> findAllExpensesByUserAndCategory(ExtraUser user, String category);
 
-    @Query("SELECT DISTINCT e.category FROM ExtraExpense e WHERE e.userId = :userId")
-    List<String> findAllDistinctCategoriesByUserId(@Param("userId") ExtraUser user);
+    @Query("SELECT DISTINCT e.category FROM ExtraExpense e WHERE e.user = :userId")
+    List<String> findAllDistinctCategoriesByUser(@Param("userId") ExtraUser user);
 
     Optional<ExtraExpense> findByCategory(String category);
 }

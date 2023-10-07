@@ -1,9 +1,6 @@
 package org.mojodojocasahouse.extra.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 @Data
@@ -18,9 +15,17 @@ public class UserAuthenticationRequest {
     @Pattern(regexp = "^([A-Za-z]|\\d|[@$!%*#?])+$", message = "Password can only contain letters, numbers or the following: @$!%*#?")
     private String password;
 
+    private Boolean rememberMe = false;
+
     public UserAuthenticationRequest(String email, String password) {
         this.email = email;
         this.password = password;
+    }
+
+    public UserAuthenticationRequest(String email, String password, Boolean rememberMe) {
+        this.email = email;
+        this.password = password;
+        this.rememberMe = rememberMe;
     }
 
     public UserAuthenticationRequest() {
