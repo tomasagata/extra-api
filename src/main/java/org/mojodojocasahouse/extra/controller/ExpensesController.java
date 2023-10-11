@@ -4,6 +4,8 @@ import java.util.List;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import org.mojodojocasahouse.extra.dto.ApiListOfExpensesResponse;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
@@ -53,16 +55,16 @@ public class ExpensesController {
     }
 
     @PostMapping(path = "/getMyExpensesByCategory", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<List<ExpenseDTO>> getMyExpensesByCategory(Principal principal,
+    public ResponseEntity<ApiListOfExpensesResponse> getMyExpensesByCategory(Principal principal,
                                                                     @Valid @RequestBody ExpenseFilteringRequest expenseFilteringRequest){
         ExtraUser user = userService.getUserByPrincipal(principal);
         String category = expenseFilteringRequest.getCategory();
 
         log.debug("Retrieving expenses of user: \"" + principal.getName() + "\" by category: \"" + category + "\"");
 
-        List<ExpenseDTO> listOfExpenses = expenseService.getAllExpensesByCategoryByUserId(user, category);
-
-        return ResponseEntity.ok(listOfExpenses);
+        ApiListOfExpensesResponse response = new ApiListOfExpensesResponse();
+        response.setResponse(expenseService.getAllExpensesByCategoryByUserId(user, category));
+        return ResponseEntity.ok(response);
     }
 
 
