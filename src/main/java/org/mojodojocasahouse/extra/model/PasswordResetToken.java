@@ -14,14 +14,14 @@ import java.util.UUID;
 public class PasswordResetToken {
 
     @Id
-    private UUID id;
+    protected UUID id;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID")
-    private ExtraUser user;
+    protected ExtraUser user;
 
     @Column(name = "VALID_UNTIL")
-    private Timestamp validUntil;
+    protected Timestamp validUntil;
 
     public PasswordResetToken(ExtraUser user){
         this.id = UUID.randomUUID();

@@ -117,4 +117,40 @@ public class ExpensesServiceTest {
         Assertions.assertThat(actualResponse).isEqualTo(expectedResponse);
     }
 
+    @Test
+    public void testGettingAllExpensesByCategoryAndUser(){
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        ExtraExpense savedExpense1 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
+        ExtraExpense savedExpense2 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.12"), Date.valueOf("2023-09-12"), "test2",(short) 1);
+        List<ExpenseDTO> expectedDtos = List.of(savedExpense1.asDto());
+
+        given(expenseRepository.findAllExpensesByUserAndCategory(any(), any())).willReturn(List.of(savedExpense1));
+
+        List<ExpenseDTO> foundExpenses = expenseService.getAllExpensesByCategoryByUserId(user, "test1");
+
+        Assertions.assertThat(foundExpenses).containsExactlyInAnyOrder(expectedDtos.toArray(ExpenseDTO[]::new));
+    }
+
+    @Test
+    public void testGettingAllDistinctCategoriesOfExpensesOfUser(){
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        List<String> expectedCategories = List.of("test1", "test2");
+
+        given(expenseRepository.findAllDistinctCategoriesByUser(any())).willReturn(expectedCategories);
+
+        List<String> foundExpenses = expenseService.getAllCategories(user);
+
+        Assertions.assertThat(foundExpenses).containsExactlyInAnyOrder(expectedCategories.toArray(String[]::new));
+    }
+
 }

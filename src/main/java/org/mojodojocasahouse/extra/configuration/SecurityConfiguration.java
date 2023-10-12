@@ -35,12 +35,16 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/getMyExpenses").authenticated()
+                        .requestMatchers("/getMyExpensesByCategory").authenticated()
+                        .requestMatchers("/getAllCategories").authenticated()
                         .requestMatchers("/addExpense").authenticated()
                         .requestMatchers("/protected").authenticated()
                         .requestMatchers("/fullyProtected").fullyAuthenticated()
                         .requestMatchers("/logout").authenticated()
                         .requestMatchers("/login").fullyAuthenticated()
                         .requestMatchers("/auth/password/change").fullyAuthenticated()
+                        .requestMatchers("/auth/forgotten").permitAll()
+                        .requestMatchers("/auth/forgotten/reset").permitAll()
                         .requestMatchers("/register*").permitAll()
                 )
                 .httpBasic(httpBasic -> httpBasic

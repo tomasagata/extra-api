@@ -3,6 +3,7 @@ package org.mojodojocasahouse.extra.dto;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.mojodojocasahouse.extra.validation.constraint.FieldsValueMatch;
 
@@ -20,6 +21,7 @@ public class PasswordResetRequest {
     private UUID token;
 
     @NotNull(message = "New password is mandatory")
+    @Size(max = 100, message = "Password cannot exceed 100 characters")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?]{8,}$", message = "New password must contain eight characters: one letter, one number and one of the following: @$!%*#?")
     private String newPassword;
 

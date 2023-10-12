@@ -24,7 +24,10 @@ public class AuthenticationController {
     public ResponseEntity<ApiResponse> registerUserAccount(
             @Valid @RequestBody UserRegistrationRequest userRegistrationRequest)
     {
+            log.debug("Registering user \"" + userRegistrationRequest.getEmail() + "\"");
+
             ApiResponse response = userService.registerUser(userRegistrationRequest);
+
             return new ResponseEntity<>(
                     response,
                     HttpStatus.CREATED
@@ -32,7 +35,9 @@ public class AuthenticationController {
     }
 
     @PostMapping(path = "/login", produces = "application/json")
-    public ResponseEntity<ApiResponse> login() {
+    public ResponseEntity<ApiResponse> login(Principal principal) {
+        log.debug("User \"" + principal.getName() + "\" authenticated successfully");
+
         return new ResponseEntity<>(
                 new ApiResponse("Login successful"),
                 HttpStatus.OK
@@ -40,8 +45,10 @@ public class AuthenticationController {
     }
 
     @GetMapping(path = "/protected", produces = "application/json")
-    public ResponseEntity<ApiResponse> protectedResource()
+    public ResponseEntity<ApiResponse> protectedResource(Principal principal)
     {
+        log.debug("User \"" + principal.getName() + "\" accessed protected endpoint");
+
         return new ResponseEntity<>(
                 new ApiResponse("Authenticated and authorized!"),
                 HttpStatus.OK
@@ -49,8 +56,10 @@ public class AuthenticationController {
     }
 
     @GetMapping(path = "/fullyProtected", produces = "application/json")
-    public ResponseEntity<ApiResponse> fullyProtectedResource()
+    public ResponseEntity<ApiResponse> fullyProtectedResource(Principal principal)
     {
+        log.debug("User \"" + principal.getName() + "\" accessed fully protected endpoint");
+
         return new ResponseEntity<>(
                 new ApiResponse("Fully authenticated and authorized!"),
                 HttpStatus.OK
@@ -60,6 +69,8 @@ public class AuthenticationController {
     @PostMapping(path = "/auth/password/change", consumes = "application/json", produces = "application/json")
     public ResponseEntity<ApiResponse> changePassword(@Valid @RequestBody UserChangePasswordRequest userChangePasswordRequest,
                                                       Principal principal){
+        log.debug("User \"" + principal.getName() + "\" requested a password change");
+
         ExtraUser user = userService.getUserByPrincipal(principal);
         ApiResponse response = userService.changePassword(user,userChangePasswordRequest);
         return new ResponseEntity<>(
@@ -70,6 +81,8 @@ public class AuthenticationController {
 
     @PostMapping(path = "/auth/forgotten")
     public ResponseEntity<ApiResponse> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request){
+        log.debug("Email \"" + request.getEmail() + "\" initiated a password forgotten flow");
+
         ApiResponse response = userService.sendPasswordResetEmail(request);
         return new ResponseEntity<>(
                 response,
@@ -79,6 +92,8 @@ public class AuthenticationController {
 
     @PostMapping(path = "/auth/forgotten/reset")
     public ResponseEntity<ApiResponse> resetPassword(@Valid @RequestBody PasswordResetRequest request){
+        log.debug("Token \"" + request.getToken() + "\" was used to reset password");
+
         ApiResponse response = userService.resetPassword(request);
         return new ResponseEntity<>(
                 response,

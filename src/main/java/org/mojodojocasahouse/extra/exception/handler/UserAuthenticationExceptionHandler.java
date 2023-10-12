@@ -1,5 +1,6 @@
 package org.mojodojocasahouse.extra.exception.handler;
 
+import jakarta.mail.MessagingException;
 import org.mojodojocasahouse.extra.exception.*;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.springframework.http.HttpHeaders;
@@ -126,6 +127,29 @@ public class UserAuthenticationExceptionHandler extends ResponseEntityExceptionH
                 ex.getMessage()
         );
         return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+    }
+
+    @ExceptionHandler(InvalidPasswordResetTokenException.class)
+    protected ResponseEntity<Object> handleInvalidPasswordResetTokenException(InvalidPasswordResetTokenException ex,
+                                                                              WebRequest request){
+        ApiError apiError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                "Invalid Token Error",
+                ex.getMessage()
+        );
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+
+    }
+
+    @ExceptionHandler(EmailException.class)
+    protected ResponseEntity<Object> handleEmailException(EmailException ex, WebRequest request){
+        ApiError apiError = new ApiError(
+                HttpStatus.FAILED_DEPENDENCY,
+                "Email Error",
+                ex.getMessage()
+        );
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+
     }
 
 }

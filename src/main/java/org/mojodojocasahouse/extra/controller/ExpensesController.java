@@ -34,6 +34,9 @@ public class ExpensesController {
     public ResponseEntity<Object> addExpense(Principal principal,
                                              @Valid @RequestBody ExpenseAddingRequest expenseAddingRequest){
         ExtraUser user = userService.getUserByPrincipal(principal);
+
+        log.debug("Adding expense to user: \"" + user.getEmail() + "\"");
+
         ApiResponse response = expenseService.addExpense(user, expenseAddingRequest);
         return new ResponseEntity<>(
                 response,
@@ -69,6 +72,9 @@ public class ExpensesController {
     @GetMapping(path = "/getAllCategories", produces = "application/json")
     public ResponseEntity<List<String>> getMyCategories (Principal principal){
         ExtraUser user = userService.getUserByPrincipal(principal);
+
+        log.debug("Retrieving all expenses of user: \"" + principal.getName() + "\"");
+
         return ResponseEntity.ok(expenseService.getAllCategories(user));
     }
 
