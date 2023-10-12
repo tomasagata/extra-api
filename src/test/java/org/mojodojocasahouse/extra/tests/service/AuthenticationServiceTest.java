@@ -165,9 +165,8 @@ public class AuthenticationServiceTest {
         ApiResponse expectedResponse = new ApiResponse("Password changed successfully");
 
         // Setup - expectations
-        given(passwordEncoder.encode("curr_pass")).willReturn("curr_pass_hashed");
+        given(passwordEncoder.matches("curr_pass","curr_pass_hashed")).willReturn(true);
         given(passwordEncoder.encode("new_pass")).willReturn("new_pass_hashed");
-        given(repo.findOneByEmailAndPassword(any(), any())).willReturn(Optional.of(existingUser));
 
         ApiResponse response = serv.changePassword(existingUser, request);
 
@@ -192,9 +191,8 @@ public class AuthenticationServiceTest {
         ApiResponse expectedResponse = new ApiResponse("Password changed successfully");
 
         // Setup - expectations
-        given(passwordEncoder.encode("some_pass")).willReturn("some_pass_hashed");
+        given(passwordEncoder.matches("some_pass", "curr_pass_hashed")).willReturn(false);
         given(passwordEncoder.encode("new_pass")).willReturn("new_pass_hashed");
-        given(repo.findOneByEmailAndPassword(any(), any())).willReturn(Optional.empty());
 
 
 

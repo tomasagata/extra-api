@@ -69,12 +69,13 @@ public class AuthenticationService {
         // Function that given the correct old password, sets a new one for the given user
         // if the old password is incorrect, it returns an error
         String newPassword = passwordEncoder.encode(userChangePasswordRequest.getNewPassword());
-        String encodedPassword = passwordEncoder.encode(userChangePasswordRequest.getCurrentPassword());
-        ExtraUser changingUser = userRepository
-                .findOneByEmailAndPassword(user.getEmail(),encodedPassword)
-                .orElseThrow(() -> new BadCredentialsException("Bad credentials"));
-        changingUser.setPassword(newPassword);
-        userRepository.save(changingUser);
+
+        if(!passwordEncoder.matches(userChangePasswordRequest.getCurrentPassword(), user.getPassword())){
+            throw new BadCredentialsException("Bad credentials");
+        }
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
 
         return new ApiResponse("Password changed successfully");
     }
