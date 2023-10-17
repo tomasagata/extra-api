@@ -1,31 +1,35 @@
-package org.mojodojocasahouse.extra.controller;
+package org.mojodojocasahouse.extra.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import org.apache.commons.codec.binary.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
+import org.mojodojocasahouse.extra.controller.ExpensesController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
-import org.mojodojocasahouse.extra.exception.InvalidSessionTokenException;
-import org.mojodojocasahouse.extra.exception.handler.UserAuthenticationExceptionHandler;
 import org.mojodojocasahouse.extra.model.ExtraExpense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
+import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
+import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.service.ExpenseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -35,41 +39,45 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doThrow;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(ExpensesController.class)
+@Import({
+        SecurityConfiguration.class,
+        DelegatingBasicAuthenticationEntryPoint.class,
+        ExtraUserDetailsService.class
+})
 public class ExpensesControllerListingTest {
+
+    @Autowired
     private MockMvc mvc;
 
     private JacksonTester<ApiError> jsonApiError;
 
+    private JacksonTester<ApiResponse> jsonApiResponse;
+
     private JacksonTester<List<ExpenseDTO>> jsonExpenseDtoList;
 
-    @Mock
+    @MockBean
     public AuthenticationService authService;
 
-    @Mock
+    @MockBean
+    public ExtraUserRepository userRepository;
+
+    @MockBean
     public ExpenseService expenseService;
 
-    @InjectMocks
+    @Autowired
     public ExpensesController controller;
 
     @BeforeEach
     public void setup() {
         JacksonTester.initFields(this, new ObjectMapper());
-
-        mvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setControllerAdvice(new UserAuthenticationExceptionHandler())
-                .build();
     }
 
 
     @Test
+    @WithMockUser
     public void testListingExpenseWithCredentialsReturnsSuccessfulResponse() throws Exception {
         // Setup - data
-        Cookie sessionCookie = new Cookie(
-                "JSESSIONID",
-                "123e4567-e89b-12d3-a456-426655440000"
-        );
         ExtraUser linkedUser = new ExtraUser(
                 "M",
                 "J",
@@ -77,18 +85,18 @@ public class ExpensesControllerListingTest {
                 "Somepassword"
         );
         List<ExtraExpense> expectedExpensesList = List.of(
-                new ExtraExpense(linkedUser, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"))
+                new ExtraExpense(linkedUser, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), "Test",(short) 1)
         );
         List<ExpenseDTO> expectedResponse = List.of(
-                new ExpenseDTO(null, null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"))
+                new ExpenseDTO(null, null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), "Test",(short) 1)
         );
 
         // Setup - Expectations
-        given(authService.getUserBySessionToken(any())).willReturn(linkedUser);
-        given(expenseService.getAllExpensesByUserId(any())).willReturn(expectedExpensesList);
+        given(authService.getUserByPrincipal(any())).willReturn(linkedUser);
+        given(expenseService.getAllExpensesByUserId(any())).willReturn(expectedResponse);
 
         // exercise
-        MockHttpServletResponse response = getExpensesWithCookie(sessionCookie);
+        MockHttpServletResponse response = getExpensesNoCookie();
 
         // Verify
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -97,7 +105,7 @@ public class ExpensesControllerListingTest {
 
 
     @Test
-    public void testListingExpensesWithInvalidCredentialsThrowsError() throws Exception {
+    public void testListingExpensesWithInvalidSessionCookieThrowsError() throws Exception {
         // Setup - data
         Cookie sessionCookie = new Cookie(
                 "JSESSIONID",
@@ -105,12 +113,9 @@ public class ExpensesControllerListingTest {
         );
         ApiError expectedError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "User Authentication Error",
-                "Session is invalid or expired"
+                "Authentication Error",
+                "Full authentication is required to access this resource"
         );
-
-        // Setup - expectations
-        doThrow(new InvalidSessionTokenException()).when(authService).validateAuthentication(any());
 
         // exercise
         MockHttpServletResponse response = getExpensesWithCookie(sessionCookie);
@@ -119,14 +124,31 @@ public class ExpensesControllerListingTest {
         assertThatResponseReturnsError(response, expectedError);
     }
 
+    @Test
+    public void testListingExpensesWithInvalidUsernameAndPasswordThrowsError() throws Exception {
+        // Setup - data
+        ApiError expectedError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                "Authentication Error",
+                "Bad credentials"
+        );
+
+        // exercise
+        MockHttpServletResponse response = getExpensesWithUsernameAndPassword("user", "pass");
+
+        // Verify
+        assertThatResponseReturnsError(response, expectedError);
+    }
+
 
     @Test
+    @WithAnonymousUser
     public void testListingExpensesWithNoCookieThrowsError() throws Exception {
         // Setup - data
         ApiError expectedError = new ApiError(
                 HttpStatus.UNAUTHORIZED,
-                "Authorization Error",
-                "Required cookie 'JSESSIONID' for method parameter type UUID is not present"
+                "Authentication Error",
+                "Full authentication is required to access this resource"
         );
 
         // exercise
@@ -152,19 +174,22 @@ public class ExpensesControllerListingTest {
                 .andReturn().getResponse();
     }
 
+    private MockHttpServletResponse getExpensesWithUsernameAndPassword(String username,
+                                                                       String password) throws Exception {
+        return mvc.perform(MockMvcRequestBuilders.
+                        get("/getMyExpenses")
+                        .header("Authorization",
+                                "Basic " + Base64
+                                        .encodeBase64String((username + ":" + password).getBytes()))
+                        .accept(MediaType.ALL))
+                .andReturn().getResponse();
+    }
+
     private void assertThatResponseReturnsError(MockHttpServletResponse response, ApiError expectedApiError) throws Exception {
         ApiError actualApiError = jsonApiError.parse(response.getContentAsString()).getObject();
 
         Assertions.assertThat(actualApiError.getMessage()).isEqualTo(expectedApiError.getMessage());
         Assertions.assertThat(actualApiError.getStatus()).isEqualTo(expectedApiError.getStatus());
         Assertions.assertThat(actualApiError.getErrors().toArray()).containsExactlyInAnyOrder(expectedApiError.getErrors().toArray());
-    }
-
-    public static String asJsonString(final Object obj) {
-        try {
-            return new ObjectMapper().writeValueAsString(obj);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }

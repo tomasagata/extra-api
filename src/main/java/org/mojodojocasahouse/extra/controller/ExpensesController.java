@@ -1,19 +1,18 @@
 package org.mojodojocasahouse.extra.controller;
-import java.util.ArrayList;
+import java.security.Principal;
 import java.util.List;
-import java.util.UUID;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
-import org.mojodojocasahouse.extra.model.ExtraExpense;
+import org.mojodojocasahouse.extra.dto.ExpenseFilteringRequest;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.service.ExpenseService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,23 +20,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 
+@Slf4j
 @RestController
+@RequiredArgsConstructor
 public class ExpensesController {
 
     private final AuthenticationService userService;
+
     private final ExpenseService expenseService;
 
-    public ExpensesController(AuthenticationService userService, ExpenseService expenseService) {
-        this.userService = userService;
-        this.expenseService = expenseService;
-    }
 
+    @PostMapping(value = "/addExpense", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> addExpense(Principal principal,
+                                             @Valid @RequestBody ExpenseAddingRequest expenseAddingRequest){
+        ExtraUser user = userService.getUserByPrincipal(principal);
 
-    @PostMapping(value = "/addExpense" , consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> addExpense(@CookieValue("JSESSIONID") UUID cookie, @Valid @RequestBody ExpenseAddingRequest expenseAddingRequest){
-        userService.validateAuthentication(cookie);
-        ExtraUser idUser = userService.getUserBySessionToken(cookie);
-        ApiResponse response = expenseService.addExpense(idUser, expenseAddingRequest);
+        log.debug("Adding expense to user: \"" + user.getEmail() + "\"");
+
+        ApiResponse response = expenseService.addExpense(user, expenseAddingRequest);
         return new ResponseEntity<>(
                 response,
                 HttpStatus.CREATED
@@ -45,24 +45,38 @@ public class ExpensesController {
     }
     
     @GetMapping(path = "/getMyExpenses", produces = "application/json")
-    public ResponseEntity<List<ExpenseDTO>> getMyExpenses(@CookieValue("JSESSIONID") UUID cookie){
-        userService.validateAuthentication(cookie);
-        ExtraUser user = userService.getUserBySessionToken(cookie);
+    public ResponseEntity<List<ExpenseDTO>> getMyExpenses(Principal principal){
+        ExtraUser user = userService.getUserByPrincipal(principal);
 
-        List <ExtraExpense> listOfExpenses = expenseService.getAllExpensesByUserId(user);
-        // Convert ExtraExpense entities to ExpenseDTO
-        List<ExpenseDTO> expenseDTOs = new ArrayList<>();
-        for (ExtraExpense expense : listOfExpenses) {
-            ExpenseDTO expenseDTO = new ExpenseDTO(null, null, null, null, null);
-            expenseDTO.setId(expense.getId());
-            expenseDTO.setUserId(expense.getUserId().getId());
-            expenseDTO.setConcept(expense.getConcept());
-            expenseDTO.setAmount(expense.getAmount());
-            expenseDTO.setDate(expense.getDate());
-            expenseDTOs.add(expenseDTO);
-        }
+        log.debug("Retrieving all expenses of user: \"" + principal.getName() + "\"");
+
+        List <ExpenseDTO> listOfExpenses = expenseService.getAllExpensesByUserId(user);
     
-        return ResponseEntity.ok(expenseDTOs);
+        return ResponseEntity.ok(listOfExpenses);
     }
+
+    @PostMapping(path = "/getMyExpensesByCategory", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<List<ExpenseDTO>> getMyExpensesByCategory(Principal principal,
+                                                                    @Valid @RequestBody ExpenseFilteringRequest expenseFilteringRequest){
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        String category = expenseFilteringRequest.getCategory();
+
+        log.debug("Retrieving expenses of user: \"" + principal.getName() + "\" by category: \"" + category + "\"");
+
+        List<ExpenseDTO> listOfExpenses = expenseService.getAllExpensesByCategoryByUserId(user, category);
+
+        return ResponseEntity.ok(listOfExpenses);
+    }
+
+
+    @GetMapping(path = "/getAllCategories", produces = "application/json")
+    public ResponseEntity<List<String>> getMyCategories (Principal principal){
+        ExtraUser user = userService.getUserByPrincipal(principal);
+
+        log.debug("Retrieving all expenses of user: \"" + principal.getName() + "\"");
+
+        return ResponseEntity.ok(expenseService.getAllCategories(user));
+    }
+
 }
 

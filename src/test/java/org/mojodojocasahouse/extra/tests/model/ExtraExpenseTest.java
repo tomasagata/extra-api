@@ -1,10 +1,12 @@
-package org.mojodojocasahouse.extra.model;
+package org.mojodojocasahouse.extra.tests.model;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mojodojocasahouse.extra.model.ExtraExpense;
+import org.mojodojocasahouse.extra.model.ExtraUser;
 
 public class ExtraExpenseTest {
     @Test
@@ -19,7 +21,9 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test",
+                (short) 1
         );
 
         Assertions.assertThat(unmanagedExpense.getId()).isNull();
@@ -37,10 +41,12 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test",
+                (short) 1
         );
 
-        Assertions.assertThat(unmanagedExpense.getUserId()).isEqualTo(unmanagedUser);
+        Assertions.assertThat(unmanagedExpense.getUser()).isEqualTo(unmanagedUser);
     }
     @Test
     void testGettingConceptOfMadridTripExpenseReturnsMadridTrip() {
@@ -54,7 +60,9 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test",
+                (short) 1
         );
 
         Assertions.assertThat(unmanagedExpense.getConcept()).isEqualTo("Madrid trip");
@@ -71,7 +79,9 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test",
+                (short) 1
         );
 
         Assertions.assertThat(unmanagedExpense.getAmount()).isEqualTo(new BigDecimal(100));
@@ -88,10 +98,52 @@ public class ExtraExpenseTest {
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
-                Date.valueOf("2018-12-9")
+                Date.valueOf("2018-12-9"),
+                "test",
+                (short) 1
         );
 
         Assertions.assertThat(unmanagedExpense.getDate()).isEqualTo(Date.valueOf("2018-12-9"));
+    }
+
+    @Test
+    void testGettingIdOfMadridTripExpenseReturnsTravel() {
+        ExtraUser unmanagedUser = new ExtraUser(
+                "Michael",
+                "Jordan",
+                "michaelj@gmail.com",
+                "somepassword"
+        );
+        ExtraExpense unmanagedExpense = new ExtraExpense(
+                unmanagedUser,
+                "Madrid trip",
+                new BigDecimal(100),
+                Date.valueOf("2018-12-9"),
+                "travel",
+                (short) 1
+        );
+
+        Assertions.assertThat(unmanagedExpense.getCategory()).isEqualTo("travel");
+    }
+
+    @Test
+    void testGettingIconofMadridTripExpenseReturnsShortOne() {
+        ExtraUser unmanagedUser = new ExtraUser(
+                "Michael",
+                "Jordan",
+                "michaelj@gmail.com",
+                "somepassword"
+        );
+        ExtraExpense unmanagedExpense = new ExtraExpense(
+                unmanagedUser,
+                "Madrid trip",
+                new BigDecimal(100),
+                Date.valueOf("2018-12-9"),
+                "test",
+                (short) 1
+        );
+
+        Assertions.assertThat(unmanagedExpense.getIconId()).isEqualTo((short) 1);
     }
 
 }
