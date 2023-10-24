@@ -2,11 +2,19 @@ package org.mojodojocasahouse.extra.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.mojodojocasahouse.extra.validation.constraint.ValidCategory;
+
+import java.sql.Date;
+import java.util.List;
 
 @Data
 public class ExpenseFilteringRequest {
-    @Size(max = 50, message = "Category cannot exceed 50 characters")
-    @Pattern(regexp = "^[A-Za-z\\d\\s]+$", message = "Category must only contain letters or numbers")
-    private String category;
-    
+    @ValidCategory
+    private List<String> categories;
+
+    @PastOrPresent
+    private Date from;
+
+    @PastOrPresent
+    private Date until;
 }

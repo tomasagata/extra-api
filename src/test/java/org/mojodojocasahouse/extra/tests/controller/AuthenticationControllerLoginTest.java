@@ -1,8 +1,6 @@
 package org.mojodojocasahouse.extra.tests.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.Cookie;
-import org.apache.commons.codec.binary.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,7 +29,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.security.Principal;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -78,10 +77,17 @@ public class AuthenticationControllerLoginTest {
                 "mj@me.com",
                 "some_pass"
         );
+        Map<String, String> expectedCredentials = new HashMap<>();
+        expectedCredentials.put("firstName", "michael");
+        expectedCredentials.put("lastName", "jackson");
         ApiResponse expectedResponse = new ApiResponse(
-                "Login successful"
+                "Login successful",
+                expectedCredentials
         );
         Principal principal = Mockito.mock(Principal.class);
+
+        // Setup - expectations
+        given(authenticationService.getUserByPrincipal(any())).willReturn(user);
 
         // exercise
         MockHttpServletResponse response = loginWithPrincipal(principal);
@@ -111,25 +117,6 @@ public class AuthenticationControllerLoginTest {
     private MockHttpServletResponse loginNoCookie() throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
                         post("/login")
-                        .accept(MediaType.ALL))
-                .andReturn().getResponse();
-    }
-
-    private MockHttpServletResponse loginWithCookie(Cookie cookie) throws Exception {
-        return mvc.perform(MockMvcRequestBuilders.
-                        post("/login")
-                        .cookie(cookie)
-                        .accept(MediaType.ALL))
-                .andReturn().getResponse();
-    }
-
-    private MockHttpServletResponse loginWithUsernameAndPassword(String username,
-                                                                                String password) throws Exception{
-        return mvc.perform(MockMvcRequestBuilders.
-                        post("/login")
-                        .header("Authorization",
-                                "Basic " + Base64
-                                        .encodeBase64String((username + ":" + password).getBytes()))
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();
     }

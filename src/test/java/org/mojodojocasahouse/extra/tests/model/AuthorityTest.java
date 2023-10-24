@@ -4,8 +4,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.model.Authority;
 import org.mojodojocasahouse.extra.model.ExtraUser;
-
-import java.util.HashSet;
 import java.util.Set;
 
 public class AuthorityTest {

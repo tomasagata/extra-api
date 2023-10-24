@@ -1,8 +1,5 @@
 package org.mojodojocasahouse.extra.tests.service;
 
-import jakarta.mail.Message;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mojodojocasahouse.extra.dto.*;
@@ -19,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mojodojocasahouse.extra.repository.PasswordResetTokenRepository;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.testmodels.TestPasswordResetToken;
-import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -188,7 +184,7 @@ public class AuthenticationServiceTest {
                 "new_pass",
                 "new_pass"
         );
-        ApiResponse expectedResponse = new ApiResponse("Password changed successfully");
+        new ApiResponse("Password changed successfully");
 
         // Setup - expectations
         given(passwordEncoder.matches("some_pass", "curr_pass_hashed")).willReturn(false);

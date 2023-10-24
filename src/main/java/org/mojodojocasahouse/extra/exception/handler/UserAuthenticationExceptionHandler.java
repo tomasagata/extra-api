@@ -1,6 +1,6 @@
 package org.mojodojocasahouse.extra.exception.handler;
 
-import jakarta.mail.MessagingException;
+
 import org.mojodojocasahouse.extra.exception.*;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.springframework.http.HttpHeaders;

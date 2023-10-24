@@ -1,22 +1,21 @@
 package org.mojodojocasahouse.extra.controller;
+import java.math.BigDecimal;
 import java.security.Principal;
+import java.sql.Date;
 import java.util.List;
+import java.util.Map;
 
+import jakarta.validation.constraints.PastOrPresent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
-import org.mojodojocasahouse.extra.dto.ExpenseDTO;
-import org.mojodojocasahouse.extra.dto.ExpenseFilteringRequest;
+import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.service.ExpenseService;
+import org.mojodojocasahouse.extra.validation.constraint.ValidCategory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
@@ -43,29 +42,77 @@ public class ExpensesController {
                 HttpStatus.CREATED
         );
     }
-    
-    @GetMapping(path = "/getMyExpenses", produces = "application/json")
-    public ResponseEntity<List<ExpenseDTO>> getMyExpenses(Principal principal){
+
+    @PostMapping(value = "/editExpense", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> editExpense(Principal principal,
+                                              @Valid @RequestBody ExpenseEditingRequest expenseEditingRequest){
         ExtraUser user = userService.getUserByPrincipal(principal);
 
-        log.debug("Retrieving all expenses of user: \"" + principal.getName() + "\"");
+        log.debug("Editing expense of user: \"" + user.getEmail() + "\"");
 
-        List <ExpenseDTO> listOfExpenses = expenseService.getAllExpensesByUserId(user);
-    
-        return ResponseEntity.ok(listOfExpenses);
+        ApiResponse response = expenseService.editExpense(user, expenseEditingRequest);
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.CREATED
+        );
     }
 
-    @PostMapping(path = "/getMyExpensesByCategory", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<List<ExpenseDTO>> getMyExpensesByCategory(Principal principal,
-                                                                    @Valid @RequestBody ExpenseFilteringRequest expenseFilteringRequest){
+    @DeleteMapping("/expenses/{id}")
+    public ResponseEntity<ApiResponse> deleteExpense(Principal principal, @PathVariable Long id) {
         ExtraUser user = userService.getUserByPrincipal(principal);
-        String category = expenseFilteringRequest.getCategory();
+    //Check that the user making the deletion is the owner of the expense
+        if (!expenseService.isOwner(user, id)) {
+            return new ResponseEntity<>(
+                    new ApiResponse("Error. You are not the owner of the expense you are trying to delete"),
+                    HttpStatus.FORBIDDEN
+            );
+        }
+    // Check if the expense with the given ID exists
+        if (!expenseService.existsById(id)) {
+            return new ResponseEntity<>(
+                    new ApiResponse("Error. Expense to delete not found"),
+                    HttpStatus.NOT_FOUND
+            );
+        }
+    // Delete the expense by ID
+        expenseService.deleteById(id);
+        return new ResponseEntity<>(
+                new ApiResponse("Expense deleted successfully"),
+                HttpStatus.OK
+        );
+    }
 
-        log.debug("Retrieving expenses of user: \"" + principal.getName() + "\" by category: \"" + category + "\"");
+    @GetMapping(path = "/getMyExpenses", produces = "application/json")
+    public ResponseEntity<List<ExpenseDTO>> getMyExpenses(
+            Principal principal,
+            @RequestParam(required = false) List<@ValidCategory String> categories,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String until){
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        Date min_date;
+        Date max_date;
 
-        List<ExpenseDTO> listOfExpenses = expenseService.getAllExpensesByCategoryByUserId(user, category);
+        if(from != null && !from.isEmpty()) {
+            min_date = Date.valueOf(from);
+        } else {
+            min_date = null;
+        }
 
-        return ResponseEntity.ok(listOfExpenses);
+        if(until != null && !until.isEmpty()) {
+            max_date = Date.valueOf(until);
+        } else {
+            max_date = null;
+        }
+
+        log.debug("Retrieving expenses of user: \"" + principal.getName() + "\", " +
+                "for categories: " + categories + ", " +
+                "from: " + from + ", " +
+                "until: " + until + ".");
+
+        List<ExpenseDTO> expenses = expenseService
+                .getExpensesOfUserByCategoriesAndDateRanges(user, categories, min_date, max_date);
+
+        return ResponseEntity.ok(expenses);
     }
 
 
@@ -76,6 +123,39 @@ public class ExpensesController {
         log.debug("Retrieving all expenses of user: \"" + principal.getName() + "\"");
 
         return ResponseEntity.ok(expenseService.getAllCategories(user));
+    }
+
+    @GetMapping(path = "/getSumOfExpenses", produces = "application/json")
+    public ResponseEntity<List<Map<String, BigDecimal>>> getExpensesByDateAndCategory(
+            Principal principal,
+            @RequestParam(required = false) List<@ValidCategory String> categories,
+            @RequestParam(required = false) String from,
+            @RequestParam(required = false) String until) {
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        Date min_date;
+        Date max_date;
+
+        if(from != null && !from.isEmpty()) {
+            min_date = Date.valueOf(from);
+        } else {
+            min_date = null;
+        }
+
+        if(until != null && !until.isEmpty()) {
+            max_date = Date.valueOf(until);
+        } else {
+            max_date = null;
+        }
+
+        log.debug("Retrieving sum of expenses of user: \"" + principal.getName() + "\", " +
+                "for categories: " + categories + ", " +
+                "from: " + from + ", " +
+                "until: " + until + ".");
+
+        List<Map<String, BigDecimal>> categoryAmounts = expenseService
+                .getSumOfExpensesOfUserByCategoriesAndDateRanges(user, categories, min_date, max_date);
+
+        return ResponseEntity.ok(categoryAmounts);
     }
 
 }
