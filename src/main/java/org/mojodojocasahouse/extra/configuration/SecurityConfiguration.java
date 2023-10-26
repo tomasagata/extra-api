@@ -47,7 +47,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/auth/forgotten/reset").permitAll()
                         .requestMatchers("/register*").permitAll()
                         .requestMatchers("/editExpense").authenticated()
-                        .requestMatchers("expenses/{id}").authenticated()
+                        .requestMatchers("/expenses/{id}").authenticated()
                         .requestMatchers("/getSumOfExpenses").authenticated()
                         .requestMatchers("/getMyExpensesFrom").authenticated()
                 )
