@@ -1,12 +1,11 @@
 package org.mojodojocasahouse.extra.model;
 
-import jakarta.persistence.Entity;
-
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.ExpenseEditingRequest;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -60,6 +59,24 @@ public class ExtraExpense{
                 expenseAddingRequest.getIconId()
         );
     }
+public void updateFrom(ExpenseEditingRequest request, ExtraUser user) {
+    if (request.getConcept() != null ) {
+        this.concept = request.getConcept();
+    }
+    if (request.getAmount() != null) {
+        this.amount = request.getAmount();
+    }
+    if (request.getDate() != null ) {
+        this.date = request.getDate();
+    }
+    if (request.getIconId() != null ) {
+        this.iconId = request.getIconId();
+    }
+    if (request.getCategory() != null ) {
+        this.category = request.getCategory();
+    }
+    // Add similar checks for other fields as needed.
+}
 
     public ExpenseDTO asDto(){
         return new ExpenseDTO(

@@ -28,7 +28,6 @@ import static org.mockito.BDDMockito.given;
 @ExtendWith(MockitoExtension.class)
 public class ExpensesServiceTest {
 
-    private JacksonTester<List<ExpenseDTO>> jsonExpenseDtoList;
 
     @Mock
     private ExtraExpenseRepository expenseRepository;
@@ -126,7 +125,7 @@ public class ExpensesServiceTest {
                 "Somepassword1!"
         );
         ExtraExpense savedExpense1 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
-        ExtraExpense savedExpense2 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.12"), Date.valueOf("2023-09-12"), "test2",(short) 1);
+        new ExtraExpense(user, "Another Concept", new BigDecimal("10.12"), Date.valueOf("2023-09-12"), "test2",(short) 1);
         List<ExpenseDTO> expectedDtos = List.of(savedExpense1.asDto());
 
         given(expenseRepository.findAllExpensesByUserAndCategory(any(), any())).willReturn(List.of(savedExpense1));

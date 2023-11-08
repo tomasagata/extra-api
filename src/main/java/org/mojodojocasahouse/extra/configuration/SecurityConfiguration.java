@@ -2,7 +2,7 @@ package org.mojodojocasahouse.extra.configuration;
 
 import lombok.RequiredArgsConstructor;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
-import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
+import org.mojodojocasahouse.extra.security.ExtraLogoutSuccessHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,13 +13,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    private final ExtraUserDetailsService userDetailsService;
 
     private final DelegatingBasicAuthenticationEntryPoint authenticationEntryPoint;
 
@@ -46,6 +46,10 @@ public class SecurityConfiguration {
                         .requestMatchers("/auth/forgotten").permitAll()
                         .requestMatchers("/auth/forgotten/reset").permitAll()
                         .requestMatchers("/register*").permitAll()
+                        .requestMatchers("/editExpense").authenticated()
+                        .requestMatchers("/expenses/{id}").authenticated()
+                        .requestMatchers("/getSumOfExpenses").authenticated()
+                        .requestMatchers("/getMyExpensesFrom").authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
                         .realmName("extra")
@@ -56,6 +60,8 @@ public class SecurityConfiguration {
                 )
                 .logout(logout -> logout
                         .deleteCookies("JSESSIONID")
+                        .invalidateHttpSession(true)
+                        .logoutSuccessHandler(customLogoutSuccessHandler())
                 )
                 .rememberMe(Customizer.withDefaults())
                 .exceptionHandling(exc -> exc
@@ -70,5 +76,8 @@ public class SecurityConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-
+    @Bean
+    public LogoutSuccessHandler customLogoutSuccessHandler() {
+        return new ExtraLogoutSuccessHandler();
+    }
 }
