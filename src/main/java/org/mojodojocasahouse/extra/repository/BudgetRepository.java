@@ -16,14 +16,13 @@ public interface BudgetRepository extends JpaRepository<ExtraBudget, Long> {
 
     List<ExtraBudget> findAllBudgetsByUser(ExtraUser user);
 
-    @Query(value = "SELECT * FROM BUDGETS " +
-           "WHERE user_id = :userId " +
-           "AND category = :category " +
-           "AND limitdate > :today " +
-           "ORDER BY limitdate ASC", nativeQuery = true)
+    @Query( "SELECT b FROM ExtraBudget b " +
+            "WHERE b.user = :user " +
+                "AND b.category = :category " +
+                "AND CURRENT DATE BETWEEN b.startingDate AND b.limitDate " +
+            "ORDER BY b.limitDate ASC")
     ExtraBudget findActiveBudgetByUserAndCategory(
-        @Param("userId") ExtraUser userId,
-        @Param("today") Date today,
+        @Param("user") ExtraUser user,
         @Param("category") String category
     );
 

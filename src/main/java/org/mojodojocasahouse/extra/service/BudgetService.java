@@ -69,8 +69,7 @@ public class BudgetService {
         return budgetRepository.findById(id).get().asDto();
     }
     public void addToActiveBudget(ExtraUser user, BigDecimal amountOfExpense, String category) {
-        Date today = new Date(System.currentTimeMillis());
-        ExtraBudget activeBudget = budgetRepository.findActiveBudgetByUserAndCategory(user, today, category);
+        ExtraBudget activeBudget = budgetRepository.findActiveBudgetByUserAndCategory(user, category);
         if (activeBudget != null) {
             activeBudget.addToCurrentAmount(amountOfExpense);
             budgetRepository.save(activeBudget);

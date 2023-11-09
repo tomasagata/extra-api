@@ -19,7 +19,7 @@ public class BudgetAddingRequest {
     private Date limitDate;
 
     @PastOrPresent(message = "Date must be in the past or present")
-    private Date creationDate;
+    private Date startingDate;
 
 
     @NotNull(message = "Category is mandatory")
@@ -33,11 +33,11 @@ public class BudgetAddingRequest {
     @DecimalMax(value = "15", message = "IconId must be less than 15")
     private Short iconId;
     
-    public BudgetAddingRequest(String name, BigDecimal limitAmount , Date limitDate , Date creationDate, String category, Short iconId) {
+    public BudgetAddingRequest(String name, BigDecimal limitAmount , Date limitDate , Date startingDate, String category, Short iconId) {
         this.name = name;
         this.limitAmount = limitAmount;
         this.limitDate = limitDate;
-        this.creationDate = creationDate;
+        this.startingDate = startingDate;
         this.category = category;
         this.iconId = iconId;
     }

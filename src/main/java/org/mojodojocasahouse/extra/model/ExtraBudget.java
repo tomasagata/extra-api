@@ -33,7 +33,7 @@ public class ExtraBudget{
     private Date limitDate;
 
     @Column(name="CREATIONDATE", nullable = false)
-    private Date creationDate;
+    private Date startingDate;
 
     @Column(name="CATEGORY", nullable = false)
     private String category;
@@ -49,18 +49,18 @@ public class ExtraBudget{
                 BigDecimal.ZERO, //currentAmount SETEADA EN CERO AL CREAR EL PRESUPUESTO
                 budgetAddingRequest.getLimitAmount(),
                 budgetAddingRequest.getLimitDate(),
-                budgetAddingRequest.getCreationDate(),
+                budgetAddingRequest.getStartingDate(),
                 budgetAddingRequest.getCategory(),
                 budgetAddingRequest.getIconId()
         );
     }
-        public ExtraBudget(ExtraUser user, String name, BigDecimal currentAmount, BigDecimal limitAmount, Date limitDate, Date creationDate, String category, Short iconId) {
+        public ExtraBudget(ExtraUser user, String name, BigDecimal currentAmount, BigDecimal limitAmount, Date limitDate, Date startingDate, String category, Short iconId) {
         this.user = user;
         this.name = name;
         this.limitAmount = limitAmount;
         this.currentAmount = currentAmount;
         this.limitDate = limitDate;
-        this.creationDate = creationDate;
+        this.startingDate = startingDate;
         this.category = category;
         this.iconId = iconId;
     }
@@ -81,7 +81,7 @@ public class ExtraBudget{
             this.limitDate = request.getLimitDate();
         }
         if (request.getCreationDate() != null ) {
-            this.creationDate = request.getCreationDate();
+            this.startingDate = request.getCreationDate();
         }
         if (request.getIconId() != null ) {
             this.iconId = request.getIconId();
@@ -98,7 +98,7 @@ public class ExtraBudget{
                 this.limitAmount,
                 this.currentAmount,
                 this.limitDate,
-                this.creationDate,
+                this.startingDate,
                 this.category,
                 this.iconId 
             );
