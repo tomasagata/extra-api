@@ -103,5 +103,10 @@ public interface ExtraExpenseRepository extends JpaRepository<ExtraExpense, Long
             @Param("user") ExtraUser user,
             @Param("categories") List<String> categories,
             @Param("maxDate") Date maxDate);
+
+    @Query( "SELECT DISTINCT e.category AS category, e.iconId AS iconId " +
+            "FROM ExtraExpense e " +
+            "WHERE e.user = :user")
+    List<Map<String, String>> findAllDistinctCategoriesByUserWithIcons(ExtraUser user);
 }
 

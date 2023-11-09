@@ -138,6 +138,15 @@ public class ExpensesController {
         return ResponseEntity.ok(expenseService.getAllCategories(user));
     }
 
+    @GetMapping(path = "/getAllCategoriesWithIcons", produces = "application/json")
+    public ResponseEntity<List<Map<String, String>>> getMyCategoriesWithIcons (Principal principal){
+        ExtraUser user = userService.getUserByPrincipal(principal);
+
+        log.debug("Retrieving all expenses of user: \"" + principal.getName() + "\"");
+
+        return ResponseEntity.ok(expenseService.getAllCategoriesWithIcons(user));
+    }
+
     @GetMapping(path = "/getSumOfExpenses", produces = "application/json")
     public ResponseEntity<List<Map<String, BigDecimal>>> getExpensesByDateAndCategory(
             Principal principal,

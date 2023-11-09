@@ -141,4 +141,8 @@ public class ExpenseService {
                 .map(ExtraExpense::asDto)
                 .collect(Collectors.toList());
     }
+
+    public List<Map<String, String>> getAllCategoriesWithIcons(ExtraUser user) {
+        return expenseRepository.findAllDistinctCategoriesByUserWithIcons(user);
+    }
 }
