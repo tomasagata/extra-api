@@ -1,13 +1,10 @@
 package org.mojodojocasahouse.extra.service;
 
 import lombok.RequiredArgsConstructor;
-
 import java.math.BigDecimal;
-import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.model.ExtraBudget;
 import org.mojodojocasahouse.extra.model.ExtraUser;

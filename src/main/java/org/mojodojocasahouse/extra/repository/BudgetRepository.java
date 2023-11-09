@@ -1,5 +1,4 @@
 package org.mojodojocasahouse.extra.repository;
-import java.sql.Date;
 import java.util.List;
 
 import org.mojodojocasahouse.extra.model.ExtraBudget;
