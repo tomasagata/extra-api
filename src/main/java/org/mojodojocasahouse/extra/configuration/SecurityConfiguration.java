@@ -56,6 +56,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/editBudget/{id}").authenticated()
                         .requestMatchers("/budget/{id}").authenticated()
                         .requestMatchers("/getAllCategoriesWithIcons").authenticated()
+                        .requestMatchers("/error").permitAll()
                 )
                 .httpBasic(httpBasic -> httpBasic
                         .realmName("extra")
