@@ -27,7 +27,8 @@ public class BudgetsController {
         ExtraUser user = userService.getUserByPrincipal(principal);
 
         log.debug("Adding budget to user: \"" + user.getEmail() + "\"");
-
+        
+        
         ApiResponse response = budgetService.addBudget(user, budgetAddingRequest);
         return new ResponseEntity<>(
                 response,

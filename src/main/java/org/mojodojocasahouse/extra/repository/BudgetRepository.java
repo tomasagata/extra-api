@@ -1,4 +1,5 @@
 package org.mojodojocasahouse.extra.repository;
+import java.sql.Date;
 import java.util.List;
 
 import org.mojodojocasahouse.extra.model.ExtraBudget;
@@ -24,5 +25,14 @@ public interface BudgetRepository extends JpaRepository<ExtraBudget, Long> {
         @Param("user") ExtraUser user,
         @Param("category") String category
     );
+
+    // find budgets of an user by category that date range dont overlap with the given date range
+    @Query( "SELECT b FROM ExtraBudget AS b " +  
+            "WHERE b.user = :user " +
+                "AND b.category = :category " +
+                "AND (b.startingDate BETWEEN :startingDate AND :limitDate OR b.limitDate BETWEEN :startingDate AND :limitDate) " +
+            "ORDER BY b.limitDate ASC")
+    List<ExtraBudget> findBudgetByUserAndCategoryAndStartDateAndEndDate(ExtraUser user, String category, Date startingDate,
+            Date limitDate);
 
 }

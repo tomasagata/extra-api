@@ -23,7 +23,11 @@ public class BudgetService {
     public ApiResponse addBudget(ExtraUser user, BudgetAddingRequest budgetAddingRequest) {
         //create budget entity from request data
         ExtraBudget newBudget = ExtraBudget.from(budgetAddingRequest, user);
-
+        //check if a budget for that category already exists within dates
+        List<ExtraBudget> existingBudget = budgetRepository.findBudgetByUserAndCategoryAndStartDateAndEndDate(user, budgetAddingRequest.getCategory(), budgetAddingRequest.getStartingDate(), budgetAddingRequest.getLimitDate());
+        if (!existingBudget.isEmpty()) {
+            return new ApiResponse("Error. A budget for that category already exists within the given dates");
+        }
         //Save new budget
         budgetRepository.save(newBudget);
         return new ApiResponse("Budget added succesfully!");
@@ -67,7 +71,7 @@ public class BudgetService {
     }
     public void addToActiveBudget(ExtraUser user, BigDecimal amountOfExpense, String category) {
         ExtraBudget activeBudget = budgetRepository.findActiveBudgetByUserAndCategory(user, category);
-        if (activeBudget != null) {
+        if (activeBudget != null){
             activeBudget.addToCurrentAmount(amountOfExpense);
             budgetRepository.save(activeBudget);
         }
