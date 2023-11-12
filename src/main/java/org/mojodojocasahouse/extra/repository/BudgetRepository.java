@@ -26,13 +26,24 @@ public interface BudgetRepository extends JpaRepository<ExtraBudget, Long> {
         @Param("category") String category
     );
 
-    // find budgets of an user by category that date range dont overlap with the given date range
-    @Query( "SELECT b FROM ExtraBudget AS b " +  
+    // Find existing budgets that overlap with given date range
+    //
+    // Added edge validation cases
+    // used:  https://www.codespeedy.com/check-if-two-date-ranges-overlap-or-not-in-java/ for reference
+    @Query( "SELECT b FROM ExtraBudget b " +
             "WHERE b.user = :user " +
                 "AND b.category = :category " +
-                "AND (b.startingDate BETWEEN :startingDate AND :limitDate OR b.limitDate BETWEEN :startingDate AND :limitDate) " +
-            "ORDER BY b.limitDate ASC")
-    List<ExtraBudget> findBudgetByUserAndCategoryAndStartDateAndEndDate(ExtraUser user, String category, Date startingDate,
-            Date limitDate);
+                "AND (" +
+                    "   (:startingDate <= b.startingDate AND :limitDate >= b.startingDate) " +
+                    "OR (:startingDate <= b.limitDate    AND :limitDate >= b.limitDate   ) " +
+                    "OR (:startingDate <= b.startingDate AND :limitDate >= b.limitDate   ) " +
+                    "OR (:startingDate >= b.startingDate AND :limitDate <= b.limitDate   ) " +
+            ") ORDER BY b.limitDate ASC")
+    List<ExtraBudget> findBudgetByUserAndCategoryAndStartDateAndEndDate(
+            ExtraUser user,
+            String category,
+            Date startingDate,
+            Date limitDate
+    );
 
 }
