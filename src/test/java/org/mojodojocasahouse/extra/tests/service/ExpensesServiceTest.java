@@ -2,6 +2,7 @@ package org.mojodojocasahouse.extra.tests.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import org.mojodojocasahouse.extra.dto.ExpenseDTO;
 import org.mojodojocasahouse.extra.model.ExtraExpense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraExpenseRepository;
+import org.mojodojocasahouse.extra.service.BudgetService;
 import org.mojodojocasahouse.extra.service.ExpenseService;
 import org.springframework.boot.test.json.JacksonTester;
 
@@ -34,6 +36,9 @@ public class ExpensesServiceTest {
 
     @InjectMocks
     private ExpenseService expenseService;
+
+    @Mock
+    private BudgetService budgetService;
 
     @BeforeEach
     public void setup() {
