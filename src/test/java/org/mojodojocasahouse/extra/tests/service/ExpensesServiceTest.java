@@ -2,6 +2,7 @@ package org.mojodojocasahouse.extra.tests.service;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,9 +13,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.ExpenseEditingRequest;
 import org.mojodojocasahouse.extra.model.ExtraExpense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraExpenseRepository;
+import org.mojodojocasahouse.extra.service.BudgetService;
 import org.mojodojocasahouse.extra.service.ExpenseService;
 import org.springframework.boot.test.json.JacksonTester;
 
@@ -34,6 +37,9 @@ public class ExpensesServiceTest {
 
     @InjectMocks
     private ExpenseService expenseService;
+
+    @Mock
+    private BudgetService budgetService;
 
     @BeforeEach
     public void setup() {
@@ -151,5 +157,60 @@ public class ExpensesServiceTest {
 
         Assertions.assertThat(foundExpenses).containsExactlyInAnyOrder(expectedCategories.toArray(String[]::new));
     }
+
+    @Test
+    public void testExpenseCanBeEdited(){
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        ExtraExpense savedExpense1 = new ExtraExpense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
+        given(expenseRepository.findById(any())).willReturn(java.util.Optional.of(savedExpense1));
+        Long id = (long) 0;
+        ExpenseEditingRequest request = new ExpenseEditingRequest(
+                "Anoother concept",
+                null,
+                null,
+                null,
+                null
+        );
+        ApiResponse expectedResponse = new ApiResponse(
+                "Expense edited successfully!"
+        );
+        ApiResponse actualResponse = expenseService.editExpense(user,id, request);
+        
+        Assertions.assertThat(actualResponse).isEqualTo(expectedResponse);
+    }  
+
+    @Test
+    public void testExpenseCanBeDeleted(){
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        ExtraExpense savedExpense1 = new ExtraExpense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
+        expenseRepository.save(savedExpense1);
+        Long id = (long) 0;
+        expenseService.deleteById(id);
+        Assertions.assertThat(expenseService.existsById(id)).isEqualTo(false);
+    }
+    @Test
+    public void testExpenseHaveOwner(){
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        ExtraExpense savedExpense1 = new ExtraExpense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
+        expenseRepository.save(savedExpense1);
+        Long id = (long) 0;
+        Assertions.assertThat(expenseService.isOwner(user, id)).isEqualTo(false);
+    }
+    
 
 }

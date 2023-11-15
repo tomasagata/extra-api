@@ -75,7 +75,6 @@ public void updateFrom(ExpenseEditingRequest request, ExtraUser user) {
     if (request.getCategory() != null ) {
         this.category = request.getCategory();
     }
-    // Add similar checks for other fields as needed.
 }
 
     public ExpenseDTO asDto(){

@@ -22,12 +22,13 @@ import jakarta.validation.Valid;
 public class ExpenseService {
 
     private final ExtraExpenseRepository expenseRepository;
-
+    private final BudgetService budgetService;
 
     public ApiResponse addExpense(ExtraUser user, ExpenseAddingRequest expenseAddingRequest) {
         //create expense entity from request data
         ExtraExpense newExpense = ExtraExpense.from(expenseAddingRequest, user);
-
+        //handle if expense should add to a budget
+        budgetService.addToActiveBudget(user, newExpense.getAmount(), newExpense.getCategory());
         //Save new expense
         expenseRepository.save(newExpense);
         return new ApiResponse("Expense added succesfully!");
@@ -47,9 +48,9 @@ public class ExpenseService {
         return expenseRepository.findAllDistinctCategoriesByUser(user);
     }
 
-    public ApiResponse editExpense(ExtraUser user, @Valid ExpenseEditingRequest expenseEditingRequest) {
+    public ApiResponse editExpense(ExtraUser user, Long expenseId, @Valid ExpenseEditingRequest expenseEditingRequest) {
         // Check if the expense with the given ID exists
-        Long expenseId = expenseEditingRequest.getId();
+
         Optional<ExtraExpense> expenseOptional = expenseRepository.findById(expenseId);
     
         if (expenseOptional.isPresent()) {
@@ -139,5 +140,9 @@ public class ExpenseService {
                 .stream()
                 .map(ExtraExpense::asDto)
                 .collect(Collectors.toList());
+    }
+
+    public List<Map<String, String>> getAllCategoriesWithIcons(ExtraUser user) {
+        return expenseRepository.findAllDistinctCategoriesByUserWithIcons(user);
     }
 }

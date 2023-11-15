@@ -4,8 +4,6 @@ import java.security.Principal;
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;
-
-import jakarta.validation.constraints.PastOrPresent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mojodojocasahouse.extra.dto.*;
@@ -33,9 +31,10 @@ public class ExpensesController {
     public ResponseEntity<Object> addExpense(Principal principal,
                                              @Valid @RequestBody ExpenseAddingRequest expenseAddingRequest){
         ExtraUser user = userService.getUserByPrincipal(principal);
-
         log.debug("Adding expense to user: \"" + user.getEmail() + "\"");
 
+        //Add expense amount to current amount of budget if budget is active
+        
         ApiResponse response = expenseService.addExpense(user, expenseAddingRequest);
         return new ResponseEntity<>(
                 response,
@@ -43,14 +42,28 @@ public class ExpensesController {
         );
     }
 
-    @PostMapping(value = "/editExpense", consumes = "application/json", produces = "application/json")
+    @PostMapping(value = "/editExpense/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editExpense(Principal principal,
-                                              @Valid @RequestBody ExpenseEditingRequest expenseEditingRequest){
+                                              @Valid @RequestBody ExpenseEditingRequest expenseEditingRequest, @PathVariable Long id){
         ExtraUser user = userService.getUserByPrincipal(principal);
+            //Check that the user making the edition is the owner of the expense
+        if (!expenseService.isOwner(user, id)) {
+            return new ResponseEntity<>(
+                    new ApiResponse("Error. You are not the owner of the expense you are trying to edit"),
+                    HttpStatus.FORBIDDEN
+            );
+        }
+    // Check if the expense with the given ID exists
+        if (!expenseService.existsById(id)) {
+            return new ResponseEntity<>(
+                    new ApiResponse("Error. Expense to edit not found"),
+                    HttpStatus.NOT_FOUND
+            );
+        }
 
         log.debug("Editing expense of user: \"" + user.getEmail() + "\"");
 
-        ApiResponse response = expenseService.editExpense(user, expenseEditingRequest);
+        ApiResponse response = expenseService.editExpense(user, id,expenseEditingRequest);
         return new ResponseEntity<>(
                 response,
                 HttpStatus.CREATED
@@ -123,6 +136,15 @@ public class ExpensesController {
         log.debug("Retrieving all expenses of user: \"" + principal.getName() + "\"");
 
         return ResponseEntity.ok(expenseService.getAllCategories(user));
+    }
+
+    @GetMapping(path = "/getAllCategoriesWithIcons", produces = "application/json")
+    public ResponseEntity<List<Map<String, String>>> getMyCategoriesWithIcons (Principal principal){
+        ExtraUser user = userService.getUserByPrincipal(principal);
+
+        log.debug("Retrieving all expenses of user: \"" + principal.getName() + "\"");
+
+        return ResponseEntity.ok(expenseService.getAllCategoriesWithIcons(user));
     }
 
     @GetMapping(path = "/getSumOfExpenses", produces = "application/json")
