@@ -183,6 +183,7 @@ public class ExpensesServiceTest {
         
         Assertions.assertThat(actualResponse).isEqualTo(expectedResponse);
     }  
+
     @Test
     public void testExpenseCanBeDeleted(){
         ExtraUser user = new ExtraUser(
@@ -210,4 +211,6 @@ public class ExpensesServiceTest {
         Long id = (long) 0;
         Assertions.assertThat(expenseService.isOwner(user, id)).isEqualTo(false);
     }
+    
+
 }
