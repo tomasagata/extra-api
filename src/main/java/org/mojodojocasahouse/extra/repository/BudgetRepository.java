@@ -26,6 +26,17 @@ public interface BudgetRepository extends JpaRepository<ExtraBudget, Long> {
         @Param("category") String category
     );
 
+    @Query( "SELECT b FROM ExtraBudget b " +
+            "WHERE b.user = :user " +
+            "AND b.category = :category " +
+            "AND :date BETWEEN b.startingDate AND b.limitDate " +
+            "ORDER BY b.limitDate ASC ")
+    List<ExtraBudget> findActiveBudgetByUserAndCategoryAndDate(
+            @Param("user") ExtraUser user,
+            @Param("category") String category,
+            @Param("date") Date date
+    );
+
     // Find existing budgets that overlap with given date range
     //
     // Added edge validation cases

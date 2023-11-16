@@ -38,7 +38,8 @@ public class BudgetsController {
     //Edit Budget
     @PostMapping(value = "/editBudget/{id}", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> editBudget(Principal principal,
-                                              @Valid @RequestBody BudgetEditingRequest budgetEditingRequest,@PathVariable Long id){
+                                             @Valid @RequestBody BudgetEditingRequest budgetEditingRequest,
+                                             @PathVariable Long id){
         ExtraUser user = userService.getUserByPrincipal(principal);
         //Check that the user making the edition is the owner of the budget
         if (!budgetService.isOwner(user, id)) {
@@ -118,8 +119,16 @@ public class BudgetsController {
                 budgetService.getBudgetById(id),
                 HttpStatus.OK
         );
+    }
 
-
+    @PostMapping("/getActiveBudgets")
+    public ResponseEntity<Object> getActiveBudgets(Principal principal, @Valid @RequestBody ActiveBudgetRequest request){
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        BudgetDTO foundBudget = budgetService.getActiveBudgetByCategoryAndDate(user, request.getCategory(), request.getDate());
+        return new ResponseEntity<>(
+                new ApiResponse("", foundBudget),
+                HttpStatus.OK
+        );
     }
 
 }

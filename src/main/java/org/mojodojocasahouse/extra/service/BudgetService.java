@@ -2,9 +2,12 @@ package org.mojodojocasahouse.extra.service;
 
 import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import lombok.extern.slf4j.Slf4j;
 import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.model.ExtraBudget;
 import org.mojodojocasahouse.extra.model.ExtraUser;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import jakarta.validation.Valid;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BudgetService {
@@ -75,5 +79,17 @@ public class BudgetService {
             activeBudget.addToCurrentAmount(amountOfExpense);
             budgetRepository.save(activeBudget);
         }
+    }
+
+    public BudgetDTO getActiveBudgetByCategoryAndDate(ExtraUser user, String category, Date date){
+        ExtraBudget activeBudget = budgetRepository.findActiveBudgetByUserAndCategoryAndDate(user, category, date)
+                .stream()
+                .findFirst()
+                .orElse(null);
+        log.debug("Found active budgets: " + activeBudget );
+        if(activeBudget == null){
+            return null;
+        }
+        return activeBudget.asDto();
     }
 }
