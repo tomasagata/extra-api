@@ -121,4 +121,8 @@ public class Budget {
     public void addToCurrentAmount(BigDecimal amountOfExpense) {
         this.currentAmount = this.currentAmount.add(amountOfExpense);
     }
+
+    public void removeFromCurrentAmount(BigDecimal amountOfExpense) {
+        this.currentAmount = this.currentAmount.add(amountOfExpense);
+    }
 }

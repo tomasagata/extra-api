@@ -208,6 +208,35 @@ public class ExpenseTest {
     }
 
     @Test
+    void testUpdatingJustTheDateModifiesOnlyTheDate() {
+        ExtraUser unmanagedUser = new ExtraUser(
+                "Michael",
+                "Jordan",
+                "michaelj@gmail.com",
+                "somepassword"
+        );
+        Expense unmanagedExpense = new Expense(
+                unmanagedUser,
+                "Madrid trip",
+                new BigDecimal(99),
+                Date.valueOf("2018-12-9"),
+                "test",
+                (short) 1
+        );
+        unmanagedExpense.updateFrom(
+                new ExpenseEditingRequest(
+                        null,
+                        null,
+                        Date.valueOf("2023-12-09"),
+                        null,
+                        null
+                ),
+                unmanagedUser
+        );
+        Assertions.assertThat(unmanagedExpense.getDate()).isEqualTo(Date.valueOf("2023-12-09"));
+    }
+
+    @Test
     void testUpdatingCategoryAndIconIDModifiesThoseFields() {
         ExtraUser unmanagedUser = new ExtraUser(
                 "Michael",

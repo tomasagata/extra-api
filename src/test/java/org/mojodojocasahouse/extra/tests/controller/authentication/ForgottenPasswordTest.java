@@ -9,6 +9,7 @@ import org.mojodojocasahouse.extra.controller.AuthenticationController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.ForgotPasswordRequest;
+import org.mojodojocasahouse.extra.exception.EmailException;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
@@ -25,6 +26,8 @@ import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -95,6 +98,27 @@ public class ForgottenPasswordTest {
         Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonApiResponse.write(expectedResponse).getJson());
     }
 
+    @Test
+    @WithMockUser
+    public void testARaisedEmailExceptionReturnsErrorResponse() throws Exception {
+        // Setup - data
+        ForgotPasswordRequest request = new ForgotPasswordRequest("some_email@me.com");
+        ApiError expectedResponse = new ApiError(
+                HttpStatus.FAILED_DEPENDENCY,
+                "Email Error",
+                "An error occurred while sending password recovery email. Try again later"
+        );
+
+        //Setup - expectations
+        given(service.sendPasswordResetEmail(any())).willThrow(new EmailException());
+
+        // execute
+        MockHttpServletResponse response = postForgottenPasswordRequest(request);
+
+        // Validate
+        assertThatResponseReturnsError(response, expectedResponse);
+    }
+
     private MockHttpServletResponse postForgottenPasswordRequest(ForgotPasswordRequest request)
             throws Exception {
 
@@ -112,6 +136,14 @@ public class ForgottenPasswordTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void assertThatResponseReturnsError(MockHttpServletResponse response, ApiError expectedApiError) throws Exception {
+        ApiError actualApiError = jsonApiError.parse(response.getContentAsString()).getObject();
+
+        Assertions.assertThat(actualApiError.getMessage()).isEqualTo(expectedApiError.getMessage());
+        Assertions.assertThat(actualApiError.getStatus()).isEqualTo(expectedApiError.getStatus());
+        Assertions.assertThat(actualApiError.getErrors().toArray()).containsExactlyInAnyOrder(expectedApiError.getErrors().toArray());
     }
 
 }

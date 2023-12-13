@@ -400,10 +400,36 @@ public class RegisterEndpointDataValidationTest {
         assertThatResponseReturnsError(response, apiError);
     }
 
+    @Test
+    public void testPostingToRegisterEndpointWithAMalformedRequestReturnsErrorMessage() throws Exception {
+        // Setup - data
+        String request = "{' OR 1=1";
+        ApiError apiError = new ApiError(
+                HttpStatus.BAD_REQUEST,
+                "Failed to read request",
+                "Malformed Request"
+        );
+
+        // exercise
+        MockHttpServletResponse response = postStringToRegisterEndpoint(request);
+
+        // verify
+        assertThatResponseReturnsError(response, apiError);
+    }
+
     private MockHttpServletResponse postUserRegistrationRequestToController(UserRegistrationRequest userRegistrationRequest) throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
                         post("/register")
                         .content(asJsonString(userRegistrationRequest))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.ALL))
+                .andReturn().getResponse();
+    }
+
+    private MockHttpServletResponse postStringToRegisterEndpoint(String request) throws Exception {
+        return mvc.perform(MockMvcRequestBuilders.
+                        post("/register")
+                        .content(asJsonString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();

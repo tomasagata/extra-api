@@ -5,6 +5,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -78,8 +79,22 @@ public class ExpenseService {
                 .findById(expenseId)
                 .orElseThrow(ExpenseNotFoundException::new);
 
+        budgetService.removeFromActiveBudget(
+                existingExpense.getUser(),
+                existingExpense.getAmount(),
+                existingExpense.getCategory(),
+                existingExpense.getDate()
+        );
+
         // Update the properties of the existing expense with the new data
         existingExpense.updateFrom(expenseEditingRequest, user);
+
+        budgetService.addToActiveBudget(
+                existingExpense.getUser(),
+                existingExpense.getAmount(),
+                existingExpense.getCategory(),
+                existingExpense.getDate()
+        );
 
         // Save the updated expense
         expenseRepository.save(existingExpense);
@@ -91,8 +106,12 @@ public class ExpenseService {
         return expenseRepository.existsById(id);
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(Long id) throws ExpenseNotFoundException{
+        Expense expense = expenseRepository.findById(id).orElseThrow(ExpenseNotFoundException::new);
+
+        budgetService.removeFromActiveBudget(expense.getUser(), expense.getAmount(), expense.getCategory(), expense.getDate());
         expenseRepository.deleteById(id);
+
     }
 
     public boolean isOwner(ExtraUser user, Long id) {

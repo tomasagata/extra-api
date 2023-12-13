@@ -13,6 +13,7 @@ import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.exception.BudgetNotFoundException;
 import org.mojodojocasahouse.extra.exception.ConflictingBudgetException;
 import org.mojodojocasahouse.extra.model.Budget;
+import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
 import org.springframework.stereotype.Service;
@@ -122,5 +123,14 @@ public class BudgetService {
 
     public List<Map<String, String>> getAllCategoriesWithIcons(ExtraUser user) {
         return budgetRepository.findAllDistinctCategoriesByUserWithIcons(user);
+    }
+
+    public void removeFromActiveBudget(ExtraUser user, BigDecimal amountOfExpense, String category, Date date) {
+        List<Budget> activeBudget = budgetRepository.findActiveBudgetByUserAndCategoryAndDate(user, category, date);
+        if (!activeBudget.isEmpty()){
+            Budget foundBudget = activeBudget.stream().findFirst().get();
+            foundBudget.removeFromCurrentAmount(amountOfExpense);
+            budgetRepository.save(foundBudget);
+        }
     }
 }
