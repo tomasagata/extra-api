@@ -2,17 +2,18 @@ package org.mojodojocasahouse.extra.service;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
 import org.mojodojocasahouse.extra.dto.*;
-import org.mojodojocasahouse.extra.model.ExtraExpense;
+import org.mojodojocasahouse.extra.exception.ExpenseNotFoundException;
+import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
-import org.mojodojocasahouse.extra.repository.ExtraExpenseRepository;
+import org.mojodojocasahouse.extra.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
 import jakarta.validation.Valid;
@@ -21,53 +22,69 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 public class ExpenseService {
 
-    private final ExtraExpenseRepository expenseRepository;
+    private final ExpenseRepository expenseRepository;
     private final BudgetService budgetService;
 
     public ApiResponse addExpense(ExtraUser user, ExpenseAddingRequest expenseAddingRequest) {
         //create expense entity from request data
-        ExtraExpense newExpense = ExtraExpense.from(expenseAddingRequest, user);
+        Expense newExpense = Expense.from(expenseAddingRequest, user);
+
         //handle if expense should add to a budget
-        budgetService.addToActiveBudget(user, newExpense.getAmount(), newExpense.getCategory());
+        budgetService.addToActiveBudget(user, newExpense.getAmount(), newExpense.getCategory(), newExpense.getDate());
+
         //Save new expense
         expenseRepository.save(newExpense);
-        return new ApiResponse("Expense added succesfully!");
+        return new ApiResponse("Expense added successfully!");
     }
 
     public List<ExpenseDTO> getAllExpensesByUserId(ExtraUser user) {
-        List<ExtraExpense> expenseObjects = expenseRepository.findAllExpensesByUser(user);
-        return expenseObjects.stream().map(ExtraExpense::asDto).collect(Collectors.toList());
+        List<Expense> expenseObjects = expenseRepository.findAllExpensesByUser(user);
+        return expenseObjects
+                .stream()
+                .map(Expense::asDto)
+                .collect(Collectors.toList());
     }
 
     public List<ExpenseDTO> getAllExpensesByCategoryByUserId(ExtraUser user, String category) {
-        List<ExtraExpense> expenseObjects = expenseRepository.findAllExpensesByUserAndCategory(user, category);
-        return expenseObjects.stream().map(ExtraExpense::asDto).collect(Collectors.toList());
+        List<Expense> expenseObjects = expenseRepository.findAllExpensesByUserAndCategory(user, category);
+        return expenseObjects
+                .stream()
+                .map(Expense::asDto)
+                .collect(Collectors.toList());
     }
 
     public List<String> getAllCategories(ExtraUser user) {
-        return expenseRepository.findAllDistinctCategoriesByUser(user);
+        // Get categories from both expenses and budgets
+        List<String> expenseCategories = expenseRepository.findAllDistinctCategoriesByUser(user);
+        List<String> budgetCategories = budgetService.getAllCategories(user);
+
+        // Unify them
+        List<String> unifiedCategories = new ArrayList<>(expenseCategories);
+        unifiedCategories.addAll(budgetCategories);
+
+        // Remove duplicates
+        return unifiedCategories
+                .stream()
+                .distinct()
+                .collect(Collectors.toList());
     }
 
-    public ApiResponse editExpense(ExtraUser user, Long expenseId, @Valid ExpenseEditingRequest expenseEditingRequest) {
-        // Check if the expense with the given ID exists
+    public ApiResponse editExpense(ExtraUser user,
+                                   Long expenseId,
+                                   @Valid ExpenseEditingRequest expenseEditingRequest) throws ExpenseNotFoundException {
 
-        Optional<ExtraExpense> expenseOptional = expenseRepository.findById(expenseId);
-    
-        if (expenseOptional.isPresent()) {
-            // Get the existing expense
-            ExtraExpense existingExpense = expenseOptional.get();
-    
-            // Update the properties of the existing expense with the new data
-            existingExpense.updateFrom(expenseEditingRequest, user);
-    
-            // Save the updated expense
-            expenseRepository.save(existingExpense);
-    
-            return new ApiResponse("Expense edited successfully!");
-        } else {
-            // Return an error response if the expense with the given ID is not found
-            return new ApiResponse("Expense not found");
-        }
+        // Get the existing expense
+        Expense existingExpense = expenseRepository
+                .findById(expenseId)
+                .orElseThrow(ExpenseNotFoundException::new);
+
+        // Update the properties of the existing expense with the new data
+        existingExpense.updateFrom(expenseEditingRequest, user);
+
+        // Save the updated expense
+        expenseRepository.save(existingExpense);
+
+        return new ApiResponse("Expense edited successfully!");
     }
 
     public boolean existsById(Long id) {
@@ -82,7 +99,7 @@ public class ExpenseService {
         return expenseRepository.existsByIdAndUser(id, user);
     }
 
-    public List<Map<String, BigDecimal>> getSumOfExpensesOfUserByCategoriesAndDateRanges(ExtraUser user,
+    public List<Map<String, String>> getSumOfExpensesOfUserByCategoriesAndDateRanges(ExtraUser user,
                                                                                          List<String> categories,
                                                                                          Date from, Date until) {
         List<String> filteringCategories = categories;
@@ -119,30 +136,67 @@ public class ExpenseService {
             return expenseRepository
                     .getExpensesOfUserByCategory(user, filteringCategories)
                     .stream()
-                    .map(ExtraExpense::asDto)
+                    .map(Expense::asDto)
                     .collect(Collectors.toList());
         } else if (from == null) {
             return expenseRepository
                     .getExpensesOfUserBeforeGivenDate(user, filteringCategories, until)
                     .stream()
-                    .map(ExtraExpense::asDto)
+                    .map(Expense::asDto)
                     .collect(Collectors.toList());
         } else if (until == null) {
             return expenseRepository
                     .getExpensesOfUserAfterGivenDate(user, filteringCategories, from)
                     .stream()
-                    .map(ExtraExpense::asDto)
+                    .map(Expense::asDto)
                     .collect(Collectors.toList());
         }
 
         return expenseRepository
                 .getExpensesOfUserByCategoriesAndDateInterval(user, filteringCategories, from, until)
                 .stream()
-                .map(ExtraExpense::asDto)
+                .map(Expense::asDto)
                 .collect(Collectors.toList());
     }
 
     public List<Map<String, String>> getAllCategoriesWithIcons(ExtraUser user) {
-        return expenseRepository.findAllDistinctCategoriesByUserWithIcons(user);
+        List<Map<String, String>> expenseCategories = expenseRepository.findAllDistinctCategoriesByUserWithIcons(user);
+        List<Map<String, String>> budgetCategories = budgetService.getAllCategoriesWithIcons(user);
+
+        // Unify them
+        List<Map<String, String>> unifiedCategories = new ArrayList<>(expenseCategories);
+        unifiedCategories.addAll(budgetCategories);
+
+        // Remove duplicates
+        return unifiedCategories
+                .stream()
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    public List<Map<String, String>> getYearlySumOfExpensesOfUserByCategoriesAndDateRanges(ExtraUser user,
+                                                                                               List<String> categories,
+                                                                                               Date from,
+                                                                                               Date until) {
+        List<String> filteringCategories = categories;
+
+        if(filteringCategories == null || filteringCategories.isEmpty()){
+            filteringCategories = this.getAllCategories(user);
+        }
+
+        if (from == null && until == null){
+            return expenseRepository
+                    .getYearlySumOfExpensesByCategories(user, filteringCategories);
+        } else if (from == null) {
+            return expenseRepository
+                    .getYearlySumOfExpensesOfUserBeforeGivenDate(user, filteringCategories, until);
+        } else if (until == null) {
+            return expenseRepository
+                    .getYearlySumOfExpensesOfUserAfterGivenDate(user, filteringCategories, from);
+        }
+
+        return expenseRepository
+                .getYearlySumOfExpensesOfUserByCategoryAndDateInterval(user, filteringCategories, from, until);
+
     }
 }

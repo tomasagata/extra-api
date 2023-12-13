@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.dto.BudgetAddingRequest;
 import org.mojodojocasahouse.extra.dto.BudgetDTO;
 import org.mojodojocasahouse.extra.dto.BudgetEditingRequest;
-import org.mojodojocasahouse.extra.model.ExtraBudget;
+import org.mojodojocasahouse.extra.model.Budget;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 
-public class ExtraBudgetTest {
+public class BudgetTest {
     @Test
     void testGettingIdOfMadridTripBudgetReturnsNull() {
         ExtraUser unmanagedUser = new ExtraUser(
@@ -20,7 +20,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -42,7 +42,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -64,7 +64,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -85,7 +85,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -107,7 +107,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -129,7 +129,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -151,7 +151,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -173,7 +173,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -195,7 +195,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -217,7 +217,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -250,7 +250,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -283,7 +283,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraBudget unmanagedBudget = new ExtraBudget(
+        Budget unmanagedBudget = new Budget(
             unmanagedUser,
             "Madrid trip",
             new BigDecimal(0),
@@ -317,7 +317,7 @@ public class ExtraBudgetTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-       ExtraBudget unmanagedBudget = ExtraBudget.from(new BudgetAddingRequest(
+       Budget unmanagedBudget = Budget.from(new BudgetAddingRequest(
                         "Paris Trip",
                         new BigDecimal(100),
                         Date.valueOf("2018-12-9"),
@@ -347,7 +347,7 @@ public class ExtraBudgetTest {
                         "Travel",
                         (short) 2
         );
-       ExtraBudget unmanagedExpense = ExtraBudget.from(
+       Budget unmanagedExpense = Budget.from(
                 unamanagedRequest,
                 unmanagedUser
         );

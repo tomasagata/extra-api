@@ -49,6 +49,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/editExpense/{id}").authenticated()
                         .requestMatchers("/expenses/{id}").authenticated()
                         .requestMatchers("/getSumOfExpenses").authenticated()
+                        .requestMatchers("/getYearlySumOfExpenses").authenticated()
                         .requestMatchers("/getMyExpensesFrom").authenticated()
                         .requestMatchers("/addBudget").authenticated()
                         .requestMatchers("/allBudgets").authenticated()

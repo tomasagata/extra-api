@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.tests.controller;
+package org.mojodojocasahouse.extra.tests.datavalidationlayer.authenticationcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -36,7 +37,7 @@ import static org.mockito.BDDMockito.given;
         SecurityConfiguration.class,
         ExtraUserDetailsService.class
 })
-public class AuthenticationControllerSignupTest {
+public class RegisterEndpointDataValidationTest {
 
     @Autowired
     private MockMvc mvc;
@@ -51,40 +52,17 @@ public class AuthenticationControllerSignupTest {
     @MockBean
     public AuthenticationService service;
 
+    @MockBean
+    public PasswordEncoder passwordEncoder;
+
     @Autowired
     public AuthenticationController controller;
-
 
     @BeforeEach
     public void setup() {
         JacksonTester.initFields(this, new ObjectMapper());
     }
 
-
-    @Test
-    public void testPostingUnregisteredUserShouldReturnSuccessResponse() throws Exception {
-        // Setup - data
-        UserRegistrationRequest userRegistrationRequest = new UserRegistrationRequest(
-                "Michael",
-                "Jordan",
-                "mj@me.com",
-                "Somepassword1!",
-                "Somepassword1!"
-        );
-        ApiResponse registrationResponse = new ApiResponse(
-                "User created successfully"
-        );
-
-        // Setup - expectations
-        given(service.registerUser(userRegistrationRequest)).willReturn(registrationResponse);
-
-        // exercise
-        MockHttpServletResponse response = postUserRegistrationRequestToController(userRegistrationRequest);
-
-        // verify
-        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-        Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonApiResponse.write(registrationResponse).getJson());
-    }
 
     @Test
     public void testRegisteringANewUserWithSpecialCharacteredFirstNameReturnsBadRequest() throws Exception {
@@ -422,7 +400,6 @@ public class AuthenticationControllerSignupTest {
         assertThatResponseReturnsError(response, apiError);
     }
 
-
     private MockHttpServletResponse postUserRegistrationRequestToController(UserRegistrationRequest userRegistrationRequest) throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
                         post("/register")
@@ -447,5 +424,4 @@ public class AuthenticationControllerSignupTest {
             throw new RuntimeException(e);
         }
     }
-
 }

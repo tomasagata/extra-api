@@ -14,9 +14,9 @@ import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
 import org.mojodojocasahouse.extra.dto.ExpenseEditingRequest;
-import org.mojodojocasahouse.extra.model.ExtraExpense;
+import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
-import org.mojodojocasahouse.extra.repository.ExtraExpenseRepository;
+import org.mojodojocasahouse.extra.repository.ExpenseRepository;
 import org.mojodojocasahouse.extra.service.BudgetService;
 import org.mojodojocasahouse.extra.service.ExpenseService;
 import org.springframework.boot.test.json.JacksonTester;
@@ -33,7 +33,7 @@ public class ExpensesServiceTest {
 
 
     @Mock
-    private ExtraExpenseRepository expenseRepository;
+    private ExpenseRepository expenseRepository;
 
     @InjectMocks
     private ExpenseService expenseService;
@@ -56,10 +56,10 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraExpense savedExpense1 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test",(short) 1);
-        ExtraExpense savedExpense2 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.12"), Date.valueOf("2023-09-12"), "test",(short) 1);
+        Expense savedExpense1 = new Expense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test",(short) 1);
+        Expense savedExpense2 = new Expense(user, "Another Concept", new BigDecimal("10.12"), Date.valueOf("2023-09-12"), "test",(short) 1);
 
-        List<ExtraExpense> expectedExpenses = List.of(
+        List<Expense> expectedExpenses = List.of(
                 savedExpense1, savedExpense2
         );
 
@@ -112,7 +112,7 @@ public class ExpensesServiceTest {
                 "Somepassword1!"
         );
         ApiResponse expectedResponse = new ApiResponse(
-                "Expense added succesfully!"
+                "Expense added successfully!"
         );
 
         // exercise
@@ -130,8 +130,8 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraExpense savedExpense1 = new ExtraExpense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
-        new ExtraExpense(user, "Another Concept", new BigDecimal("10.12"), Date.valueOf("2023-09-12"), "test2",(short) 1);
+        Expense savedExpense1 = new Expense(user, "Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
+        new Expense(user, "Another Concept", new BigDecimal("10.12"), Date.valueOf("2023-09-12"), "test2",(short) 1);
         List<ExpenseDTO> expectedDtos = List.of(savedExpense1.asDto());
 
         given(expenseRepository.findAllExpensesByUserAndCategory(any(), any())).willReturn(List.of(savedExpense1));
@@ -166,7 +166,7 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraExpense savedExpense1 = new ExtraExpense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
+        Expense savedExpense1 = new Expense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
         given(expenseRepository.findById(any())).willReturn(java.util.Optional.of(savedExpense1));
         Long id = (long) 0;
         ExpenseEditingRequest request = new ExpenseEditingRequest(
@@ -192,7 +192,7 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraExpense savedExpense1 = new ExtraExpense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
+        Expense savedExpense1 = new Expense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
         expenseRepository.save(savedExpense1);
         Long id = (long) 0;
         expenseService.deleteById(id);
@@ -206,7 +206,7 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraExpense savedExpense1 = new ExtraExpense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
+        Expense savedExpense1 = new Expense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
         expenseRepository.save(savedExpense1);
         Long id = (long) 0;
         Assertions.assertThat(expenseService.isOwner(user, id)).isEqualTo(false);

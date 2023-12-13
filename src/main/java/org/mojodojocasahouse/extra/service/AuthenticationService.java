@@ -13,7 +13,9 @@ import org.mojodojocasahouse.extra.exception.InvalidPasswordResetTokenException;
 import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.repository.PasswordResetTokenRepository;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -93,7 +95,7 @@ public class AuthenticationService {
 
             try {
                 sendEmail(user, token);
-            } catch (MessagingException ex) {
+            } catch (MailException | MessagingException ex) {
                 throw new EmailException(ex.getMessage());
             }
         }
@@ -104,7 +106,7 @@ public class AuthenticationService {
         return new ApiResponse("If user is registered, an email was sent. Check inbox");
     }
 
-    private void sendEmail(ExtraUser user, PasswordResetToken token) throws MessagingException {
+    private void sendEmail(ExtraUser user, PasswordResetToken token) throws MailException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 

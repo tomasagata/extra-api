@@ -1,10 +1,11 @@
-package org.mojodojocasahouse.extra.tests.controller;
+package org.mojodojocasahouse.extra.tests.securitylayer.authenticationcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.AuthenticationController;
+import org.mojodojocasahouse.extra.dto.ApiError;
+import org.mojodojocasahouse.extra.dto.ApiResponse;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
@@ -15,7 +16,7 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(AuthenticationController.class)
 @Import({
@@ -23,7 +24,14 @@ import org.springframework.security.test.context.support.WithMockUser;
         SecurityConfiguration.class,
         ExtraUserDetailsService.class
 })
-public class AuthenticationControllerPasswordChangeTest {
+public class ChangePasswordEndpointSecurityTest {
+
+    @Autowired
+    private MockMvc mvc;
+
+    private JacksonTester<ApiError> jsonApiError;
+
+    private JacksonTester<ApiResponse> jsonApiResponse;
 
     @MockBean
     public ExtraUserRepository userRepository;
@@ -42,10 +50,5 @@ public class AuthenticationControllerPasswordChangeTest {
         JacksonTester.initFields(this, new ObjectMapper());
     }
 
-    @Test
-    @WithMockUser
-    public void testChangingPasswordIsSuccessful() {
-
-    }
 
 }

@@ -1,8 +1,12 @@
 package org.mojodojocasahouse.extra.tests.service;
 
+import jakarta.mail.Message;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mojodojocasahouse.extra.dto.*;
+import org.mojodojocasahouse.extra.exception.EmailException;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidPasswordResetTokenException;
 import org.mojodojocasahouse.extra.model.ExtraUser;
@@ -16,8 +20,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mojodojocasahouse.extra.repository.PasswordResetTokenRepository;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.testmodels.TestPasswordResetToken;
+import org.springframework.mail.MailException;
+import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -39,7 +46,7 @@ public class AuthenticationServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @Mock
-    private JavaMailSender mailSender;
+    private JavaMailSenderImpl mailSender;
 
     @Mock
     private PasswordResetTokenRepository tokenRepo;
@@ -199,36 +206,53 @@ public class AuthenticationServiceTest {
                 .isInstanceOf(BadCredentialsException.class);
     }
 
-//    @Test
-//    public void testSendingPasswordResetEmailIsSuccessful() throws MessagingException {
-//        // Setup - data
-//        ExtraUser existingUser = new ExtraUser(
-//                "Some",
-//                "User",
-//                "mj@me.com",
-//                "curr_pass_hashed"
-//        );
-//        ForgotPasswordRequest request = new ForgotPasswordRequest(
-//                "mj@me.com"
-//        );
-//        PasswordResetToken token = new PasswordResetToken(existingUser);
-//        MimeMessage mockMessage = Mockito.mock(MimeMessage.class);
-//
-//        // Setup - expectations
-//        given(repo.findByEmail(any())).willReturn(Optional.of(existingUser));
-//        given(tokenRepo.save(any())).willReturn(token);
-//        given(mailSender.createMimeMessage()).willReturn(mockMessage);
-//
-//        doNothing().when(mockMessage).setFrom(anyString());
-//        doNothing().when(mockMessage).setRecipient(Message.RecipientType.TO, any());
-//        doNothing().when(mockMessage).setSubject(anyString());
-//        doNothing().when(mockMessage).setContent(any(), any());
-//
-//        doNothing().when(mailSender).send(any(MimeMessage.class));
-//
-//        // exercise and verify
-//        Assertions.assertThatNoException().isThrownBy(() -> serv.sendPasswordResetEmail(request));
-//    }
+    @Test
+    public void testSendingPasswordResetEmailIsSuccessful() throws MessagingException {
+        // Setup - data
+        ExtraUser existingUser = new ExtraUser(
+                "Some",
+                "User",
+                "mj@me.com",
+                "curr_pass_hashed"
+        );
+        ForgotPasswordRequest request = new ForgotPasswordRequest(
+                "mj@me.com"
+        );
+        PasswordResetToken token = new PasswordResetToken(existingUser);
+
+        // Setup - expectations
+        given(repo.findByEmail(any())).willReturn(Optional.of(existingUser));
+        given(tokenRepo.save(any())).willReturn(token);
+        given(mailSender.createMimeMessage()).willCallRealMethod();
+
+        // exercise and verify
+        Assertions.assertThatNoException().isThrownBy(() -> serv.sendPasswordResetEmail(request));
+    }
+
+    @Test
+    public void testSendingPasswordResetEmailThrowsMessagingException() throws MessagingException {
+        // Setup - data
+        ExtraUser existingUser = new ExtraUser(
+                "Some",
+                "User",
+                "mj@me.com",
+                "curr_pass_hashed"
+        );
+        ForgotPasswordRequest request = new ForgotPasswordRequest(
+                "mj@me.com"
+        );
+        PasswordResetToken token = new PasswordResetToken(existingUser);
+
+        // Setup - expectations
+        given(repo.findByEmail(any())).willReturn(Optional.of(existingUser));
+        given(tokenRepo.save(any())).willReturn(token);
+        given(mailSender.createMimeMessage()).willCallRealMethod();
+        doThrow(new MailSendException("")).when(mailSender).send(any(MimeMessage.class));
+
+        // exercise and verify
+        Assertions.assertThatThrownBy(() -> serv.sendPasswordResetEmail(request)).isInstanceOf(EmailException.class);
+    }
+
 
     @Test
     public void testSendingPasswordResetEmailFailsSilentlyWhenNoUserIsFound() {

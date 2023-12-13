@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.tests.controller;
+package org.mojodojocasahouse.extra.tests.securitylayer.authenticationcontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -22,8 +22,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
@@ -38,7 +38,7 @@ import static org.mockito.BDDMockito.given;
         SecurityConfiguration.class,
         ExtraUserDetailsService.class
 })
-public class AuthenticationControllerProtectedTest {
+public class ProtectedEndpointSecurityTest {
 
     @Autowired
     private MockMvc mvc;
@@ -53,30 +53,15 @@ public class AuthenticationControllerProtectedTest {
     @MockBean
     public AuthenticationService authenticationService;
 
+    @MockBean
+    public PasswordEncoder passwordEncoder;
+
     @Autowired
     public AuthenticationController controller;
-
 
     @BeforeEach
     public void setup() {
         JacksonTester.initFields(this, new ObjectMapper());
-    }
-
-
-    @Test
-    @WithMockUser
-    public void testAccessingProtectedResourceWithValidCredentialsIsSuccessful() throws Exception {
-        // Setup - data
-        ApiResponse expectedResponse = new ApiResponse(
-                "Authenticated and authorized!"
-        );
-
-        // exercise
-        MockHttpServletResponse response = getProtectedResourceNoCookie();
-
-        // Verify
-        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonApiResponse.write(expectedResponse).getJson());
     }
 
     @Test

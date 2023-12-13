@@ -1,29 +1,21 @@
-package org.mojodojocasahouse.extra.tests.controller;
+package org.mojodojocasahouse.extra.tests.securitylayer.budgetscontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-
-import java.math.BigDecimal;
-import java.sql.Date;
-
 import org.apache.commons.codec.binary.Base64;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
-import org.mojodojocasahouse.extra.controller.ExpensesController;
+import org.mojodojocasahouse.extra.controller.BudgetsController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
-import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.dto.BudgetAddingRequest;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
-import org.mojodojocasahouse.extra.service.ExpenseService;
+import org.mojodojocasahouse.extra.service.BudgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
@@ -33,17 +25,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@WebMvcTest(ExpensesController.class)
+import java.math.BigDecimal;
+import java.sql.Date;
+
+@WebMvcTest(BudgetsController.class)
 @Import({
         DelegatingBasicAuthenticationEntryPoint.class,
         SecurityConfiguration.class,
         ExtraUserDetailsService.class
 })
-public class ExpensesControllerAddingTest {
+public class AddBudgetEndpointSecurityTest {
 
     @Autowired
     private MockMvc mvc;
@@ -59,10 +53,10 @@ public class ExpensesControllerAddingTest {
     public ExtraUserRepository userRepository;
 
     @MockBean
-    public ExpenseService expenseService;
+    public BudgetService budgetService;
 
     @Autowired
-    public ExpensesController controller;
+    public BudgetsController controller;
 
     @BeforeEach
     public void setup() {
@@ -70,47 +64,15 @@ public class ExpensesControllerAddingTest {
     }
 
 
-    @Test
-    @WithMockUser
-    public void testAddingExpenseWithCredentialsReturnsSuccessfulResponse() throws Exception {
-        // Setup - data
-        ExpenseAddingRequest request = new ExpenseAddingRequest(
-            "test",
-            new BigDecimal(100),
-            Date.valueOf("2018-12-09"),
-            "test",
-            (short) 1
-        );
-        ExtraUser linkedUser = new ExtraUser(
-                "M",
-                "J",
-                "mj@me.com",
-                "Somepassword"
-        );
-        ApiResponse expectedResponse = new ApiResponse(
-                "Expense added succesfully!"
-        );
-
-        // Setup - Expectations
-        given(authService.getUserByPrincipal(any())).willReturn(linkedUser);
-        given(expenseService.addExpense(any(), any())).willReturn(expectedResponse);
-
-        // exercise
-        MockHttpServletResponse response = postExpenseAddToControllerNoCookie(request);
-
-        // Verify
-        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
-        Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonApiResponse.write(expectedResponse).getJson());
-    }
-
 
     @Test
-    public void testAddingNewExpenseWithInvalidSessionCookieThrowsError() throws Exception {
+    public void testAddingNewBudgetWithInvalidSessionCookieThrowsError() throws Exception {
         // Setup - data
-        ExpenseAddingRequest request = new ExpenseAddingRequest(
+        BudgetAddingRequest request = new BudgetAddingRequest(
                 "test",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-09"),
+                Date.valueOf("2023-12-09"),
                 "test",
                 (short) 1
         );
@@ -125,19 +87,20 @@ public class ExpensesControllerAddingTest {
         );
 
         // exercise
-        MockHttpServletResponse response = postExpenseAddToControllerWithCookie(request, sessionCookie);
+        MockHttpServletResponse response = postBudgetAddToControllerWithCookie(request, sessionCookie);
 
         // Verify
         assertThatResponseReturnsError(response, expectedError);
     }
 
     @Test
-    public void testAddingNewExpenseWithInvalidUsernameAndPasswordThrowsError() throws Exception {
+    public void testAddingNewBudgetWithInvalidUsernameAndPasswordThrowsError() throws Exception {
         // Setup - data
-        ExpenseAddingRequest request = new ExpenseAddingRequest(
+        BudgetAddingRequest request = new BudgetAddingRequest(
                 "test",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-09"),
+                Date.valueOf("2023-12-09"),
                 "test",
                 (short) 1
         );
@@ -148,7 +111,7 @@ public class ExpensesControllerAddingTest {
         );
 
         // exercise
-        MockHttpServletResponse response = postExpenseAddToControllerWithUsernameAndPassword(
+        MockHttpServletResponse response = postBudgetAddToControllerWithUsernameAndPassword(
                 request,
                 "user",
                 "pass"
@@ -161,13 +124,14 @@ public class ExpensesControllerAddingTest {
 
     @Test
     @WithAnonymousUser
-    public void testAddingExpenseWithNoCookieThrowsError() throws Exception {
+    public void testAddingBudgetWithNoCookieThrowsError() throws Exception {
         // Setup - data
-        ExpenseAddingRequest request = new ExpenseAddingRequest(
+        BudgetAddingRequest request = new BudgetAddingRequest(
                 "test",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-09"),
-                "Test",
+                Date.valueOf("2023-12-09"),
+                "test",
                 (short) 1
         );
         ApiError expectedError = new ApiError(
@@ -177,15 +141,15 @@ public class ExpensesControllerAddingTest {
         );
 
         // exercise
-        MockHttpServletResponse response = postExpenseAddToControllerNoCookie(request);
+        MockHttpServletResponse response = postBudgetAddToControllerNoCookie(request);
 
         // Verify
         assertThatResponseReturnsError(response, expectedError);
     }
 
-    private MockHttpServletResponse postExpenseAddToControllerWithCookie(ExpenseAddingRequest request, Cookie cookie) throws Exception{
+    private MockHttpServletResponse postBudgetAddToControllerWithCookie(BudgetAddingRequest request, Cookie cookie) throws Exception{
         return mvc.perform(MockMvcRequestBuilders.
-                        post("/addExpense")
+                        post("/addBudget")
                         .cookie(cookie)
                         .content(asJsonString(request))
                         .contentType(MediaType.APPLICATION_JSON)
@@ -194,20 +158,20 @@ public class ExpensesControllerAddingTest {
 
     }
 
-    private MockHttpServletResponse postExpenseAddToControllerNoCookie(ExpenseAddingRequest request) throws Exception {
+    private MockHttpServletResponse postBudgetAddToControllerNoCookie(BudgetAddingRequest request) throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
-                        post("/addExpense")
+                        post("/addBudget")
                         .content(asJsonString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();
     }
 
-    private MockHttpServletResponse postExpenseAddToControllerWithUsernameAndPassword(ExpenseAddingRequest request,
-                                                                                      String username,
-                                                                                      String password) throws Exception{
+    private MockHttpServletResponse postBudgetAddToControllerWithUsernameAndPassword(BudgetAddingRequest request,
+                                                                                     String username,
+                                                                                     String password) throws Exception{
         return mvc.perform(MockMvcRequestBuilders.
-                        get("/addExpense")
+                        get("/addBudget")
                         .content(asJsonString(request))
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization",

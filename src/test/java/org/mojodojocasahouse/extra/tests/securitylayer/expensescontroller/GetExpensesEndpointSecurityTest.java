@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.tests.controller;
+package org.mojodojocasahouse.extra.tests.securitylayer.expensescontroller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
@@ -10,7 +10,6 @@ import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.ExpensesController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
-import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
@@ -25,16 +24,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.math.BigDecimal;
-import java.sql.Date;
 import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
 @WebMvcTest(ExpensesController.class)
 @Import({
@@ -42,7 +35,7 @@ import static org.mockito.BDDMockito.given;
         DelegatingBasicAuthenticationEntryPoint.class,
         ExtraUserDetailsService.class
 })
-public class ExpensesControllerListingTest {
+public class GetExpensesEndpointSecurityTest {
 
     @Autowired
     private MockMvc mvc;
@@ -67,34 +60,6 @@ public class ExpensesControllerListingTest {
     public void setup() {
         JacksonTester.initFields(this, new ObjectMapper());
     }
-
-
-    @Test
-    @WithMockUser
-    public void testListingExpenseWithCredentialsReturnsSuccessfulResponse() throws Exception {
-        // Setup - data
-        ExtraUser linkedUser = new ExtraUser(
-                "M",
-                "J",
-                "mj@me.com",
-                "Somepassword"
-        );
-        List<ExpenseDTO> expectedResponse = List.of(
-                new ExpenseDTO(null, null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), "Test",(short) 1)
-        );
-
-        // Setup - Expectations
-        given(authService.getUserByPrincipal(any())).willReturn(linkedUser);
-        given(expenseService.getExpensesOfUserByCategoriesAndDateRanges(any(), any(), any(), any())).willReturn(expectedResponse);
-
-        // exercise
-        MockHttpServletResponse response = getExpensesNoCookie();
-
-        // Verify
-        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonExpenseDtoList.write(expectedResponse).getJson());
-    }
-
 
     @Test
     public void testListingExpensesWithInvalidSessionCookieThrowsError() throws Exception {
@@ -184,4 +149,5 @@ public class ExpensesControllerListingTest {
         Assertions.assertThat(actualApiError.getStatus()).isEqualTo(expectedApiError.getStatus());
         Assertions.assertThat(actualApiError.getErrors().toArray()).containsExactlyInAnyOrder(expectedApiError.getErrors().toArray());
     }
+
 }

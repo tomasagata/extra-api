@@ -16,6 +16,7 @@ public class ExpenseAddingRequest {
     @Digits(integer = 12, fraction = 2, message = "Amount must limit to 12 integer places and 2 fraction places")
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0.01")
     private BigDecimal amount;
+
     @PastOrPresent(message = "Date must be in the past or present")
     private Date date;
 

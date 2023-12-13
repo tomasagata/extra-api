@@ -2,9 +2,9 @@ package org.mojodojocasahouse.extra.tests.repository;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mojodojocasahouse.extra.model.ExtraExpense;
+import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
-import org.mojodojocasahouse.extra.repository.ExtraExpenseRepository;
+import org.mojodojocasahouse.extra.repository.ExpenseRepository;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -15,10 +15,10 @@ import java.util.Optional;
 
 
 @DataJpaTest
-class ExtraExpenseRepositoryTest {
+class ExpenseRepositoryTest {
 
     @Autowired
-    private ExtraExpenseRepository repo;
+    private ExpenseRepository repo;
     @Autowired
     private ExtraUserRepository userRepo;
 
@@ -32,8 +32,8 @@ class ExtraExpenseRepositoryTest {
                         "a_password"
                 );
         userRepo.save(user);
-        ExtraExpense savedExpense = repo.save(
-                new ExtraExpense(
+        Expense savedExpense = repo.save(
+                new Expense(
                     user,
                     "concept",
                     new BigDecimal(100),
@@ -44,7 +44,7 @@ class ExtraExpenseRepositoryTest {
         );
 
         // execute
-        Optional<ExtraExpense> foundExpense = repo.findFirstByConcept("concept");
+        Optional<Expense> foundExpense = repo.findFirstByConcept("concept");
 
         // verify
         Assertions.assertThat(foundExpense).isEqualTo(Optional.of(savedExpense));
@@ -59,8 +59,8 @@ class ExtraExpenseRepositoryTest {
                         "a_password"
                 );
         userRepo.save(user);
-        ExtraExpense savedExpense = repo.save(
-                new ExtraExpense(
+        Expense savedExpense = repo.save(
+                new Expense(
                     user,
                     "concept",
                     new BigDecimal(100),
@@ -71,7 +71,7 @@ class ExtraExpenseRepositoryTest {
         );
 
         // execute
-        Optional<ExtraExpense> foundExpense = repo.findByCategory("test");
+        Optional<Expense> foundExpense = repo.findByCategory("test");
 
         // verify
         Assertions.assertThat(foundExpense).isEqualTo(Optional.of(savedExpense));

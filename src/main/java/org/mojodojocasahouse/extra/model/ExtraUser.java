@@ -1,6 +1,7 @@
 package org.mojodojocasahouse.extra.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,14 +19,23 @@ public class ExtraUser {
     private Long id;
 
     @Setter
+    @NotNull(message = "First name is mandatory")
+    @Size(max = 100, message = "First name cannot exceed 100 characters in length")
+    @Pattern(regexp = "^[a-zA-Z ,.'-]+$", message = "First name must not be left blank or contain special characters or numbers")
     @Column(name = "FIRST_NAME", nullable = false)
     private String firstName;
 
     @Setter
+    @NotNull(message = "Last name is mandatory")
+    @Size(max = 100, message = "Last name cannot exceed 100 characters in length")
+    @Pattern(regexp = "^[a-zA-Z ,.'-]+$", message = "Last name must not be left blank or contain special characters or numbers")
     @Column(name = "LAST_NAME", nullable = false)
     private String lastName;
 
     @Setter
+    @NotBlank(message = "Email must not be left blank")
+    @NotNull(message = "Email is mandatory")
+    @Email(message = "Email must be valid")
     @Column(name = "EMAIL", nullable = false, unique = true)
     private String email;
 

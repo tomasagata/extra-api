@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.ExpenseDTO;
 import org.mojodojocasahouse.extra.dto.ExpenseEditingRequest;
-import org.mojodojocasahouse.extra.model.ExtraExpense;
+import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 
-public class ExtraExpenseTest {
+public class ExpenseTest {
     @Test
     void testGettingIdOfMadridTripExpenseReturnsNull() {
         ExtraUser unmanagedUser = new ExtraUser(
@@ -20,7 +20,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
@@ -40,7 +40,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
@@ -59,7 +59,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
@@ -78,7 +78,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
@@ -97,7 +97,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
@@ -117,7 +117,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
@@ -137,7 +137,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
@@ -157,7 +157,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(99),
@@ -186,7 +186,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(99),
@@ -215,7 +215,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExtraExpense unmanagedExpense = new ExtraExpense(
+        Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(99),
@@ -246,7 +246,7 @@ public class ExtraExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-       ExtraExpense unmanagedExpense = ExtraExpense.from(
+       Expense unmanagedExpense = Expense.from(
                 new ExpenseAddingRequest(
                         "Paris Trip",
                         new BigDecimal(100),
@@ -275,7 +275,7 @@ public class ExtraExpenseTest {
                         "Travel",
                         (short) 2
         );
-       ExtraExpense unmanagedExpense = ExtraExpense.from(
+       Expense unmanagedExpense = Expense.from(
                 unamanagedRequest,
                 unmanagedUser
         );

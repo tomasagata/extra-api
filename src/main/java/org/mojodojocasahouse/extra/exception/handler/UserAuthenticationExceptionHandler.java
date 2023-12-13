@@ -152,4 +152,53 @@ public class UserAuthenticationExceptionHandler extends ResponseEntityExceptionH
 
     }
 
+    @ExceptionHandler(ExpenseNotFoundException.class)
+    protected ResponseEntity<Object> handleExpenseNotFoundException(ExpenseNotFoundException ex, WebRequest request){
+        ApiError apiError = new ApiError(
+                HttpStatus.NOT_FOUND,
+                "Expense Fetch Error",
+                ex.getMessage()
+        );
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+    }
+
+    @ExceptionHandler(ExpenseAccessDeniedException.class)
+    protected ResponseEntity<Object> handleExpenseAccessDeniedException(ExpenseAccessDeniedException ex, WebRequest request){
+        ApiError apiError = new ApiError(
+                HttpStatus.FORBIDDEN,
+                "Expense Access Denied",
+                ex.getMessage()
+        );
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+    }
+
+    @ExceptionHandler(BudgetNotFoundException.class)
+    protected ResponseEntity<Object> handleBudgetNotFoundException(BudgetNotFoundException ex, WebRequest request){
+        ApiError apiError = new ApiError(
+                HttpStatus.NOT_FOUND,
+                "Budget Fetch Error",
+                ex.getMessage()
+        );
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+    }
+
+    @ExceptionHandler(BudgetAccessDeniedException.class)
+    protected ResponseEntity<Object> handleBudgetAccessDeniedException(BudgetAccessDeniedException ex, WebRequest request){
+        ApiError apiError = new ApiError(
+                HttpStatus.FORBIDDEN,
+                "Budget Access Denied",
+                ex.getMessage()
+        );
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+    }
+
+    @ExceptionHandler(ConflictingBudgetException.class)
+    protected ResponseEntity<Object> handleConflictingBudgetException(ConflictingBudgetException ex, WebRequest request){
+        ApiError apiError = new ApiError(
+                HttpStatus.CONFLICT,
+                "Budget Conflict Error",
+                ex.getMessage()
+        );
+        return handleExceptionInternal(ex, apiError, new HttpHeaders(), apiError.getStatus(), request);
+    }
 }

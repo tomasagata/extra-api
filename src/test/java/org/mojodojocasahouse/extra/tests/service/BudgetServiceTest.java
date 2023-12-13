@@ -9,19 +9,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.BudgetAddingRequest;
-import org.mojodojocasahouse.extra.dto.BudgetDTO;
-import org.mojodojocasahouse.extra.dto.BudgetEditingRequest;
-import org.mojodojocasahouse.extra.model.ExtraBudget;
+import org.mojodojocasahouse.extra.dto.*;
+import org.mojodojocasahouse.extra.exception.BudgetNotFoundException;
+import org.mojodojocasahouse.extra.exception.ConflictingBudgetException;
+import org.mojodojocasahouse.extra.exception.EmailException;
+import org.mojodojocasahouse.extra.model.Budget;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
 import org.mojodojocasahouse.extra.service.BudgetService;
 import org.springframework.boot.test.json.JacksonTester;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -51,10 +56,10 @@ public class BudgetServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraBudget savedBudget1 = new ExtraBudget(user,"Name", new BigDecimal("10.11"), new BigDecimal("10.11"), Date.valueOf("2023-09-11"), Date.valueOf("2023-09-11"), "test",(short) 1);
-        ExtraBudget savedBudget2 = new ExtraBudget(user,"Name", new BigDecimal("10.11"), new BigDecimal("10.11"), Date.valueOf("2023-09-11"), Date.valueOf("2023-09-11"), "test",(short) 1);
+        Budget savedBudget1 = new Budget(user,"Name", new BigDecimal("10.11"), new BigDecimal("10.11"), Date.valueOf("2023-09-11"), Date.valueOf("2023-09-11"), "test",(short) 1);
+        Budget savedBudget2 = new Budget(user,"Name", new BigDecimal("10.11"), new BigDecimal("10.11"), Date.valueOf("2023-09-11"), Date.valueOf("2023-09-11"), "test",(short) 1);
 
-        List<ExtraBudget> expectedBudget = List.of(
+        List<Budget> expectedBudget = List.of(
                 savedBudget1, savedBudget2
         );
 
@@ -108,7 +113,7 @@ public class BudgetServiceTest {
                 "Somepassword1!"
         );
         ApiResponse expectedResponse = new ApiResponse(
-                "Budget added succesfully!"
+                "Budget added successfully!"
         );
 
         // exercise
@@ -119,6 +124,35 @@ public class BudgetServiceTest {
     }
 
     @Test
+    public void testAddingABudgetWhenAnotherIsActiveThrowsConflictingBudgetException() {
+        // Setup - data
+        BudgetAddingRequest request = new BudgetAddingRequest(
+                "Name",
+                new BigDecimal("10.11"),
+                Date.valueOf("2023-09-11"),
+                Date.valueOf("2023-09-11"),
+                "test",
+                (short) 1
+        );
+        Budget conflictingBudget = new Budget();
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+
+        // Setup - expectations
+        given(budgetRepository.findBudgetByUserAndCategoryAndStartDateAndEndDate(any(), any(), any(), any()))
+                .willReturn(List.of(conflictingBudget));
+
+        // exercise & verify
+        Assertions
+                .assertThatThrownBy(() -> budgetService.addBudget(user, request))
+                .isInstanceOf(ConflictingBudgetException.class);
+    }
+
+    @Test
     public void testGettingAllBudgetsByCategoryAndUserReturnsAListOfBudgets(){
         ExtraUser user = new ExtraUser(
                 "Michael",
@@ -126,7 +160,7 @@ public class BudgetServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraBudget savedBudget1 = new ExtraBudget(
+        Budget savedBudget1 = new Budget(
                 user,
                 "Name",
                 new BigDecimal("10.11"),
@@ -153,7 +187,7 @@ public class BudgetServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraBudget savedBudget1 = new ExtraBudget(
+        Budget savedBudget1 = new Budget(
                 user,
                 "Name",
                 new BigDecimal("10.11"),
@@ -190,7 +224,7 @@ public class BudgetServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraBudget savedBudget1 = new ExtraBudget(
+        Budget savedBudget1 = new Budget(
                 user,
                 "Name",
                 new BigDecimal("10.11"),
@@ -213,7 +247,7 @@ public class BudgetServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        ExtraBudget savedBudget1 = new ExtraBudget(
+        Budget savedBudget1 = new Budget(
                 user,
                 "Name",
                 new BigDecimal("10.11"),
@@ -227,6 +261,171 @@ public class BudgetServiceTest {
         Long id = (long) 0;
         Assertions.assertThat(budgetService.isOwner(user, id)).isEqualTo(false);
     }
-    
+
+    @Test
+    public void testGettingExistingBudgetByIdReturnsItsDTO() {
+        // Setup - data
+        Long existingBudgetId = 1L;
+        ExtraUser linkedUser = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        Budget existingBudget = new Budget(
+                linkedUser,
+                "Name",
+                new BigDecimal("10.11"),
+                new BigDecimal("10.11"),
+                Date.valueOf("2023-09-11"),
+                Date.valueOf("2023-09-11"),
+                "test1",
+                (short) 1
+        );
+
+        // Setup - expectations
+        given(budgetRepository.findById(any())).willReturn(Optional.of(existingBudget));
+
+        // exercise & verify
+        BudgetDTO result = budgetService.getBudgetById(existingBudgetId);
+        Assertions.assertThat(result).isEqualTo(existingBudget.asDto());
+    }
+
+    @Test
+    public void testGettingNonExistingBudgetByIdReturnsItsDTO() {
+        // Setup - data
+        Long nonExistingBudgetId = 1L;
+
+        // Setup - expectations
+        given(budgetRepository.findById(any()))
+                .willReturn(Optional.empty());
+
+        // exercise & verify
+        Assertions
+                .assertThatThrownBy(() -> budgetService.getBudgetById(nonExistingBudgetId))
+                .isInstanceOf(BudgetNotFoundException.class);
+    }
+
+    @Test
+    public void addingAmountToActiveBudgetUpdatesOldBudget() {
+        // Setup - data
+        ExtraUser linkedUser = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        Budget existingBudget = new Budget(
+                linkedUser,
+                "Name",
+                new BigDecimal("0"),
+                new BigDecimal("100"),
+                Date.valueOf("2023-09-30"),
+                Date.valueOf("2023-09-10"),
+                "test1",
+                (short) 1
+        );
+
+        // Setup - expectations
+        given(budgetRepository.findActiveBudgetByUserAndCategoryAndDate(any(), any(), any()))
+                .willReturn(List.of(existingBudget));
+
+        // exercise & verify
+        Assertions.assertThat(existingBudget.getCurrentAmount()).isEqualTo(new BigDecimal(0));
+        budgetService.addToActiveBudget(linkedUser, new BigDecimal(10), "test1", Date.valueOf("2023-09-15"));
+        Assertions.assertThat(existingBudget.getCurrentAmount()).isEqualTo(new BigDecimal(10));
+    }
+
+    @Test
+    public void gettingExistingActiveBudgetReturnsItsDTO() {
+        // Setup - data
+        ExtraUser linkedUser = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        Budget existingBudget = new Budget(
+                linkedUser,
+                "Name",
+                new BigDecimal("0"),
+                new BigDecimal("100"),
+                Date.valueOf("2023-09-30"),
+                Date.valueOf("2023-09-10"),
+                "test1",
+                (short) 1
+        );
+
+        // Setup - expectations
+        given(budgetRepository.findActiveBudgetByUserAndCategoryAndDate(any(), any(), any()))
+                .willReturn(List.of(existingBudget));
+
+        // exercise & verify
+        BudgetDTO result = budgetService.getActiveBudgetByCategoryAndDate(linkedUser, "test1", Date.valueOf("2023-09-15"));
+        Assertions.assertThat(result).isEqualTo(existingBudget.asDto());
+    }
+
+    @Test
+    public void gettingNonExistingActiveBudgetReturnsNull() {
+        // Setup - data
+        ExtraUser linkedUser = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+
+        // Setup - expectations
+        given(budgetRepository.findActiveBudgetByUserAndCategoryAndDate(any(), any(), any()))
+                .willReturn(List.of());
+
+        // exercise & verify
+        BudgetDTO result = budgetService.getActiveBudgetByCategoryAndDate(linkedUser, "test1", Date.valueOf("2023-09-15"));
+        Assertions.assertThat(result).isNull();
+    }
+
+    @Test
+    public void gettingAllCategoriesOfUserReturnsListOfStrings() {
+        // Setup - data
+        ExtraUser linkedUser = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        List<String> existingCategories = List.of("sample1", "sample2", "sample3");
+
+        // Setup - expectations
+        given(budgetRepository.findAllDistinctCategoriesByUser(any()))
+                .willReturn(existingCategories);
+
+        // exercise & verify
+        List<String> results = budgetService.getAllCategories(linkedUser);
+        Assertions.assertThat(results).isEqualTo(existingCategories);
+    }
+
+    @Test
+    public void gettingAllCategoriesWithIconsOfUserReturnsListOfJsonObjects() {
+        // Setup - data
+        ExtraUser linkedUser = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        List<Map<String, String>> expectedResponse = List.of(
+                Map.of("category", "some category 1", "iconId", "1"),
+                Map.of("category", "some category 2", "iconId", "2"),
+                Map.of("category", "some category 3", "iconId", "3")
+        );
+
+        // Setup - expectations
+        given(budgetRepository.findAllDistinctCategoriesByUserWithIcons(any()))
+                .willReturn(expectedResponse);
+
+        // exercise & verify
+        List<Map<String, String>> results = budgetService.getAllCategoriesWithIcons(linkedUser);
+        Assertions.assertThat(results).isEqualTo(expectedResponse);
+    }
 
 }

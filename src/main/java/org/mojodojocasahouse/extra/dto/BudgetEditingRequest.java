@@ -18,7 +18,6 @@ public class BudgetEditingRequest {
     private BigDecimal limitAmount;
     
     @Digits(integer = 12, fraction = 2, message = "Limit Amount must limit to 12 integer places and 2 fraction places")
-    @DecimalMin(value = "0.01", message = "Limit Amount must be greater than 0.01")
     private BigDecimal currentAmount;
 
     @PastOrPresent(message = "Creation date must be in the past or present")
