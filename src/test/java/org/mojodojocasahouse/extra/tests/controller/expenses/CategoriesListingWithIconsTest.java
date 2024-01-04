@@ -9,6 +9,7 @@ import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.ExpensesController;
 import org.mojodojocasahouse.extra.dto.ApiError;
 import org.mojodojocasahouse.extra.dto.ApiResponse;
+import org.mojodojocasahouse.extra.dto.CategoryWithIconDTO;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
@@ -75,10 +76,10 @@ public class CategoriesListingWithIconsTest {
                 "mj@me.com",
                 "Somepassword"
         );
-        List<Map<String, String>> expectedResponse = List.of(
-                Map.of("category", "some category 1", "iconId", "1"),
-                Map.of("category", "some category 2", "iconId", "2"),
-                Map.of("category", "some category 3", "iconId", "3")
+        List<CategoryWithIconDTO> expectedResponse = List.of(
+                new CategoryWithIconDTO("some category 1", (short)1),
+                new CategoryWithIconDTO("some category 2", (short)2),
+                new CategoryWithIconDTO("some category 3", (short)3)
         );
 
         // Setup - Expectations

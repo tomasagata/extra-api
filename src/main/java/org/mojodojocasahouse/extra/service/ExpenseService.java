@@ -8,8 +8,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.exception.ExpenseNotFoundException;
 import org.mojodojocasahouse.extra.model.Expense;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import jakarta.validation.Valid;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class ExpenseService {
 
@@ -178,13 +181,23 @@ public class ExpenseService {
                 .collect(Collectors.toList());
     }
 
-    public List<Map<String, String>> getAllCategoriesWithIcons(ExtraUser user) {
-        List<Map<String, String>> expenseCategories = expenseRepository.findAllDistinctCategoriesByUserWithIcons(user);
-        List<Map<String, String>> budgetCategories = budgetService.getAllCategoriesWithIcons(user);
+    public List<CategoryWithIconDTO> getAllCategoriesWithIcons(ExtraUser user) {
+        List<CategoryWithIconDTO> expenseCategories = expenseRepository.findAllDistinctCategoriesByUserWithIcons(user);
+        List<CategoryWithIconDTO> budgetCategories = budgetService.getAllCategoriesWithIcons(user);
 
         // Unify them
-        List<Map<String, String>> unifiedCategories = new ArrayList<>(expenseCategories);
+        List<CategoryWithIconDTO> unifiedCategories = new ArrayList<>(expenseCategories);
         unifiedCategories.addAll(budgetCategories);
+
+        ObjectMapper ob = new ObjectMapper();
+
+        try {
+            for (CategoryWithIconDTO catWithIcon : unifiedCategories) {
+                log.debug(ob.writeValueAsString(catWithIcon));
+            }
+        } catch (Exception ignored) {
+
+        }
 
         // Remove duplicates
         return unifiedCategories

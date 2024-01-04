@@ -18,7 +18,6 @@ public class BudgetAddingRequest {
     @Future(message = "Date must be in the future")
     private Date limitDate;
 
-    @FutureOrPresent(message = "Date must be in the future or present")
     private Date startingDate;
 
     @NotNull(message = "Category is mandatory")

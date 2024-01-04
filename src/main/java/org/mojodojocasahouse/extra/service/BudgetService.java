@@ -121,7 +121,7 @@ public class BudgetService {
         return budgetRepository.findAllDistinctCategoriesByUser(user);
     }
 
-    public List<Map<String, String>> getAllCategoriesWithIcons(ExtraUser user) {
+    public List<CategoryWithIconDTO> getAllCategoriesWithIcons(ExtraUser user) {
         return budgetRepository.findAllDistinctCategoriesByUserWithIcons(user);
     }
 

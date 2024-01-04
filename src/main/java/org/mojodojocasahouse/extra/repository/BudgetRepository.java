@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.mojodojocasahouse.extra.dto.CategoryWithIconDTO;
 import org.mojodojocasahouse.extra.model.Budget;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -52,8 +53,8 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
     @Query("SELECT DISTINCT b.category FROM Budget b WHERE b.user = :user")
     List<String> findAllDistinctCategoriesByUser(ExtraUser user);
 
-    @Query( "SELECT DISTINCT e.category AS category, e.iconId AS iconId " +
+    @Query( "SELECT NEW org.mojodojocasahouse.extra.dto.CategoryWithIconDTO(upper(e.category), e.iconId) " +
             "FROM Budget e " +
             "WHERE e.user = :user")
-    List<Map<String, String>> findAllDistinctCategoriesByUserWithIcons(ExtraUser user);
+    List<CategoryWithIconDTO> findAllDistinctCategoriesByUserWithIcons(ExtraUser user);
 }

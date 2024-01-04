@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 
 
+import org.mojodojocasahouse.extra.dto.CategoryWithIconDTO;
 import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -151,10 +152,10 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
             @Param("categories") List<String> categories,
             @Param("maxDate") Date maxDate);
 
-    @Query( "SELECT DISTINCT e.category AS category, e.iconId AS iconId " +
+    @Query( "SELECT NEW org.mojodojocasahouse.extra.dto.CategoryWithIconDTO(UPPER(e.category), e.iconId) " +
             "FROM Expense e " +
             "WHERE e.user = :user")
-    List<Map<String, String>> findAllDistinctCategoriesByUserWithIcons(ExtraUser user);
+    List<CategoryWithIconDTO> findAllDistinctCategoriesByUserWithIcons(ExtraUser user);
 
 }
 

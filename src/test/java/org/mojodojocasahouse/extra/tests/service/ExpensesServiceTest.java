@@ -10,10 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
-import org.mojodojocasahouse.extra.dto.ExpenseDTO;
-import org.mojodojocasahouse.extra.dto.ExpenseEditingRequest;
+import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExpenseRepository;
@@ -769,23 +766,23 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        List<Map<String, String>> existingBudgetCategories = List.of(
-                Map.of("category", "cat1", "iconId", "1"),
-                Map.of("category", "cat2", "iconId", "2"),
-                Map.of("category", "cat3", "iconId", "3")
+        List<CategoryWithIconDTO> existingBudgetCategories = List.of(
+                new CategoryWithIconDTO("cat1", (short)1),
+                new CategoryWithIconDTO("cat2", (short)2),
+                new CategoryWithIconDTO("cat3", (short)3)
         );
-        List<Map<String, String>> existingExpenseCategories = List.of(
-                Map.of("category", "cat1", "iconId", "3"),
-                Map.of("category", "cat2", "iconId", "2"),
-                Map.of("category", "cat3", "iconId", "1")
+        List<CategoryWithIconDTO> existingExpenseCategories = List.of(
+                new CategoryWithIconDTO("cat1", (short)3),
+                new CategoryWithIconDTO("cat2", (short)2),
+                new CategoryWithIconDTO("cat3", (short)1)
         );
-        List<Map<String, String>> expectedResults = List.of(
-                Map.of("category", "cat1", "iconId", "1"),
-                Map.of("category", "cat2", "iconId", "2"),
-                Map.of("category", "cat3", "iconId", "3"),
-                // Map.of("category", "cat2", "iconId", "2"), is repeated
-                Map.of("category", "cat1", "iconId", "3"),
-                Map.of("category", "cat3", "iconId", "1")
+        List<CategoryWithIconDTO> expectedResults = List.of(
+                new CategoryWithIconDTO("cat1", (short)1),
+                new CategoryWithIconDTO("cat2", (short)2),
+                new CategoryWithIconDTO("cat3", (short)3),
+                new CategoryWithIconDTO("cat1", (short)3),
+                // CategoryWithIconDTO("cat2", "2"), is repeated
+                new CategoryWithIconDTO("cat3", (short)1)
         );
 
         // Setup - expectations
@@ -795,7 +792,7 @@ public class ExpensesServiceTest {
                 .willReturn(existingBudgetCategories);
 
         // Execute
-        List<Map<String, String>> results = expenseService.getAllCategoriesWithIcons(user);
+        List<CategoryWithIconDTO> results = expenseService.getAllCategoriesWithIcons(user);
 
         // Verify
         Assertions.assertThat(results.toArray()).containsExactlyInAnyOrder(expectedResults.toArray());
@@ -810,16 +807,16 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        List<Map<String, String>> existingBudgetCategories = List.of(
-                Map.of("category", "cat1", "iconId", "1"),
-                Map.of("category", "cat2", "iconId", "2"),
-                Map.of("category", "cat3", "iconId", "3")
+        List<CategoryWithIconDTO> existingBudgetCategories = List.of(
+                new CategoryWithIconDTO("cat1", (short)1),
+                new CategoryWithIconDTO("cat2", (short)2),
+                new CategoryWithIconDTO("cat3", (short)3)
         );
-        List<Map<String, String>> existingExpenseCategories = List.of();
-        List<Map<String, String>> expectedResults = List.of(
-                Map.of("category", "cat1", "iconId", "1"),
-                Map.of("category", "cat2", "iconId", "2"),
-                Map.of("category", "cat3", "iconId", "3")
+        List<CategoryWithIconDTO> existingExpenseCategories = List.of();
+        List<CategoryWithIconDTO> expectedResults = List.of(
+                new CategoryWithIconDTO("cat1", (short)1),
+                new CategoryWithIconDTO("cat2", (short)2),
+                new CategoryWithIconDTO("cat3", (short)3)
         );
 
         // Setup - expectations
@@ -829,7 +826,7 @@ public class ExpensesServiceTest {
                 .willReturn(existingBudgetCategories);
 
         // Execute
-        List<Map<String, String>> results = expenseService.getAllCategoriesWithIcons(user);
+        List<CategoryWithIconDTO> results = expenseService.getAllCategoriesWithIcons(user);
 
         // Verify
         Assertions.assertThat(results.toArray()).containsExactlyInAnyOrder(expectedResults.toArray());
@@ -845,16 +842,16 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        List<Map<String, String>> existingBudgetCategories = List.of();
-        List<Map<String, String>> existingExpenseCategories = List.of(
-                Map.of("category", "cat1", "iconId", "3"),
-                Map.of("category", "cat2", "iconId", "2"),
-                Map.of("category", "cat3", "iconId", "1")
+        List<CategoryWithIconDTO> existingBudgetCategories = List.of();
+        List<CategoryWithIconDTO> existingExpenseCategories = List.of(
+                new CategoryWithIconDTO("cat1", (short)3),
+                new CategoryWithIconDTO("cat2", (short)2),
+                new CategoryWithIconDTO("cat3", (short)1)
         );
-        List<Map<String, String>> expectedResults = List.of(
-                Map.of("category", "cat1", "iconId", "3"),
-                Map.of("category", "cat2", "iconId", "2"),
-                Map.of("category", "cat3", "iconId", "1")
+        List<CategoryWithIconDTO> expectedResults = List.of(
+                new CategoryWithIconDTO("cat1", (short)3),
+                new CategoryWithIconDTO("cat2", (short)2),
+                new CategoryWithIconDTO("cat3", (short)1)
         );
 
         // Setup - expectations
@@ -864,7 +861,7 @@ public class ExpensesServiceTest {
                 .willReturn(existingBudgetCategories);
 
         // Execute
-        List<Map<String, String>> results = expenseService.getAllCategoriesWithIcons(user);
+        List<CategoryWithIconDTO> results = expenseService.getAllCategoriesWithIcons(user);
 
         // Verify
         Assertions.assertThat(results.toArray()).containsExactlyInAnyOrder(expectedResults.toArray());
@@ -880,9 +877,9 @@ public class ExpensesServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        List<Map<String, String>> existingBudgetCategories = List.of();
-        List<Map<String, String>> existingExpenseCategories = List.of();
-        List<Map<String, String>> expectedResults = List.of();
+        List<CategoryWithIconDTO> existingBudgetCategories = List.of();
+        List<CategoryWithIconDTO> existingExpenseCategories = List.of();
+        List<CategoryWithIconDTO> expectedResults = List.of();
 
         // Setup - expectations
         given(expenseRepository.findAllDistinctCategoriesByUserWithIcons(any(ExtraUser.class)))
@@ -891,7 +888,7 @@ public class ExpensesServiceTest {
                 .willReturn(existingBudgetCategories);
 
         // Execute
-        List<Map<String, String>> results = expenseService.getAllCategoriesWithIcons(user);
+        List<CategoryWithIconDTO> results = expenseService.getAllCategoriesWithIcons(user);
 
         // Verify
         Assertions.assertThat(results.toArray()).containsExactlyInAnyOrder(expectedResults.toArray());

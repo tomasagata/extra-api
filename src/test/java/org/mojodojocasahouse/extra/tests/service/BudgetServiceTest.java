@@ -413,10 +413,10 @@ public class BudgetServiceTest {
                 "mj@me.com",
                 "Somepassword1!"
         );
-        List<Map<String, String>> expectedResponse = List.of(
-                Map.of("category", "some category 1", "iconId", "1"),
-                Map.of("category", "some category 2", "iconId", "2"),
-                Map.of("category", "some category 3", "iconId", "3")
+        List<CategoryWithIconDTO> expectedResponse = List.of(
+                new CategoryWithIconDTO("some category 1", (short)1),
+                new CategoryWithIconDTO("some category 1", (short)2),
+                new CategoryWithIconDTO("some category 1", (short)3)
         );
 
         // Setup - expectations
@@ -424,7 +424,7 @@ public class BudgetServiceTest {
                 .willReturn(expectedResponse);
 
         // exercise & verify
-        List<Map<String, String>> results = budgetService.getAllCategoriesWithIcons(linkedUser);
+        List<CategoryWithIconDTO> results = budgetService.getAllCategoriesWithIcons(linkedUser);
         Assertions.assertThat(results).isEqualTo(expectedResponse);
     }
 

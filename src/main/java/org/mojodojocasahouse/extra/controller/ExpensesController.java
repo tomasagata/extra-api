@@ -133,7 +133,7 @@ public class ExpensesController {
     }
 
     @GetMapping(path = "/getAllCategoriesWithIcons", produces = "application/json")
-    public ResponseEntity<List<Map<String, String>>> getMyCategoriesWithIcons (Principal principal){
+    public ResponseEntity<List<CategoryWithIconDTO>> getMyCategoriesWithIcons (Principal principal){
         ExtraUser user = userService.getUserByPrincipal(principal);
 
         log.debug("Retrieving all categories along with icons of user: \"" + principal.getName() + "\"");
