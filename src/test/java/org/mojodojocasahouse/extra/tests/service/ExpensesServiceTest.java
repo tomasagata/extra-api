@@ -194,7 +194,7 @@ public class ExpensesServiceTest {
         );
         Expense savedExpense1 = new Expense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), "test1",(short) 1);
         expenseRepository.save(savedExpense1);
-        Long id = (long) 0;
+        Long id = 0L;
         expenseService.deleteById(id);
         Assertions.assertThat(expenseService.existsById(id)).isEqualTo(false);
     }
