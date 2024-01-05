@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +11,6 @@ import org.mojodojocasahouse.extra.dto.*;
 import org.mojodojocasahouse.extra.exception.BudgetNotFoundException;
 import org.mojodojocasahouse.extra.exception.ConflictingBudgetException;
 import org.mojodojocasahouse.extra.model.Budget;
-import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
 import org.springframework.stereotype.Service;

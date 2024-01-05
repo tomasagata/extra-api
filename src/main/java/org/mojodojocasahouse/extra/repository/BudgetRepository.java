@@ -1,8 +1,6 @@
 package org.mojodojocasahouse.extra.repository;
 import java.sql.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import org.mojodojocasahouse.extra.dto.CategoryWithIconDTO;
 import org.mojodojocasahouse.extra.model.Budget;
