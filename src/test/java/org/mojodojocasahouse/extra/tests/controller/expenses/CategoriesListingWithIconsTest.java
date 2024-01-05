@@ -43,10 +43,6 @@ public class CategoriesListingWithIconsTest {
     @Autowired
     private MockMvc mvc;
 
-    private JacksonTester<ApiError> jsonApiError;
-
-    private JacksonTester<ApiResponse> jsonApiResponse;
-
     @MockBean
     public AuthenticationService authService;
 

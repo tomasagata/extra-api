@@ -259,7 +259,7 @@ public class ExpensesServiceTest {
         Date fromParameter = null;
         Date untilParameter = Date.valueOf("2022-10-10");
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Map<String, String>> expectedResults = List.of(
                 Map.of("category", "cat1", "amount", "100"),
                 Map.of("category", "cat2", "amount", "200")
@@ -292,7 +292,7 @@ public class ExpensesServiceTest {
         Date fromParameter = Date.valueOf("2020-10-10");
         Date untilParameter = Date.valueOf("2022-10-10");
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Map<String, String>> expectedResults = List.of(
                 Map.of("category", "cat2", "amount", "200")
         );
@@ -324,7 +324,7 @@ public class ExpensesServiceTest {
         Date fromParameter = Date.valueOf("2020-10-10");
         Date untilParameter = null;
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Map<String, String>> expectedResults = List.of(
                 Map.of("category", "cat2", "amount", "200")
         );
@@ -356,7 +356,7 @@ public class ExpensesServiceTest {
         Date fromParameter = null;
         Date untilParameter = null;
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Map<String, String>> expectedResults = List.of(
                 Map.of("category", "cat1", "amount", "100"),
                 Map.of("category", "cat2", "amount", "200")
@@ -534,7 +534,7 @@ public class ExpensesServiceTest {
         Date fromParameter = null;
         Date untilParameter = Date.valueOf("2022-10-10");
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Expense> expectedExpenseResults = List.of(
                 new Expense(user, "Expense 1", new BigDecimal("100.0"), Date.valueOf("2020-09-12"), "cat1",(short) 1),
                 new Expense(user, "Expense 2", new BigDecimal("200.0"), Date.valueOf("2022-09-12"), "cat2",(short) 2)
@@ -567,7 +567,7 @@ public class ExpensesServiceTest {
         Date fromParameter = Date.valueOf("2020-10-10");
         Date untilParameter = Date.valueOf("2022-10-10");
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Expense> expectedExpenseResults = List.of(
                 new Expense(user, "Expense 2", new BigDecimal("200.0"), Date.valueOf("2022-09-12"), "cat2",(short) 2)
         );
@@ -599,7 +599,7 @@ public class ExpensesServiceTest {
         Date fromParameter = Date.valueOf("2020-10-10");
         Date untilParameter = null;
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Expense> expectedExpenseResults = List.of(
                 new Expense(user, "Expense 2", new BigDecimal("200.0"), Date.valueOf("2022-09-12"), "cat2",(short) 2)
         );
@@ -631,7 +631,7 @@ public class ExpensesServiceTest {
         Date fromParameter = null;
         Date untilParameter = null;
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Expense> expectedExpenseResults = List.of(
                 new Expense(user, "Expense 1", new BigDecimal("100.0"), Date.valueOf("2020-09-12"), "cat1",(short) 1),
                 new Expense(user, "Expense 2", new BigDecimal("200.0"), Date.valueOf("2022-09-12"), "cat2",(short) 2)
@@ -946,7 +946,7 @@ public class ExpensesServiceTest {
         Date fromParameter = null;
         Date untilParameter = Date.valueOf("2022-10-10");
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Map<String, String>> expectedResults = List.of(
                 Map.of("year", "2020", "amount", "100"),
                 Map.of("year", "2021", "amount", "200")
@@ -979,7 +979,7 @@ public class ExpensesServiceTest {
         Date fromParameter = Date.valueOf("2020-10-10");
         Date untilParameter = Date.valueOf("2022-10-10");
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Map<String, String>> expectedResults = List.of(
                 Map.of("year", "2021", "amount", "200")
         );
@@ -1011,7 +1011,7 @@ public class ExpensesServiceTest {
         Date fromParameter = Date.valueOf("2020-10-10");
         Date untilParameter = null;
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Map<String, String>> expectedResults = List.of(
                 Map.of("year", "2021", "amount", "200")
         );
@@ -1043,7 +1043,7 @@ public class ExpensesServiceTest {
         Date fromParameter = null;
         Date untilParameter = null;
 
-        List<String> existingCategories = List.of("cat1", "cat2", "cat3");
+        // List<String> existingCategories = List.of("cat1", "cat2", "cat3");
         List<Map<String, String>> expectedResults = List.of(
                 Map.of("year", "2020", "amount", "100"),
                 Map.of("year", "2021", "amount", "200")
