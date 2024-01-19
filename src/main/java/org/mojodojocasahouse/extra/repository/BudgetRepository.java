@@ -2,7 +2,6 @@ package org.mojodojocasahouse.extra.repository;
 import java.sql.Date;
 import java.util.List;
 
-import org.mojodojocasahouse.extra.dto.model.CategoryWithIconDTO;
 import org.mojodojocasahouse.extra.model.Budget;
 import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;

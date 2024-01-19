@@ -7,7 +7,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
 import org.mojodojocasahouse.extra.dto.model.BudgetDTO;
-import org.mojodojocasahouse.extra.dto.requests.BudgetEditingRequest;
 import org.mojodojocasahouse.extra.model.Budget;
 import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;

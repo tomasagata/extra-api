@@ -208,7 +208,7 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testSendingPasswordResetEmailIsSuccessful() throws MessagingException {
+    public void testSendingPasswordResetEmailIsSuccessful() {
         // Setup - data
         ExtraUser existingUser = new ExtraUser(
                 "Some",
@@ -231,7 +231,7 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testSendingPasswordResetEmailThrowsMessagingException() throws MessagingException {
+    public void testSendingPasswordResetEmailThrowsMessagingException() {
         // Setup - data
         ExtraUser existingUser = new ExtraUser(
                 "Some",

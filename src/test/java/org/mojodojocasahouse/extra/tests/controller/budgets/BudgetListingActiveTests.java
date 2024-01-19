@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.BudgetsController;
-import org.mojodojocasahouse.extra.dto.model.CategoryDTO;
 import org.mojodojocasahouse.extra.dto.requests.ActiveBudgetRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;

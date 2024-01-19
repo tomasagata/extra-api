@@ -38,7 +38,4 @@ public class ExpenseAddingRequest {
         this.category = category;
         this.iconId = iconId;
     }
-    
-    public ExpenseAddingRequest() {
-    }
 }

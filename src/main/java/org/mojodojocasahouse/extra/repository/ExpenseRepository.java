@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 
 
-import org.mojodojocasahouse.extra.dto.model.CategoryWithIconDTO;
 import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
@@ -21,8 +20,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
     List<Expense> findAllExpensesByUser(@Param("userId") ExtraUser user);
 
     Optional<Expense> findFirstByConcept(String string);
-
-    List<Expense> findAllExpensesByUserAndCategory(ExtraUser user, Category category);
 
     boolean existsByIdAndUser(Long id, ExtraUser user);
 

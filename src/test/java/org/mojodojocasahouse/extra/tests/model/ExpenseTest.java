@@ -5,10 +5,7 @@ import java.sql.Date;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mojodojocasahouse.extra.dto.requests.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
-import org.mojodojocasahouse.extra.dto.requests.ExpenseEditingRequest;
-import org.mojodojocasahouse.extra.model.Budget;
 import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;

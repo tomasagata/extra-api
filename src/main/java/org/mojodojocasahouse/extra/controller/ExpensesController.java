@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mojodojocasahouse.extra.dto.model.CategoryWithIconDTO;
 import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
 import org.mojodojocasahouse.extra.dto.requests.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.requests.ExpenseEditingRequest;

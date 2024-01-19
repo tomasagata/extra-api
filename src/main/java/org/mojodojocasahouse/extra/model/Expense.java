@@ -7,7 +7,6 @@ import lombok.Setter;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
-import org.mojodojocasahouse.extra.dto.requests.ExpenseEditingRequest;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -46,7 +45,7 @@ public class Expense {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "BUDGET_ID", nullable = true)
+    @JoinColumn(name = "BUDGET_ID")
     @Setter
     private Budget linkedBudget;
 
