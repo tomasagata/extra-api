@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.dto;
+package org.mojodojocasahouse.extra.dto.responses;
 
 import lombok.Data;
 import org.springframework.http.HttpStatus;

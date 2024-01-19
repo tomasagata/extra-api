@@ -1,28 +1,28 @@
 package org.mojodojocasahouse.extra.model;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import org.mojodojocasahouse.extra.dto.BudgetAddingRequest;
-import org.mojodojocasahouse.extra.dto.BudgetDTO;
-import org.mojodojocasahouse.extra.dto.BudgetEditingRequest;
+import org.mojodojocasahouse.extra.dto.model.BudgetDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
+
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "BUDGETS")
 @Getter
+@Table(name = "BUDGETS")
 public class Budget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "USER_ID", nullable = false)
-    private ExtraUser user;
-
     @Size(max = 100, message = "Name cannot exceed 100 characters")
-    @Pattern(regexp = "^[A-Za-z\\d\\s]+$", message = "Name must only contain letters or numbers")
+    @Pattern(regexp = "^([A-Za-z\\d]+(\\s[A-Za-z\\d])?)*$",
+            message = "Name must only contain letters, numbers or spaces")
     @Column(name = "NAME", nullable = false)
     private String name;
 
@@ -32,97 +32,79 @@ public class Budget {
     @Column(name="LIMITAMOUNT", nullable = false)
     private BigDecimal limitAmount;
 
-    @NotNull(message = "Amount is mandatory")
-    @Digits(integer = 12, fraction = 2, message = "Amount must limit to 12 integer places and 2 fraction places")
-    @Column(name="CURRENTAMOUNT", nullable = false)
-    private BigDecimal currentAmount;
-
     @Column(name="LIMITDATE", nullable = false)
     private Date limitDate;
 
     @Column(name="CREATIONDATE", nullable = false)
     private Date startingDate;
 
-    @NotNull(message = "Category is mandatory")
-    @Size(max = 50, message = "Category cannot exceed 50 characters")
-    @Pattern(regexp = "^[A-Za-z\\d\\s-]+$", message = "Category must only contain letters or numbers")
-    @Column(name="CATEGORY", nullable = false)
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "USER_ID", nullable = false)
+    private ExtraUser user;
 
-    @NotNull(message = "IconId is mandatory")
-    @Digits(integer = 3, fraction = 0, message = "IconId must limit to 3 integer places")
-    @DecimalMin(value = "0", message = "IconId must be greater than 0")
-    @DecimalMax(value = "15", message = "IconId must be less than 15")
-    @Column(name="ICON_ID", nullable = false)
-    private Short iconId;
+    @ManyToOne
+    @JoinColumn(name = "CATEGORY_ID", nullable = false)
+    private Category category;
+
+    @OneToMany(mappedBy = "linkedBudget", fetch = FetchType.EAGER)
+    private Set<Expense> expenses;
 
 
-    public static Budget from(BudgetAddingRequest budgetAddingRequest, ExtraUser user) {
+    public static Budget from(BudgetAddingRequest budgetAddingRequest, Category category, ExtraUser user) {
         return new Budget(
                 user,
                 budgetAddingRequest.getName(),
-                BigDecimal.ZERO, //currentAmount SETEADA EN CERO AL CREAR EL PRESUPUESTO
                 budgetAddingRequest.getLimitAmount(),
                 budgetAddingRequest.getLimitDate(),
                 budgetAddingRequest.getStartingDate(),
-                budgetAddingRequest.getCategory(),
-                budgetAddingRequest.getIconId()
+                category
         );
     }
-        public Budget(ExtraUser user, String name, BigDecimal currentAmount, BigDecimal limitAmount, Date limitDate, Date startingDate, String category, Short iconId) {
-        this.user = user;
+
+    @Valid
+    public Budget(ExtraUser user,
+                  String name,
+                  BigDecimal limitAmount,
+                  Date startingDate,
+                  Date limitDate,
+                  Category category) {
         this.name = name;
         this.limitAmount = limitAmount;
-        this.currentAmount = currentAmount;
         this.limitDate = limitDate;
         this.startingDate = startingDate;
+        this.user = user;
         this.category = category;
-        this.iconId = iconId;
+        this.expenses = new HashSet<>();
     }
 
     public Budget(){}
 
-    public void updateFrom(BudgetEditingRequest request, ExtraUser user) {
-        if (request.getName() != null ) {
-            this.name = request.getName();
-        }
-        if (request.getLimitAmount() != null) {
-            this.limitAmount = request.getLimitAmount();
-        }
-        if (request.getCurrentAmount() != null) {
-            this.currentAmount = request.getCurrentAmount();
-        }
-        if (request.getLimitDate() != null ) {
-            this.limitDate = request.getLimitDate();
-        }
-        if (request.getCreationDate() != null ) {
-            this.startingDate = request.getCreationDate();
-        }
-        if (request.getIconId() != null ) {
-            this.iconId = request.getIconId();
-        }
-        if (request.getCategory() != null ) {
-            this.category = request.getCategory();
-        }
-    }
     public BudgetDTO asDto(){
         return new BudgetDTO(
                 this.id,
-                this.user.getId(),
                 this.name,
                 this.limitAmount,
-                this.currentAmount,
+                this.getCurrentAmount(),
                 this.limitDate,
                 this.startingDate,
-                this.category,
-                this.iconId 
-            );
-        }
-    public void addToCurrentAmount(BigDecimal amountOfExpense) {
-        this.currentAmount = this.currentAmount.add(amountOfExpense);
+                this.category.asDto()
+        );
     }
 
-    public void removeFromCurrentAmount(BigDecimal amountOfExpense) {
-        this.currentAmount = this.currentAmount.add(amountOfExpense);
+    public BigDecimal getCurrentAmount() {
+        BigDecimal sum = BigDecimal.ZERO;
+        for( Expense expense: expenses ) {
+            sum = sum.add(expense.getAmount());
+        }
+        return sum;
     }
+
+    public void add(Expense expense) {
+        this.expenses.add(expense);
+    }
+
+    public void remove(Expense expense) {
+        this.expenses.remove(expense);
+    }
+
 }

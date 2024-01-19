@@ -6,8 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.ExpensesController;
-import org.mojodojocasahouse.extra.dto.ApiError;
-import org.mojodojocasahouse.extra.dto.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.responses.ApiError;
+import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
@@ -26,7 +26,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 import java.util.Map;

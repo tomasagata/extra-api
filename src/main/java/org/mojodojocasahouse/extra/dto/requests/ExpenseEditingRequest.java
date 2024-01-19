@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.dto;
+package org.mojodojocasahouse.extra.dto.requests;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -36,7 +36,5 @@ public class ExpenseEditingRequest {
         this.category = category;
         this.iconId = iconId;
     }
-    
-    public ExpenseEditingRequest() {
-    }
+
 }

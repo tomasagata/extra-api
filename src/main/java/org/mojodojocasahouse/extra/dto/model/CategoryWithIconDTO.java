@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.dto;
+package org.mojodojocasahouse.extra.dto.model;
 
 import lombok.Data;
 

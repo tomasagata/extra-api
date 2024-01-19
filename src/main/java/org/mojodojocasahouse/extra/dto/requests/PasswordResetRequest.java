@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.dto;
+package org.mojodojocasahouse.extra.dto.requests;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;

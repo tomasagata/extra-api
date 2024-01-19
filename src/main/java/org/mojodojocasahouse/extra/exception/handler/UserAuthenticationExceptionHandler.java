@@ -2,7 +2,7 @@ package org.mojodojocasahouse.extra.exception.handler;
 
 
 import org.mojodojocasahouse.extra.exception.*;
-import org.mojodojocasahouse.extra.dto.ApiError;
+import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;

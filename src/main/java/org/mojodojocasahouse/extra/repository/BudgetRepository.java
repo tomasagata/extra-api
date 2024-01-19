@@ -2,8 +2,9 @@ package org.mojodojocasahouse.extra.repository;
 import java.sql.Date;
 import java.util.List;
 
-import org.mojodojocasahouse.extra.dto.CategoryWithIconDTO;
+import org.mojodojocasahouse.extra.dto.model.CategoryWithIconDTO;
 import org.mojodojocasahouse.extra.model.Budget;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +13,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
-
-    boolean existsByIdAndUser(Long id, ExtraUser user);
 
     List<Budget> findAllBudgetsByUser(ExtraUser user);
 
@@ -24,7 +23,7 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
             "ORDER BY b.limitDate ASC ")
     List<Budget> findActiveBudgetByUserAndCategoryAndDate(
             @Param("user") ExtraUser user,
-            @Param("category") String category,
+            @Param("category") Category category,
             @Param("date") Date date
     );
 
@@ -41,18 +40,10 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
                     "OR (:startingDate <= b.startingDate AND :limitDate >= b.limitDate   ) " +
                     "OR (:startingDate >= b.startingDate AND :limitDate <= b.limitDate   ) " +
             ") ORDER BY b.limitDate ASC")
-    List<Budget> findBudgetByUserAndCategoryAndStartDateAndEndDate(
+    List<Budget> findOverlappingBudgetsByUserAndCategory(
             ExtraUser user,
-            String category,
+            Category category,
             Date startingDate,
             Date limitDate
     );
-
-    @Query("SELECT DISTINCT b.category FROM Budget b WHERE b.user = :user")
-    List<String> findAllDistinctCategoriesByUser(ExtraUser user);
-
-    @Query( "SELECT NEW org.mojodojocasahouse.extra.dto.CategoryWithIconDTO(upper(e.category), e.iconId) " +
-            "FROM Budget e " +
-            "WHERE e.user = :user")
-    List<CategoryWithIconDTO> findAllDistinctCategoriesByUserWithIcons(ExtraUser user);
 }

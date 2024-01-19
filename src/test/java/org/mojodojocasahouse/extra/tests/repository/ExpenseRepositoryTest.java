@@ -2,6 +2,7 @@ package org.mojodojocasahouse.extra.tests.repository;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExpenseRepository;
@@ -34,44 +35,16 @@ class ExpenseRepositoryTest {
         userRepo.save(user);
         Expense savedExpense = repo.save(
                 new Expense(
-                    user,
-                    "concept",
-                    new BigDecimal(100),
-                    Date.valueOf("2018-12-9"),
-                    "test",
-                    (short) 1
+                        user,
+                        "concept",
+                        new BigDecimal(100),
+                        Date.valueOf("2018-12-9"),
+                        new Category("test", (short) 1, user)
                 )
         );
 
         // execute
         Optional<Expense> foundExpense = repo.findFirstByConcept("concept");
-
-        // verify
-        Assertions.assertThat(foundExpense).isEqualTo(Optional.of(savedExpense));
-    }
-    @Test
-    void testFindingAnExpenseByCategoryReturnsOne() {
-        // Setup - data
-        ExtraUser user = new ExtraUser(
-                        "Some",
-                        "User",
-                        "mj@me.com",
-                        "a_password"
-                );
-        userRepo.save(user);
-        Expense savedExpense = repo.save(
-                new Expense(
-                    user,
-                    "concept",
-                    new BigDecimal(100),
-                    Date.valueOf("2018-12-9"),
-                    "test",
-                    (short) 1
-                )
-        );
-
-        // execute
-        Optional<Expense> foundExpense = repo.findByCategory("test");
 
         // verify
         Assertions.assertThat(foundExpense).isEqualTo(Optional.of(savedExpense));

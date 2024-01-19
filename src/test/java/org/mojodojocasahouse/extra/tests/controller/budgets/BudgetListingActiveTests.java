@@ -6,16 +6,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.BudgetsController;
-import org.mojodojocasahouse.extra.dto.ActiveBudgetRequest;
-import org.mojodojocasahouse.extra.dto.ApiError;
-import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.BudgetDTO;
+import org.mojodojocasahouse.extra.dto.model.CategoryDTO;
+import org.mojodojocasahouse.extra.dto.requests.ActiveBudgetRequest;
+import org.mojodojocasahouse.extra.dto.responses.ApiError;
+import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
+import org.mojodojocasahouse.extra.dto.model.BudgetDTO;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.service.BudgetService;
+import org.mojodojocasahouse.extra.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
@@ -30,7 +33,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.math.BigDecimal;
 import java.sql.Date;
-import java.util.List;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -59,6 +62,9 @@ public class BudgetListingActiveTests {
     @MockBean
     public BudgetService budgetService;
 
+    @MockBean
+    public CategoryService categoryService;
+
     @Autowired
     public BudgetsController controller;
 
@@ -72,29 +78,30 @@ public class BudgetListingActiveTests {
     @WithMockUser
     public void testListingActiveBudgetsByCategoryAndDateReturnsSuccessfulResponse() throws Exception {
         // Setup - data
-        ActiveBudgetRequest request = new ActiveBudgetRequest(
-                "test", Date.valueOf("2020-12-09")
-        );
         ExtraUser linkedUser = new ExtraUser(
                 "M",
                 "J",
                 "mj@me.com",
                 "Somepassword"
         );
+        Category customCategory = new Category("test", (short) 1, linkedUser);
+        ActiveBudgetRequest request = new ActiveBudgetRequest(
+                customCategory.asDto(),
+                Date.valueOf("2020-12-09")
+        );
         BudgetDTO expectedResponse = new BudgetDTO(
-                1L,
                 1L,
                 "test",
                 new BigDecimal(100),
-                new BigDecimal(0),
+                BigDecimal.ZERO,
                 Date.valueOf("2018-12-09"),
                 Date.valueOf("2024-12-09"),
-                "test",
-                (short) 1
+                customCategory.asDto()
         );
 
         // Setup - Expectations
         given(authService.getUserByPrincipal(any())).willReturn(linkedUser);
+        given(categoryService.getCategoryByUserAndNameAndIconId(any(), any(), any())).willReturn(Optional.of(customCategory));
         given(budgetService.getActiveBudgetByCategoryAndDate(any(), any(), any())).willReturn(expectedResponse);
 
         // exercise

@@ -1,11 +1,14 @@
 package org.mojodojocasahouse.extra.tests.service;
 
-import jakarta.mail.Message;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mojodojocasahouse.extra.dto.*;
+import org.mojodojocasahouse.extra.dto.requests.ForgotPasswordRequest;
+import org.mojodojocasahouse.extra.dto.requests.PasswordResetRequest;
+import org.mojodojocasahouse.extra.dto.requests.UserChangePasswordRequest;
+import org.mojodojocasahouse.extra.dto.requests.UserRegistrationRequest;
+import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.exception.EmailException;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidPasswordResetTokenException;
@@ -20,10 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mojodojocasahouse.extra.repository.PasswordResetTokenRepository;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.testmodels.TestPasswordResetToken;
-import org.springframework.mail.MailException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;

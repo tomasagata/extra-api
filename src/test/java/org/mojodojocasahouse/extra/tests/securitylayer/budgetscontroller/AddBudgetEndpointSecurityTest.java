@@ -8,9 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.BudgetsController;
-import org.mojodojocasahouse.extra.dto.ApiError;
-import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.BudgetAddingRequest;
+import org.mojodojocasahouse.extra.dto.responses.ApiError;
+import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
+import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
@@ -54,6 +54,9 @@ public class AddBudgetEndpointSecurityTest {
 
     @MockBean
     public BudgetService budgetService;
+
+    @MockBean
+    public BudgetsController budgetsController;
 
     @Autowired
     public BudgetsController controller;

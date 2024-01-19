@@ -6,15 +6,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.BudgetsController;
-import org.mojodojocasahouse.extra.dto.ApiError;
-import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.BudgetDTO;
+import org.mojodojocasahouse.extra.dto.responses.ApiError;
+import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
+import org.mojodojocasahouse.extra.dto.model.BudgetDTO;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.service.BudgetService;
+import org.mojodojocasahouse.extra.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
@@ -58,6 +60,9 @@ public class BudgetListingTests {
     @MockBean
     public BudgetService budgetService;
 
+    @MockBean
+    public CategoryService categoryService;
+
     @Autowired
     public BudgetsController controller;
 
@@ -77,17 +82,16 @@ public class BudgetListingTests {
                 "mj@me.com",
                 "Somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, linkedUser);
         List<BudgetDTO> expectedResponse = List.of(
                 new BudgetDTO(
-                        1L,
                         1L,
                         "test",
                         new BigDecimal(100),
                         new BigDecimal(0),
                         Date.valueOf("2018-12-09"),
                         Date.valueOf("2024-12-09"),
-                        "test",
-                        (short) 1)
+                        customCategory.asDto())
         );
 
         // Setup - Expectations

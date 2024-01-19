@@ -5,7 +5,11 @@ import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mojodojocasahouse.extra.dto.*;
+import org.mojodojocasahouse.extra.dto.model.CategoryWithIconDTO;
+import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.requests.ExpenseAddingRequest;
+import org.mojodojocasahouse.extra.dto.requests.ExpenseEditingRequest;
+import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.exception.ExpenseAccessDeniedException;
 import org.mojodojocasahouse.extra.exception.ExpenseNotFoundException;
 import org.mojodojocasahouse.extra.model.ExtraUser;
@@ -59,7 +63,7 @@ public class ExpensesController {
 
         log.debug("Editing expense of user: \"" + user.getEmail() + "\"");
 
-        ApiResponse response = expenseService.editExpense(user, id, expenseEditingRequest);
+        ApiResponse response = expenseService.editExpense(id, expenseEditingRequest);
         return new ResponseEntity<>(
                 response,
                 HttpStatus.CREATED
@@ -119,25 +123,6 @@ public class ExpensesController {
                 .getExpensesOfUserByCategoriesAndDateRanges(user, categories, min_date, max_date);
 
         return ResponseEntity.ok(expenses);
-    }
-
-
-    @GetMapping(path = "/getAllCategories", produces = "application/json")
-    public ResponseEntity<List<String>> getMyCategories (Principal principal){
-        ExtraUser user = userService.getUserByPrincipal(principal);
-
-        log.debug("Retrieving all categories of user: \"" + principal.getName() + "\"");
-
-        return ResponseEntity.ok(expenseService.getAllCategories(user));
-    }
-
-    @GetMapping(path = "/getAllCategoriesWithIcons", produces = "application/json")
-    public ResponseEntity<List<CategoryWithIconDTO>> getMyCategoriesWithIcons (Principal principal){
-        ExtraUser user = userService.getUserByPrincipal(principal);
-
-        log.debug("Retrieving all categories along with icons of user: \"" + principal.getName() + "\"");
-
-        return ResponseEntity.ok(expenseService.getAllCategoriesWithIcons(user));
     }
 
     @GetMapping(path = "/getSumOfExpenses", produces = "application/json")

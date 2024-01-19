@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.util.Set;
 
-import org.mojodojocasahouse.extra.dto.UserRegistrationRequest;
+import org.mojodojocasahouse.extra.dto.requests.UserRegistrationRequest;
 
 @Entity
 @Table(name = "USERS")

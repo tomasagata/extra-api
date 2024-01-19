@@ -1,13 +1,18 @@
 package org.mojodojocasahouse.extra.controller;
 import java.security.Principal;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mojodojocasahouse.extra.dto.*;
-import org.mojodojocasahouse.extra.exception.BudgetAccessDeniedException;
-import org.mojodojocasahouse.extra.exception.BudgetNotFoundException;
+import org.mojodojocasahouse.extra.dto.model.BudgetDTO;
+import org.mojodojocasahouse.extra.dto.requests.ActiveBudgetRequest;
+import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
+import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.service.BudgetService;
+import org.mojodojocasahouse.extra.service.CategoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +24,7 @@ import jakarta.validation.Valid;
 public class BudgetsController {
 
     private final AuthenticationService userService;
-
+    private final CategoryService categoryService;
     private final BudgetService budgetService;
 
 
@@ -38,54 +43,6 @@ public class BudgetsController {
         );
     }
 
-    @PostMapping(value = "/editBudget/{id}", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> editBudget(Principal principal,
-                                             @Valid @RequestBody BudgetEditingRequest budgetEditingRequest,
-                                             @PathVariable Long id){
-        ExtraUser user = userService.getUserByPrincipal(principal);
-
-        // Check if the budget with the given ID exists
-        if (!budgetService.existsById(id)) {
-            throw new BudgetNotFoundException();
-        }
-
-        //Check that the user making the edition is the owner of the budget
-        if (!budgetService.isOwner(user, id)) {
-            throw new BudgetAccessDeniedException();
-        }
-
-        log.debug("Editing Budget of user: \"" + user.getEmail() + "\"");
-
-        ApiResponse response = budgetService.editBudget(user,id,budgetEditingRequest);
-        return new ResponseEntity<>(
-                response,
-                HttpStatus.CREATED
-        );
-    }
-
-    @DeleteMapping("/deleteBudget/{id}")
-    public ResponseEntity<ApiResponse> deleteBudget(Principal principal, @PathVariable Long id)
-            throws BudgetNotFoundException, BudgetAccessDeniedException {
-        ExtraUser user = userService.getUserByPrincipal(principal);
-
-        // Check if the budget with the given ID exists
-        if (!budgetService.existsById(id)) {
-            throw new BudgetNotFoundException();
-        }
-
-        //Check that the user making the deletion is the owner of the budget
-        if (!budgetService.isOwner(user, id)) {
-            throw new BudgetAccessDeniedException();
-        }
-
-        // Delete the budget by ID
-        budgetService.deleteById(id);
-        return new ResponseEntity<>(
-                new ApiResponse("Budget deleted successfully"),
-                HttpStatus.OK
-        );
-    }
-
     @GetMapping("/allBudgets")
     public ResponseEntity<Object> getAllBudgets(Principal principal) {
         ExtraUser user = userService.getUserByPrincipal(principal);
@@ -95,36 +52,19 @@ public class BudgetsController {
         );
     }
 
-    @GetMapping("/budget/{id}")
-    public ResponseEntity<Object> getBudgetById(Principal principal, @PathVariable Long id)
-            throws BudgetNotFoundException, BudgetAccessDeniedException {
-        ExtraUser user = userService.getUserByPrincipal(principal);
-
-        // Check if the budget with the given ID exists
-        if (!budgetService.existsById(id)) {
-            throw new BudgetNotFoundException();
-        }
-
-        //Check if the budget belongs to the user
-        if (!budgetService.isOwner(user, id)) {
-            throw new BudgetAccessDeniedException();
-        }
-
-        return new ResponseEntity<>(
-                budgetService.getBudgetById(id),
-                HttpStatus.OK
-        );
-    }
-
     @PostMapping("/getActiveBudgets")
     public ResponseEntity<Object> getActiveBudgets(Principal principal, @Valid @RequestBody ActiveBudgetRequest request){
         ExtraUser user = userService.getUserByPrincipal(principal);
 
-        BudgetDTO foundBudget = budgetService.getActiveBudgetByCategoryAndDate(user, request.getCategory(), request.getDate());
-        return new ResponseEntity<>(
-                foundBudget,
-                HttpStatus.OK
-        );
+        Optional<Category> foundCategory = categoryService.getCategoryByUserAndNameAndIconId(user,
+                request.getCategory().getName(), request.getCategory().getIconId());
+
+        if(foundCategory.isEmpty()){
+            return ResponseEntity.ok(null);
+        }
+
+        BudgetDTO foundBudget = budgetService.getActiveBudgetByCategoryAndDate(user, foundCategory.get(), request.getDate());
+        return ResponseEntity.ok(foundBudget);
     }
 
 }

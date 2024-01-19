@@ -5,9 +5,11 @@ import java.sql.Date;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
-import org.mojodojocasahouse.extra.dto.ExpenseDTO;
-import org.mojodojocasahouse.extra.dto.ExpenseEditingRequest;
+import org.mojodojocasahouse.extra.dto.requests.ExpenseAddingRequest;
+import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.requests.ExpenseEditingRequest;
+import org.mojodojocasahouse.extra.model.Budget;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 
@@ -20,13 +22,13 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
 
         Assertions.assertThat(unmanagedExpense.getId()).isNull();
@@ -40,13 +42,13 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
 
         Assertions.assertThat(unmanagedExpense.getUser()).isEqualTo(unmanagedUser);
@@ -59,13 +61,13 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
 
         Assertions.assertThat(unmanagedExpense.getConcept()).isEqualTo("Madrid trip");
@@ -78,13 +80,13 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
 
         Assertions.assertThat(unmanagedExpense.getAmount()).isEqualTo(new BigDecimal(100));
@@ -97,13 +99,13 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
 
         Assertions.assertThat(unmanagedExpense.getDate()).isEqualTo(Date.valueOf("2018-12-9"));
@@ -117,36 +119,16 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "travel",
-                (short) 1
+                customCategory
         );
 
-        Assertions.assertThat(unmanagedExpense.getCategory()).isEqualTo("travel");
-    }
-
-    @Test
-    void testGettingIconofMadridTripExpenseReturnsShortOne() {
-        ExtraUser unmanagedUser = new ExtraUser(
-                "Michael",
-                "Jordan",
-                "michaelj@gmail.com",
-                "somepassword"
-        );
-        Expense unmanagedExpense = new Expense(
-                unmanagedUser,
-                "Madrid trip",
-                new BigDecimal(100),
-                Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
-        );
-
-        Assertions.assertThat(unmanagedExpense.getIconId()).isEqualTo((short) 1);
+        Assertions.assertThat(unmanagedExpense.getCategory()).isEqualTo(customCategory);
     }
 
     @Test
@@ -157,23 +139,20 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
-                new BigDecimal(99),
+                new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
-       unmanagedExpense.updateFrom(
-                new ExpenseEditingRequest(
-                        null,
-                        new BigDecimal(100),
-                        null,
-                        null,
-                        null
-                ),
-                unmanagedUser
+
+        unmanagedExpense.update(
+                null,
+                new BigDecimal(100),
+                null,
+                null
         );
         Assertions.assertThat(unmanagedExpense.getAmount()).isEqualTo((BigDecimal.valueOf(100)));
     }
@@ -186,23 +165,20 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
-                new BigDecimal(99),
+                new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
-       unmanagedExpense.updateFrom(
-                new ExpenseEditingRequest(
-                        "Paris Trip",
-                        null,
-                        null,
-                        null,
-                        null
-                ),
-                unmanagedUser
+
+        unmanagedExpense.update(
+                "Paris Trip",
+                null,
+                null,
+                null
         );
         Assertions.assertThat(unmanagedExpense.getConcept()).isEqualTo(("Paris Trip"));
     }
@@ -215,23 +191,20 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
-                new BigDecimal(99),
+                new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
-        unmanagedExpense.updateFrom(
-                new ExpenseEditingRequest(
-                        null,
-                        null,
-                        Date.valueOf("2023-12-09"),
-                        null,
-                        null
-                ),
-                unmanagedUser
+
+        unmanagedExpense.update(
+                null,
+                null,
+                Date.valueOf("2023-12-09"),
+                null
         );
         Assertions.assertThat(unmanagedExpense.getDate()).isEqualTo(Date.valueOf("2023-12-09"));
     }
@@ -244,48 +217,23 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
         Expense unmanagedExpense = new Expense(
                 unmanagedUser,
                 "Madrid trip",
-                new BigDecimal(99),
+                new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
-                "test",
-                (short) 1
+                customCategory
         );
-       unmanagedExpense.updateFrom(
-                new ExpenseEditingRequest(
-                        null,
-                        null,
-                        null,
-                        "Travel",
-                        (short) 2
-                ),
-                unmanagedUser
-        );
-        Assertions.assertThat(unmanagedExpense.getCategory()).isEqualTo("Travel");
-        Assertions.assertThat(unmanagedExpense.getIconId()).isEqualTo((short) 2);
-    }
-    
+        Category newCategory = new Category("Travel", (short) 2, unmanagedUser);
 
-    @Test
-    void testExtraExpenseCanBeCreatedFromDTO() {
-        ExtraUser unmanagedUser = new ExtraUser(
-                "Michael",
-                "Jordan",
-                "michaelj@gmail.com",
-                "somepassword"
+        unmanagedExpense.update(
+                null,
+                null,
+                null,
+                newCategory
         );
-       Expense unmanagedExpense = Expense.from(
-                new ExpenseAddingRequest(
-                        "Paris Trip",
-                        new BigDecimal(100),
-                        Date.valueOf("2018-12-9"),
-                        "Travel",
-                        (short) 2
-                ),
-                unmanagedUser
-        );
-        Assertions.assertThat(unmanagedExpense.getAmount()).isEqualTo((BigDecimal.valueOf(100)));
+        Assertions.assertThat(unmanagedExpense.getCategory()).isEqualTo(newCategory);
     }
     
 
@@ -297,18 +245,24 @@ public class ExpenseTest {
                 "michaelj@gmail.com",
                 "somepassword"
         );
-        ExpenseAddingRequest unamanagedRequest = new ExpenseAddingRequest(
-                        "Paris Trip",
-                        new BigDecimal(100),
-                        Date.valueOf("2018-12-9"),
-                        "Travel",
-                        (short) 2
+        Category customCategory = new Category("test1", (short) 1, unmanagedUser);
+        Expense unmanagedExpense = new Expense(
+                unmanagedUser,
+                "Madrid trip",
+                new BigDecimal(100),
+                Date.valueOf("2018-12-9"),
+                customCategory
         );
-       Expense unmanagedExpense = Expense.from(
-                unamanagedRequest,
-                unmanagedUser
+        ExpenseDTO unmanagedExpenseDto = new ExpenseDTO(
+                null,
+                null,
+                "Madrid trip",
+                new BigDecimal(100),
+                Date.valueOf("2018-12-9"),
+                customCategory.asDto()
         );
-        Assertions.assertThat(unmanagedExpense.asDto()).isInstanceOf(ExpenseDTO.class);
+
+        Assertions.assertThat(unmanagedExpense.asDto()).isEqualTo(unmanagedExpenseDto);
     }
 
 }

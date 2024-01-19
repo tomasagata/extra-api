@@ -6,10 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.ExpensesController;
-import org.mojodojocasahouse.extra.dto.ApiError;
-import org.mojodojocasahouse.extra.dto.ApiResponse;
-import org.mojodojocasahouse.extra.dto.ExpenseAddingRequest;
-import org.mojodojocasahouse.extra.dto.ExpenseEditingRequest;
+import org.mojodojocasahouse.extra.dto.responses.ApiError;
+import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
+import org.mojodojocasahouse.extra.dto.requests.ExpenseEditingRequest;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
@@ -91,7 +90,7 @@ public class ExpensesEditingTest {
         given(authService.getUserByPrincipal(any())).willReturn(linkedUser);
         given(expenseService.existsById(any())).willReturn(true);
         given(expenseService.isOwner(any(), any())).willReturn(true);
-        given(expenseService.editExpense(any(), any(), any())).willReturn(expectedResponse);
+        given(expenseService.editExpense(any(), any())).willReturn(expectedResponse);
 
         // exercise
         MockHttpServletResponse response = postExpenseEditingRequest(request, 1L);

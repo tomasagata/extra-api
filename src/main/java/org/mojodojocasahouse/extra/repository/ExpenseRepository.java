@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Optional;
 
 
-import org.mojodojocasahouse.extra.dto.CategoryWithIconDTO;
+import org.mojodojocasahouse.extra.dto.model.CategoryWithIconDTO;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,12 +22,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     Optional<Expense> findFirstByConcept(String string);
 
-    List<Expense> findAllExpensesByUserAndCategory(ExtraUser user, String category);
-
-    @Query("SELECT DISTINCT e.category FROM Expense e WHERE e.user = :userId")
-    List<String> findAllDistinctCategoriesByUser(@Param("userId") ExtraUser user);
-
-    Optional<Expense> findByCategory(String category);
+    List<Expense> findAllExpensesByUserAndCategory(ExtraUser user, Category category);
 
     boolean existsByIdAndUser(Long id, ExtraUser user);
 
@@ -128,6 +124,18 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT e FROM Expense e " +
             "WHERE e.user = :user " +
+                "AND e.category = :category " +
+                "AND e.date BETWEEN :minDate AND :maxDate")
+    List<Expense> getExpensesByUserAndCategoryAndDateInterval(
+            @Param("user") ExtraUser user,
+            @Param("category") Category category,
+            @Param("minDate") Date minDate,
+            @Param("maxDate") Date maxDate
+    );
+
+
+    @Query( "SELECT e FROM Expense e " +
+            "WHERE e.user = :user " +
                 "AND e.category IN :categories")
     List<Expense> getExpensesOfUserByCategory(
             @Param("user") ExtraUser user,
@@ -150,11 +158,5 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
             @Param("user") ExtraUser user,
             @Param("categories") List<String> categories,
             @Param("maxDate") Date maxDate);
-
-    @Query( "SELECT NEW org.mojodojocasahouse.extra.dto.CategoryWithIconDTO(UPPER(e.category), e.iconId) " +
-            "FROM Expense e " +
-            "WHERE e.user = :user")
-    List<CategoryWithIconDTO> findAllDistinctCategoriesByUserWithIcons(ExtraUser user);
-
 }
 
