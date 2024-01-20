@@ -33,4 +33,6 @@ public class PasswordResetRequest {
         this.newPasswordRepeat = newPasswordRepeat;
     }
 
+    public PasswordResetRequest() {}
+
 }

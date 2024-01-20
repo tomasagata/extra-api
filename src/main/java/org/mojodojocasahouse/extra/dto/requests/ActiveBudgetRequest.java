@@ -19,4 +19,6 @@ public class ActiveBudgetRequest {
         this.date = date;
     }
 
+    public ActiveBudgetRequest() {}
+
 }

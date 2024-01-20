@@ -42,4 +42,6 @@ public class UserRegistrationRequest {
         this.passwordRepeat = passwordRepeat;
     }
 
+    public UserRegistrationRequest() {}
+
 }

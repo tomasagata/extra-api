@@ -30,4 +30,6 @@ public class UserChangePasswordRequest {
         this.newPasswordRepeat = newPasswordRepeat;
     }
 
+    public UserChangePasswordRequest() {}
+
 }

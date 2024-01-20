@@ -37,4 +37,6 @@ public class ExpenseEditingRequest {
         this.iconId = iconId;
     }
 
+    public ExpenseEditingRequest() {}
+
 }

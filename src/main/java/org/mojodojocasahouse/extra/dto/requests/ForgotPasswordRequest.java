@@ -17,4 +17,6 @@ public class ForgotPasswordRequest {
         this.email = email;
     }
 
+    public ForgotPasswordRequest() {}
+
 }

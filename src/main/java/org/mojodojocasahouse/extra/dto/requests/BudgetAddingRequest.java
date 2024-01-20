@@ -44,4 +44,7 @@ public class BudgetAddingRequest {
         this.category = category;
         this.iconId = iconId;
     }
+
+    public BudgetAddingRequest() {}
+
 }
