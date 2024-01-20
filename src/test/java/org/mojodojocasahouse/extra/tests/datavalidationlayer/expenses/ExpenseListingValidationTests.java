@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.tests.controller.expenses;
+package org.mojodojocasahouse.extra.tests.datavalidationlayer.expenses;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -6,9 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.ExpensesController;
+import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
 import org.mojodojocasahouse.extra.dto.requests.FilteringRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
-import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
@@ -27,9 +28,9 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
-import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
@@ -41,7 +42,7 @@ import static org.mockito.BDDMockito.given;
         DelegatingBasicAuthenticationEntryPoint.class,
         ExtraUserDetailsService.class
 })
-public class SumOfExpensesTest {
+public class ExpenseListingValidationTests {
 
     @Autowired
     private MockMvc mvc;
@@ -67,85 +68,39 @@ public class SumOfExpensesTest {
         JacksonTester.initFields(this, new ObjectMapper());
     }
 
-
     @Test
     @WithMockUser
-    public void testListingExpensesWithNoDateRangesCallsServiceMethodWithNullReturnsAllExpenses() throws Exception {
+    public void testListingExpensesWithInvalidDateRangesReturnsErrorResponse() throws Exception {
         // Setup - data
-        ExtraUser linkedUser = new ExtraUser(
-                "M",
-                "J",
-                "mj@me.com",
-                "Somepassword"
+        FilteringRequest request = new FilteringRequest(
+                null, null, List.of("some_invalid_category_value_!@#$#^%$%&*&")
         );
-        List<Map<String, String>> expectedResponse = List.of(
-                Map.of("category", "A category", "amount", "10000"),
-                Map.of("category", "Another category", "amount", "20000"),
-                Map.of("category", "A third category", "amount", "30000")
+        ApiError expectedResponse = new ApiError(
+                HttpStatus.BAD_REQUEST,
+                "Data validation error",
+                "categories[0]: Category must only contain letters or numbers"
         );
-
-        // Setup - Expectations
-        given(authService.getUserByPrincipal(any()))
-                .willReturn(linkedUser);
-        given(expenseService.getSumOfExpensesOfUserByCategoriesAndDateRanges(any(), any(), isNull(), isNull()))
-                .willReturn(expectedResponse);
 
         // exercise
-        MockHttpServletResponse response = getSumOfExpenses();
+        MockHttpServletResponse response = getExpensesWithArguments(request);
 
         // Verify
-        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        Assertions.assertThat(response.getContentAsString()).isEqualTo(asJsonString(expectedResponse));
-    }
-
-    @Test
-    @WithMockUser
-    public void testListingExpensesWithRangesCallsServiceMethodWithDateRangesAndReturnsAllExpensesWithinThoseRanges() throws Exception {
-        // Setup - data
-        ExtraUser linkedUser = new ExtraUser(
-                "M",
-                "J",
-                "mj@me.com",
-                "Somepassword"
-        );
-        List<Map<String, String>> expectedResponse = List.of(
-                Map.of("category", "A category", "amount", "10000"),
-                Map.of("category", "Another category", "amount", "20000"),
-                Map.of("category", "A third category", "amount", "30000")
-        );
-
-        // Setup - Expectations
-        given(authService.getUserByPrincipal(any()))
-                .willReturn(linkedUser);
-        given(expenseService.getSumOfExpensesOfUserByCategoriesAndDateRanges(any(), any(), any(Date.class), any(Date.class)))
-                .willReturn(expectedResponse);
-
-        // exercise
-        MockHttpServletResponse response = getSumOfExpensesWithArguments();
-
-        // Verify
-        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-        Assertions.assertThat(response.getContentAsString()).isEqualTo(asJsonString(expectedResponse));
+        assertThatResponseReturnsError(response, expectedResponse);
     }
 
 
-    private MockHttpServletResponse getSumOfExpenses() throws Exception {
+
+    private MockHttpServletResponse getExpenses() throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
-                        post("/getSumOfExpenses")
+                        get("/getMyExpenses")
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();
     }
 
-    private MockHttpServletResponse getSumOfExpensesWithArguments() throws Exception {
-        FilteringRequest request = new FilteringRequest(
-                Date.valueOf("2022-12-09"),
-                Date.valueOf("2022-12-10"),
-                List.of()
-        );
-
+    private MockHttpServletResponse getExpensesWithArguments(Object request) throws Exception {
         return mvc.perform(
                         MockMvcRequestBuilders
-                                .post("/getSumOfExpenses")
+                                .post("/getMyExpenses")
                                 .content(asJsonString(request))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.ALL))
@@ -160,5 +115,14 @@ public class SumOfExpensesTest {
             throw new RuntimeException(e);
         }
     }
+
+    private void assertThatResponseReturnsError(MockHttpServletResponse response, ApiError expectedApiError) throws Exception {
+        ApiError actualApiError = jsonApiError.parse(response.getContentAsString()).getObject();
+
+        Assertions.assertThat(actualApiError.getMessage()).isEqualTo(expectedApiError.getMessage());
+        Assertions.assertThat(actualApiError.getStatus()).isEqualTo(expectedApiError.getStatus());
+        Assertions.assertThat(actualApiError.getErrors().toArray()).containsExactlyInAnyOrder(expectedApiError.getErrors().toArray());
+    }
+
 
 }

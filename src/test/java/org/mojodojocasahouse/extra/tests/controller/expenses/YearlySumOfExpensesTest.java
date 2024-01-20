@@ -6,6 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.ExpensesController;
+import org.mojodojocasahouse.extra.dto.requests.FilteringRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
 import org.mojodojocasahouse.extra.model.ExtraUser;
@@ -107,6 +108,9 @@ public class YearlySumOfExpensesTest {
                 "mj@me.com",
                 "Somepassword"
         );
+        FilteringRequest request = new FilteringRequest(
+                Date.valueOf("2019-12-09"), Date.valueOf("2022-12-10"), List.of()
+        );
         List<Map<String, String>> expectedResponse = List.of(
                 Map.of("year", "2020", "amount", "10000"),
                 Map.of("year", "2023", "amount", "20000"),
@@ -120,7 +124,7 @@ public class YearlySumOfExpensesTest {
                 .willReturn(expectedResponse);
 
         // exercise
-        MockHttpServletResponse response = getYearlySumOfExpensesWithArguments("2019-12-09", "2022-12-10");
+        MockHttpServletResponse response = getYearlySumOfExpensesWithArguments(request);
 
         // Verify
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -130,17 +134,17 @@ public class YearlySumOfExpensesTest {
 
     private MockHttpServletResponse getYearlySumOfExpenses() throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
-                        get("/getYearlySumOfExpenses")
+                        post("/getYearlySumOfExpenses")
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();
     }
 
-    private MockHttpServletResponse getYearlySumOfExpensesWithArguments(String from_date_iso, String until_date_iso) throws Exception {
+    private MockHttpServletResponse getYearlySumOfExpensesWithArguments(FilteringRequest request) throws Exception {
         return mvc.perform(
                         MockMvcRequestBuilders
-                                .get("/getYearlySumOfExpenses")
-                                .param("from", from_date_iso)
-                                .param("until", until_date_iso)
+                                .post("/getYearlySumOfExpenses")
+                                .content(asJsonString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.ALL))
                 .andReturn()
                 .getResponse();

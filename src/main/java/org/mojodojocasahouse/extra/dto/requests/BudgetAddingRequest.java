@@ -1,10 +1,16 @@
 package org.mojodojocasahouse.extra.dto.requests;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import org.mojodojocasahouse.extra.validation.constraint.ValidDateRange;
+
 import java.math.BigDecimal;
 import java.sql.Date;
 
 @Data
+@ValidDateRange(
+        fromDateField = "startingDate",
+        untilDateField = "limitDate"
+)
 public class BudgetAddingRequest {
     @Size(max = 100, message = "Name cannot exceed 100 characters")
     @Pattern(regexp = "^[A-Za-z\\d\\s]+$", message = "Name must only contain letters or numbers")
@@ -15,7 +21,6 @@ public class BudgetAddingRequest {
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0.01")
     private BigDecimal limitAmount;
 
-    @Future(message = "Date must be in the future")
     private Date limitDate;
 
     private Date startingDate;

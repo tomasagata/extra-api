@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.tests.datavalidationlayer.authenticationcontroller;
+package org.mojodojocasahouse.extra.tests.datavalidationlayer.authentication;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
