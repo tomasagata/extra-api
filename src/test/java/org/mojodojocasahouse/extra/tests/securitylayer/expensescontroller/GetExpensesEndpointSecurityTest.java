@@ -15,6 +15,7 @@ import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPo
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.service.ExpenseService;
+import org.mojodojocasahouse.extra.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.json.JacksonTester;
@@ -52,6 +53,9 @@ public class GetExpensesEndpointSecurityTest {
 
     @MockBean
     public ExpenseService expenseService;
+
+    @MockBean
+    public TransactionService transactionService;
 
     @Autowired
     public TransactionController controller;

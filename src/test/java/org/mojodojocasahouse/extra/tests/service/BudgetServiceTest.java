@@ -15,12 +15,10 @@ import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.exception.BudgetNotFoundException;
 import org.mojodojocasahouse.extra.exception.ConflictingBudgetException;
-import org.mojodojocasahouse.extra.model.Budget;
-import org.mojodojocasahouse.extra.model.Category;
-import org.mojodojocasahouse.extra.model.Expense;
-import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
 import org.mojodojocasahouse.extra.repository.ExpenseRepository;
+import org.mojodojocasahouse.extra.repository.TransactionRepository;
 import org.mojodojocasahouse.extra.service.BudgetService;
 import org.mojodojocasahouse.extra.service.CategoryService;
 import org.springframework.boot.test.json.JacksonTester;
@@ -46,6 +44,9 @@ public class BudgetServiceTest {
 
     @Mock
     private CategoryService categoryService;
+
+    @Mock
+    private TransactionRepository transactionRepository;
 
     @InjectMocks
     private BudgetService budgetService;
@@ -123,7 +124,7 @@ public class BudgetServiceTest {
                 "Somepassword1!"
         );
         Category existingOrNewCategory = new Category("test", (short) 1, user);
-        List<Expense> overlappingExpenses = new ArrayList<>();
+        List<Transaction> overlappingExpenses = new ArrayList<>();
         ApiResponse expectedResponse = new ApiResponse(
                 "Budget added successfully!"
         );
@@ -133,7 +134,7 @@ public class BudgetServiceTest {
                 categoryService.fetchOrCreateCategoryFromUserAndNameAndIconId(any(), any(), any())
         ).willReturn(existingOrNewCategory);
         given(
-                expenseRepository.getExpensesByUserAndCategoryAndDateInterval(any(), any(), any(), any())
+                transactionRepository.getTransactionsByUserAndCategoryAndDateInterval(any(), any(), any(), any())
         ).willReturn(overlappingExpenses);
 
         // exercise
@@ -163,7 +164,7 @@ public class BudgetServiceTest {
         Category existingOrNewCategory = new Category("test", (short) 1, user);
         Expense existingExpense1 = new Expense(user, "test1", BigDecimal.TEN, Date.valueOf("2023-09-11"), existingOrNewCategory);
         Expense existingExpense2 = new Expense(user, "test2", BigDecimal.TWO, Date.valueOf("2023-09-11"), existingOrNewCategory);
-        List<Expense> overlappingExpenses = List.of(
+        List<Transaction> overlappingExpenses = List.of(
                 existingExpense1,
                 existingExpense2
         );
@@ -176,7 +177,7 @@ public class BudgetServiceTest {
                 categoryService.fetchOrCreateCategoryFromUserAndNameAndIconId(any(), any(), any())
         ).willReturn(existingOrNewCategory);
         given(
-                expenseRepository.getExpensesByUserAndCategoryAndDateInterval(any(), any(), any(), any())
+                transactionRepository.getTransactionsByUserAndCategoryAndDateInterval(any(), any(), any(), any())
         ).willReturn(overlappingExpenses);
 
         // exercise
