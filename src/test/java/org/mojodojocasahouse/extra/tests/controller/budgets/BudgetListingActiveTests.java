@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
-import org.mojodojocasahouse.extra.controller.BudgetsController;
+import org.mojodojocasahouse.extra.controller.BudgetController;
 import org.mojodojocasahouse.extra.dto.requests.ActiveBudgetRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
@@ -37,7 +37,7 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@WebMvcTest(BudgetsController.class)
+@WebMvcTest(BudgetController.class)
 @Import({
         DelegatingBasicAuthenticationEntryPoint.class,
         SecurityConfiguration.class,
@@ -65,7 +65,7 @@ public class BudgetListingActiveTests {
     public CategoryService categoryService;
 
     @Autowired
-    public BudgetsController controller;
+    public BudgetController controller;
 
     @BeforeEach
     public void setup() {

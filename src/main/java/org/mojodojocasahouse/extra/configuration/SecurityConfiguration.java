@@ -10,6 +10,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,7 +33,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/getMyExpenses").authenticated()
                         .requestMatchers("/getMyExpensesByCategory").authenticated()
@@ -59,6 +60,9 @@ public class SecurityConfiguration {
                         .requestMatchers("/getAllCategoriesWithIcons").authenticated()
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/getActiveBudgets").authenticated()
+                        .requestMatchers("/addInvestment").authenticated()
+                        .requestMatchers("/unregisterDevice").authenticated()
+                        .requestMatchers("/registerDevice").authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
                         .realmName("extra")

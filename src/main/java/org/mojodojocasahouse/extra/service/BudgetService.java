@@ -12,12 +12,10 @@ import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.exception.BudgetNotFoundException;
 import org.mojodojocasahouse.extra.exception.ConflictingBudgetException;
-import org.mojodojocasahouse.extra.model.Budget;
-import org.mojodojocasahouse.extra.model.Category;
-import org.mojodojocasahouse.extra.model.Expense;
-import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
 import org.mojodojocasahouse.extra.repository.ExpenseRepository;
+import org.mojodojocasahouse.extra.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -26,7 +24,7 @@ import org.springframework.stereotype.Service;
 public class BudgetService {
 
     private final BudgetRepository budgetRepository;
-    private final ExpenseRepository expenseRepository;
+    private final TransactionRepository transactionRepository;
 
     private final CategoryService categoryService;
 
@@ -48,7 +46,7 @@ public class BudgetService {
         // Save new budget
         budgetRepository.save(newBudget);
 
-        this.updateExpensesWithBudget(newBudget);
+        this.updateTransactionsWithBudget(newBudget);
 
         return new ApiResponse("Budget added successfully!");
     }
@@ -94,16 +92,16 @@ public class BudgetService {
         }
     }
 
-    public void updateExpensesWithBudget(Budget budget) {
-        List<Expense> unlinkedExpenses = expenseRepository.getExpensesByUserAndCategoryAndDateInterval(
+    public void updateTransactionsWithBudget(Budget budget) {
+        List<Transaction> unlinkedTransactions = transactionRepository.getTransactionsByUserAndCategoryAndDateInterval(
                 budget.getUser(),
                 budget.getCategory(),
                 budget.getStartingDate(),
                 budget.getLimitDate()
         );
 
-        for( Expense expense: unlinkedExpenses){
-            expense.setLinkedBudget(budget);
+        for( Transaction transaction: unlinkedTransactions){
+            transaction.setLinkedBudget(budget);
         }
     }
 }

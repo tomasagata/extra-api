@@ -5,7 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
-import org.mojodojocasahouse.extra.controller.ExpensesController;
+import org.mojodojocasahouse.extra.controller.TransactionController;
 import org.mojodojocasahouse.extra.dto.requests.FilteringRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 
-@WebMvcTest(ExpensesController.class)
+@WebMvcTest(TransactionController.class)
 @Import({
         SecurityConfiguration.class,
         DelegatingBasicAuthenticationEntryPoint.class,
@@ -60,7 +60,7 @@ public class SumOfExpensesTest {
     public ExpenseService expenseService;
 
     @Autowired
-    public ExpensesController controller;
+    public TransactionController controller;
 
     @BeforeEach
     public void setup() {

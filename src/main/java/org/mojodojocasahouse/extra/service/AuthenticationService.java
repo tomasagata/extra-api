@@ -6,10 +6,8 @@ import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mojodojocasahouse.extra.dto.requests.ForgotPasswordRequest;
-import org.mojodojocasahouse.extra.dto.requests.PasswordResetRequest;
-import org.mojodojocasahouse.extra.dto.requests.UserChangePasswordRequest;
-import org.mojodojocasahouse.extra.dto.requests.UserRegistrationRequest;
+import org.checkerframework.checker.units.qual.A;
+import org.mojodojocasahouse.extra.dto.requests.*;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.exception.EmailException;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
@@ -17,6 +15,8 @@ import org.mojodojocasahouse.extra.exception.InvalidPasswordResetTokenException;
 import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.repository.PasswordResetTokenRepository;
+import org.mojodojocasahouse.extra.repository.UserDeviceRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -32,13 +32,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final ExtraUserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     private final JavaMailSender mailSender;
 
+    private final ExtraUserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
+    private final UserDeviceRepository deviceRepository;
 
 
     public ApiResponse registerUser(UserRegistrationRequest userRegistrationRequest)
@@ -213,6 +213,29 @@ public class AuthenticationService {
         userRepository.save(changingUser);
 
         return new ApiResponse("Password changed successfully");
+    }
+
+    public ApiResponse registerUserDevice(ExtraUser user, DeviceRegisteringRequest request) {
+        try {
+            deviceRepository.save(
+                    new UserDevice(request.getToken(), user)
+            );
+        } catch (DataIntegrityViolationException e) {
+            return new ApiResponse("Device is already registered");
+        }
+
+        return new ApiResponse("Device registered successfully");
+    }
+
+    public ApiResponse unregisterUserDevice(ExtraUser user, DeviceRegisteringRequest request) {
+        Optional<UserDevice> foundDevice =  deviceRepository.findByFcmToken(request.getToken());
+
+        if (foundDevice.isEmpty()) {
+            return new ApiResponse("Device is not registered");
+        }
+
+        deviceRepository.delete(foundDevice.get());
+        return new ApiResponse("Device was removed successfully");
     }
 
 }

@@ -47,7 +47,7 @@ public class Budget {
     private Category category;
 
     @OneToMany(mappedBy = "linkedBudget", fetch = FetchType.EAGER)
-    private Set<Expense> expenses;
+    private Set<Transaction> transactions;
 
 
     public static Budget from(BudgetAddingRequest budgetAddingRequest, Category category, ExtraUser user) {
@@ -74,7 +74,7 @@ public class Budget {
         this.startingDate = startingDate;
         this.user = user;
         this.category = category;
-        this.expenses = new HashSet<>();
+        this.transactions = new HashSet<>();
     }
 
     public Budget(){}
@@ -93,18 +93,18 @@ public class Budget {
 
     public BigDecimal getCurrentAmount() {
         BigDecimal sum = BigDecimal.ZERO;
-        for( Expense expense: expenses ) {
-            sum = sum.add(expense.getAmount());
+        for( Transaction transaction: transactions) {
+            sum = sum.add(transaction.getAmount());
         }
         return sum;
     }
 
-    public void add(Expense expense) {
-        this.expenses.add(expense);
+    public void add(Transaction transaction) {
+        this.transactions.add(transaction);
     }
 
-    public void remove(Expense expense) {
-        this.expenses.remove(expense);
+    public void remove(Transaction transaction) {
+        this.transactions.remove(transaction);
     }
 
 }

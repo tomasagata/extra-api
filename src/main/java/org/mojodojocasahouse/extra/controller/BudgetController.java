@@ -21,7 +21,7 @@ import jakarta.validation.Valid;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class BudgetsController {
+public class BudgetController {
 
     private final AuthenticationService userService;
     private final CategoryService categoryService;

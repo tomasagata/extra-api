@@ -7,7 +7,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
-import org.mojodojocasahouse.extra.controller.BudgetsController;
+import org.mojodojocasahouse.extra.controller.BudgetController;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
@@ -31,7 +31,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.math.BigDecimal;
 import java.sql.Date;
 
-@WebMvcTest(BudgetsController.class)
+@WebMvcTest(BudgetController.class)
 @Import({
         DelegatingBasicAuthenticationEntryPoint.class,
         SecurityConfiguration.class,
@@ -56,10 +56,10 @@ public class AddBudgetEndpointSecurityTest {
     public BudgetService budgetService;
 
     @MockBean
-    public BudgetsController budgetsController;
+    public BudgetController budgetController;
 
     @Autowired
-    public BudgetsController controller;
+    public BudgetController controller;
 
     @BeforeEach
     public void setup() {

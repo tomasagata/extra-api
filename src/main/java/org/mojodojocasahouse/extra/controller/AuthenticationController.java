@@ -3,11 +3,9 @@ package org.mojodojocasahouse.extra.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mojodojocasahouse.extra.dto.requests.ForgotPasswordRequest;
-import org.mojodojocasahouse.extra.dto.requests.PasswordResetRequest;
-import org.mojodojocasahouse.extra.dto.requests.UserChangePasswordRequest;
-import org.mojodojocasahouse.extra.dto.requests.UserRegistrationRequest;
+import org.mojodojocasahouse.extra.dto.requests.*;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
+import org.mojodojocasahouse.extra.model.Authority;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.springframework.http.HttpStatus;
@@ -111,4 +109,29 @@ public class AuthenticationController {
         );
     }
 
+    @PostMapping(path = "/registerDevice")
+    public ResponseEntity<Object> registerDeviceForPushNotifications(
+            Principal principal,
+            @Valid @RequestBody DeviceRegisteringRequest request) {
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        ApiResponse response = userService.registerUserDevice(user, request);
+
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.CREATED
+        );
+    }
+
+    @PostMapping(path = "/unregisterDevice")
+    public ResponseEntity<Object> unregisterDeviceForPushNotifications(
+            Principal principal,
+            @Valid @RequestBody DeviceRegisteringRequest request) {
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        ApiResponse response = userService.unregisterUserDevice(user, request);
+
+        return new ResponseEntity<>(
+                response,
+                HttpStatus.OK
+        );
+    }
 }

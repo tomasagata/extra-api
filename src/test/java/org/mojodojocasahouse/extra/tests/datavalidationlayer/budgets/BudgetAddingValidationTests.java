@@ -5,12 +5,10 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
-import org.mojodojocasahouse.extra.controller.AuthenticationController;
-import org.mojodojocasahouse.extra.controller.BudgetsController;
+import org.mojodojocasahouse.extra.controller.BudgetController;
 import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
-import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
 import org.mojodojocasahouse.extra.security.ExtraUserDetailsService;
@@ -34,9 +32,8 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 
-@WebMvcTest(BudgetsController.class)
+@WebMvcTest(BudgetController.class)
 @Import({
         DelegatingBasicAuthenticationEntryPoint.class,
         SecurityConfiguration.class,
@@ -67,7 +64,7 @@ public class BudgetAddingValidationTests {
     public PasswordEncoder passwordEncoder;
 
     @Autowired
-    public BudgetsController controller;
+    public BudgetController controller;
 
     @BeforeEach
     public void setup() {

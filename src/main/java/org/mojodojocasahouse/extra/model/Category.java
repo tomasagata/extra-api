@@ -7,7 +7,8 @@ import lombok.Getter;
 import org.mojodojocasahouse.extra.dto.model.CategoryDTO;
 
 @Entity
-@Table(uniqueConstraints = {
+@Table( name = "CATEGORIES",
+        uniqueConstraints = {
         @UniqueConstraint(name = "UniqueNameAndIconPerUser", columnNames = {"NAME", "ICON_ID", "OWNER_ID"})
 })
 @Getter

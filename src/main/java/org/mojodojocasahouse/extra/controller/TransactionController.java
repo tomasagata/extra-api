@@ -18,6 +18,7 @@ import org.mojodojocasahouse.extra.exception.ExpenseNotFoundException;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.service.ExpenseService;
+import org.mojodojocasahouse.extra.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,10 +28,11 @@ import jakarta.validation.Valid;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ExpensesController {
+public class TransactionController {
 
     private final AuthenticationService userService;
 
+    private final TransactionService transactionService;
     private final ExpenseService expenseService;
 
 
@@ -165,6 +167,82 @@ public class ExpensesController {
 
         List<Map<String, String>> categoryAmounts = expenseService
                 .getYearlySumOfExpensesOfUserByCategoriesAndDateRanges(user, categories, from, until);
+
+        return ResponseEntity.ok(categoryAmounts);
+    }
+
+
+    @PostMapping(path = "/getMyTransactions", produces = "application/json")
+    public ResponseEntity<List<ExpenseDTO>> getMyTransactions(
+            Principal principal,
+            @Valid @RequestBody @Nullable FilteringRequest request){
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        Date from = null, until = null;
+        List<String> categories = new ArrayList<>();
+
+        if(request != null) {
+            from = request.getFrom();
+            until = request.getUntil();
+            categories = request.getCategories();
+        }
+
+        log.debug("Retrieving transactions of user: \"" + principal.getName() + "\", " +
+                "for categories: " + categories + ", " +
+                "from: " + from + ", " +
+                "until: " + until + ".");
+
+        List<ExpenseDTO> expenses = transactionService
+                .getTransactionsOfUserByCategoriesAndDateRanges(user, categories, from, until);
+
+        return ResponseEntity.ok(expenses);
+    }
+
+    @PostMapping(path = "/getSumOfTransactions", produces = "application/json")
+    public ResponseEntity<List<Map<String, String>>> getSumOfTransactions(
+            Principal principal,
+            @Valid @RequestBody @Nullable FilteringRequest request) {
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        Date from = null, until = null;
+        List<String> categories = new ArrayList<>();
+
+        if(request != null) {
+            from = request.getFrom();
+            until = request.getUntil();
+            categories = request.getCategories();
+        }
+
+        log.debug("Retrieving sum of transactions of user: \"" + principal.getName() + "\", " +
+                "for categories: " + categories + ", " +
+                "from: " + from + ", " +
+                "until: " + until + ".");
+
+        List<Map<String, String>> categoryAmounts = transactionService
+                .getSumOfTransactionsOfUserByCategoriesAndDateRanges(user, categories, from, until);
+
+        return ResponseEntity.ok(categoryAmounts);
+    }
+
+    @PostMapping(path = "/getYearlySumOfTransactions", produces = "application/json")
+    public ResponseEntity<List<Map<String, String>>> getSumOfTransactionsByYear(
+            Principal principal,
+            @Valid @RequestBody @Nullable FilteringRequest request) {
+        ExtraUser user = userService.getUserByPrincipal(principal);
+        Date from = null, until = null;
+        List<String> categories = new ArrayList<>();
+
+        if(request != null) {
+            from = request.getFrom();
+            until = request.getUntil();
+            categories = request.getCategories();
+        }
+
+        log.debug("Retrieving yearly sum of transactions of user: \"" + principal.getName() + "\", " +
+                "for categories: " + categories + ", " +
+                "from: " + from + ", " +
+                "until: " + until + ".");
+
+        List<Map<String, String>> categoryAmounts = transactionService
+                .getYearlySumOfTransactionsOfUserByCategoriesAndDateRanges(user, categories, from, until);
 
         return ResponseEntity.ok(categoryAmounts);
     }

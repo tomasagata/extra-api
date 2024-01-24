@@ -12,7 +12,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
-import org.mojodojocasahouse.extra.controller.ExpensesController;
+import org.mojodojocasahouse.extra.controller.TransactionController;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.dto.requests.ExpenseAddingRequest;
@@ -34,7 +34,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-@WebMvcTest(ExpensesController.class)
+@WebMvcTest(TransactionController.class)
 @Import({
         DelegatingBasicAuthenticationEntryPoint.class,
         SecurityConfiguration.class,
@@ -59,7 +59,7 @@ public class ExpensesAddingTest {
     public ExpenseService expenseService;
 
     @Autowired
-    public ExpensesController controller;
+    public TransactionController controller;
 
     @BeforeEach
     public void setup() {
