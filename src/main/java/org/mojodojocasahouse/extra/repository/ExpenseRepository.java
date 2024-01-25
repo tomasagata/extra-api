@@ -25,7 +25,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT e.category AS category, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
-                "AND e.category IN :categories " +
+                "AND e.category.name IN :categories " +
                 "AND e.date BETWEEN :minDate AND :maxDate " +
             "GROUP BY e.category " +
             "ORDER BY SUM(e.amount) DESC")
@@ -37,7 +37,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT e.category AS category, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
-                "AND e.category IN :categories " +
+                "AND e.category.name IN :categories " +
             "GROUP BY e.category " +
             "ORDER BY SUM(e.amount) DESC")
     List<Map<String, String>> getSumOfExpensesByCategories(
@@ -46,7 +46,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT e.category AS category, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
-                "AND e.category IN :categories " +
+                "AND e.category.name IN :categories " +
                 "AND e.date >= :minDate " +
             "GROUP BY e.category " +
             "ORDER BY SUM(e.amount) DESC")
@@ -57,7 +57,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
     
     @Query( "SELECT e.category AS category, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
-                "AND e.category IN :categories " +
+                "AND e.category.name IN :categories " +
                 "AND e.date <= :maxDate " +
             "GROUP BY e.category " +
             "ORDER BY SUM(e.amount) DESC")
@@ -68,7 +68,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT YEAR(e.date) AS year, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
-            "AND e.category IN :categories " +
+            "AND e.category.name IN :categories " +
             "AND e.date BETWEEN :minDate AND :maxDate " +
             "GROUP BY YEAR(e.date) " +
             "ORDER BY YEAR(e.date) ASC")
@@ -80,7 +80,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT YEAR(e.date) AS year, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
-            "AND e.category IN :categories " +
+            "AND e.category.name IN :categories " +
             "GROUP BY YEAR(e.date) " +
             "ORDER BY YEAR(e.date) ASC")
     List<Map<String, String>> getYearlySumOfExpensesByCategories(
@@ -89,7 +89,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT YEAR(e.date) AS year, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
-            "AND e.category IN :categories " +
+            "AND e.category.name IN :categories " +
             "AND e.date >= :minDate " +
             "GROUP BY YEAR(e.date) " +
             "ORDER BY YEAR(e.date) ASC")
@@ -100,7 +100,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT YEAR(e.date) AS year, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
-            "AND e.category IN :categories " +
+            "AND e.category.name IN :categories " +
             "AND e.date <= :maxDate " +
             "GROUP BY YEAR(e.date) " +
             "ORDER BY YEAR(e.date) ASC")
@@ -111,7 +111,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT e FROM Expense e " +
             "WHERE e.user = :user " +
-                "AND e.category IN :categories " +
+                "AND e.category.name IN :categories " +
                 "AND e.date BETWEEN :minDate AND :maxDate")
     List<Expense> getExpensesOfUserByCategoriesAndDateInterval(
             @Param("user") ExtraUser user,
@@ -133,14 +133,14 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT e FROM Expense e " +
             "WHERE e.user = :user " +
-                "AND e.category IN :categories")
+                "AND e.category.name IN :categories")
     List<Expense> getExpensesOfUserByCategory(
             @Param("user") ExtraUser user,
             @Param("categories") List<String> categories);
 
     @Query( "SELECT e FROM Expense e " +
             "WHERE e.user = :user " +
-                "AND e.category IN :categories " +
+                "AND e.category.name IN :categories " +
                 "AND e.date >= :minDate")
     List<Expense> getExpensesOfUserAfterGivenDate(
             @Param("user") ExtraUser user,
@@ -149,7 +149,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     @Query( "SELECT e FROM Expense e " +
             "WHERE e.user = :user " +
-                "AND e.category IN :categories " +
+                "AND e.category.name IN :categories " +
                 "AND e.date <= :maxDate")
     List<Expense> getExpensesOfUserBeforeGivenDate(
             @Param("user") ExtraUser user,
