@@ -23,7 +23,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
 
     boolean existsByIdAndUser(Long id, ExtraUser user);
 
-    @Query( "SELECT e.category AS category, SUM(e.amount) AS amount FROM Expense e " +
+    @Query( "SELECT e.category.name AS category, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
                 "AND e.category.name IN :categories " +
                 "AND e.date BETWEEN :minDate AND :maxDate " +
@@ -35,7 +35,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
             @Param("minDate") Date minDate,
             @Param("maxDate") Date maxDate);
 
-    @Query( "SELECT e.category AS category, SUM(e.amount) AS amount FROM Expense e " +
+    @Query( "SELECT e.category.name AS category, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
                 "AND e.category.name IN :categories " +
             "GROUP BY e.category " +
@@ -44,7 +44,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
             @Param("user") ExtraUser user,
             @Param("categories") List<String> categories);
 
-    @Query( "SELECT e.category AS category, SUM(e.amount) AS amount FROM Expense e " +
+    @Query( "SELECT e.category.name AS category, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
                 "AND e.category.name IN :categories " +
                 "AND e.date >= :minDate " +
@@ -55,7 +55,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long>{
             @Param("categories") List<String> categories,
             @Param("minDate") Date minDate);
     
-    @Query( "SELECT e.category AS category, SUM(e.amount) AS amount FROM Expense e " +
+    @Query( "SELECT e.category.name AS category, SUM(e.amount) AS amount FROM Expense e " +
             "WHERE e.user = :user " +
                 "AND e.category.name IN :categories " +
                 "AND e.date <= :maxDate " +
