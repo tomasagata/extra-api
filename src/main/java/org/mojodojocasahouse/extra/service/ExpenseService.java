@@ -13,10 +13,7 @@ import org.mojodojocasahouse.extra.dto.requests.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.requests.ExpenseEditingRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.exception.ExpenseNotFoundException;
-import org.mojodojocasahouse.extra.model.Budget;
-import org.mojodojocasahouse.extra.model.Category;
-import org.mojodojocasahouse.extra.model.Expense;
-import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
 import org.mojodojocasahouse.extra.repository.ExpenseRepository;
 import org.springframework.stereotype.Service;
@@ -202,5 +199,21 @@ public class ExpenseService {
 
     public void removeExpenseFromActiveBudget(Expense expense) {
         expense.setLinkedBudget(null);
+    }
+
+    public void createDownPaymentExpense(Investment savedInvestment) {
+
+        // Create expense entity from request data
+        Expense savedExpense = expenseRepository.save(
+                new Expense(
+                        savedInvestment.getUser(),
+                        savedInvestment.getName(),
+                        savedInvestment.getDownPaymentAmount(),
+                        new Date(System.currentTimeMillis()),
+                        savedInvestment.getCategory()
+                )
+        );
+
+        this.addExpenseToActiveBudget(savedExpense);
     }
 }

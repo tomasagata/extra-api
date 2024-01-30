@@ -40,6 +40,7 @@ public class Expense extends Transaction {
         }
     }
 
+    @Override
     public ExpenseDTO asDto(){
         return new ExpenseDTO(
                 this.id,

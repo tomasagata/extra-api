@@ -23,8 +23,8 @@ public class Investment {
     @Column(name = "DOWNPAYMENT_AMOUNT", nullable = false)
     private BigDecimal downPaymentAmount;
 
-    @Column(name = "DOWNPAYMENT_TIMESTAMP", nullable = false)
-    private Timestamp downPaymentTimestamp;
+    @Column(name = "DEPOSIT_START_TIMESTAMP", nullable = false)
+    private Timestamp depositStartTimestamp;
 
     @Column(name = "DEPOSIT_AMOUNT", nullable = false)
     private BigDecimal depositAmount;
@@ -49,7 +49,7 @@ public class Investment {
 
     public Investment(String name,
                       BigDecimal downPaymentAmount,
-                      Timestamp downPaymentTimestamp,
+                      Timestamp depositStartTimestamp,
                       BigDecimal depositAmount,
                       Integer maxNumberOfDeposits,
                       Integer depositIntervalInDays,
@@ -57,7 +57,7 @@ public class Investment {
                       Category category) {
         this.name = name;
         this.downPaymentAmount = downPaymentAmount;
-        this.downPaymentTimestamp = downPaymentTimestamp;
+        this.depositStartTimestamp = depositStartTimestamp;
         this.depositAmount = depositAmount;
         this.maxNumberOfDeposits = maxNumberOfDeposits;
         this.depositIntervalInDays = depositIntervalInDays;
@@ -74,7 +74,7 @@ public class Investment {
                 id,
                 name,
                 downPaymentAmount,
-                downPaymentTimestamp,
+                depositStartTimestamp,
                 depositAmount,
                 maxNumberOfDeposits,
                 depositIntervalInDays,

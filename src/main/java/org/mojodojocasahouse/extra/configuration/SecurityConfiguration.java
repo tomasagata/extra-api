@@ -64,6 +64,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/unregisterDevice").authenticated()
                         .requestMatchers("/registerDevice").authenticated()
                         .requestMatchers("/getMyInvestments").authenticated()
+                        .requestMatchers("/getMyTransactions").authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
                         .realmName("extra")

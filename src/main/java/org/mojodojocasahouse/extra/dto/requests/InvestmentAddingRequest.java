@@ -1,5 +1,6 @@
 package org.mojodojocasahouse.extra.dto.requests;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -8,20 +9,28 @@ import java.sql.Timestamp;
 @Data
 public class InvestmentAddingRequest {
 
+    @NotNull
     private String name;
+    @NotNull
     private BigDecimal downPaymentAmount;
-    private Timestamp downPaymentTimestamp;
+    @NotNull
+    private Timestamp depositStartTimestamp;
+    @NotNull
     private BigDecimal depositAmount;
+    @NotNull
     private Integer maxNumberOfDeposits;
+    @NotNull
     private Integer depositIntervalInDays;
+    @NotNull
     private String category;
+    @NotNull
     private Short iconId;
 
     public InvestmentAddingRequest() {}
 
     public InvestmentAddingRequest(String name,
                                    BigDecimal downPaymentAmount,
-                                   Timestamp downPaymentTimestamp,
+                                   Timestamp depositStartTimestamp,
                                    BigDecimal depositAmount,
                                    Integer maxNumberOfDeposits,
                                    Integer depositIntervalInDays,
@@ -29,7 +38,7 @@ public class InvestmentAddingRequest {
                                    Short iconId) {
         this.name = name;
         this.downPaymentAmount = downPaymentAmount;
-        this.downPaymentTimestamp = downPaymentTimestamp;
+        this.depositStartTimestamp = depositStartTimestamp;
         this.depositAmount = depositAmount;
         this.maxNumberOfDeposits = maxNumberOfDeposits;
         this.depositIntervalInDays = depositIntervalInDays;

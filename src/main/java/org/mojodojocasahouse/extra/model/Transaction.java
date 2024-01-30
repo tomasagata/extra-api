@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.mojodojocasahouse.extra.dto.model.TransactionDTO;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -47,5 +48,6 @@ public abstract class Transaction {
     @Setter
     protected Budget linkedBudget;
 
+    public abstract TransactionDTO asDto();
 
 }

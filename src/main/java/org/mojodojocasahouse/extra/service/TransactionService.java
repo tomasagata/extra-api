@@ -3,8 +3,10 @@ package org.mojodojocasahouse.extra.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.model.TransactionDTO;
 import org.mojodojocasahouse.extra.model.Expense;
 import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.model.Transaction;
 import org.mojodojocasahouse.extra.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
@@ -46,9 +48,9 @@ public class TransactionService {
                 .getSumOfTransactionsOfUserByCategoryAndDateInterval(user, filteringCategories, from, until);
     }
 
-    public List<ExpenseDTO> getTransactionsOfUserByCategoriesAndDateRanges(ExtraUser user,
-                                                                       List<String> categories,
-                                                                       Date from, Date until) {
+    public List<TransactionDTO> getTransactionsOfUserByCategoriesAndDateRanges(ExtraUser user,
+                                                                               List<String> categories,
+                                                                               Date from, Date until) {
         List<String> filteringCategories = categories;
 
         if(filteringCategories == null || filteringCategories.isEmpty()){
@@ -59,26 +61,26 @@ public class TransactionService {
             return transactionRepository
                     .getTransactionsOfUserByCategory(user, filteringCategories)
                     .stream()
-                    .map(Expense::asDto)
+                    .map(Transaction::asDto)
                     .collect(Collectors.toList());
         } else if (from == null) {
             return transactionRepository
                     .getTransactionsOfUserBeforeGivenDate(user, filteringCategories, until)
                     .stream()
-                    .map(Expense::asDto)
+                    .map(Transaction::asDto)
                     .collect(Collectors.toList());
         } else if (until == null) {
             return transactionRepository
                     .getTransactionsOfUserAfterGivenDate(user, filteringCategories, from)
                     .stream()
-                    .map(Expense::asDto)
+                    .map(Transaction::asDto)
                     .collect(Collectors.toList());
         }
 
         return transactionRepository
                 .getTransactionsOfUserByCategoriesAndDateInterval(user, filteringCategories, from, until)
                 .stream()
-                .map(Expense::asDto)
+                .map(Transaction::asDto)
                 .collect(Collectors.toList());
     }
 

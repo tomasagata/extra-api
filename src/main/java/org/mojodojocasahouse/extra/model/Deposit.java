@@ -37,6 +37,7 @@ public class Deposit extends Transaction {
         this.sourceInvestment = sourceInvestment;
     }
 
+    @Override
     public DepositDTO asDto() {
         return new DepositDTO(
                 this.id,

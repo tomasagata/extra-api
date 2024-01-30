@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 public class DepositService {
 
     private final CategoryService categoryService;
+    private final ExpenseService expenseService;
 
     private final DepositRepository depositRepository;
     private final InvestmentRepository investmentRepository;
@@ -61,6 +62,7 @@ public class DepositService {
     public InvestmentDTO createNewInvestment(ExtraUser user, InvestmentAddingRequest request) {
         Category category = getCategoryFromUserAndInvestmentRequest(user, request);
         Investment savedInvestment = createNewInvestmentFromRequestWithCategory(user, request, category);
+        expenseService.createDownPaymentExpense(savedInvestment);
         scheduleRecurrentDepositsOf(savedInvestment);
         return savedInvestment.asDto();
     }
@@ -84,7 +86,7 @@ public class DepositService {
                 new Investment(
                         request.getName(),
                         request.getDownPaymentAmount(),
-                        request.getDownPaymentTimestamp(),
+                        request.getDepositStartTimestamp(),
                         request.getDepositAmount(),
                         request.getMaxNumberOfDeposits(),
                         request.getDepositIntervalInDays(),
@@ -110,7 +112,7 @@ public class DepositService {
                         .withIntervalInHours(24 * investment.getDepositIntervalInDays())
                         .withMisfireHandlingInstructionNowWithRemainingCount()
                         .withRepeatCount(investment.getMaxNumberOfDeposits() - 1))
-                .startAt(investment.getDownPaymentTimestamp())
+                .startAt(investment.getDepositStartTimestamp())
                 .build();
 
         try {

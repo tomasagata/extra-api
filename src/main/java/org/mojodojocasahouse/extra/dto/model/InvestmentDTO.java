@@ -11,7 +11,7 @@ public class InvestmentDTO {
     private Long id;
     private String name;
     private BigDecimal downPaymentAmount;
-    private Timestamp downPaymentTimestamp;
+    private Timestamp depositStartTimestamp;
     private BigDecimal depositAmount;
     private Integer maxNumberOfDeposits;
     private Integer depositIntervalInDays;
@@ -20,7 +20,7 @@ public class InvestmentDTO {
     public InvestmentDTO(Long id,
                          String name,
                          BigDecimal downPaymentAmount,
-                         Timestamp downPaymentTimestamp,
+                         Timestamp depositStartTimestamp,
                          BigDecimal depositAmount,
                          Integer maxNumberOfDeposits,
                          Integer depositIntervalInDays,
@@ -28,7 +28,7 @@ public class InvestmentDTO {
         this.id = id;
         this.name = name;
         this.downPaymentAmount = downPaymentAmount;
-        this.downPaymentTimestamp = downPaymentTimestamp;
+        this.depositStartTimestamp = depositStartTimestamp;
         this.depositAmount = depositAmount;
         this.maxNumberOfDeposits = maxNumberOfDeposits;
         this.depositIntervalInDays = depositIntervalInDays;
