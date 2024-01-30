@@ -63,6 +63,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/addInvestment").authenticated()
                         .requestMatchers("/unregisterDevice").authenticated()
                         .requestMatchers("/registerDevice").authenticated()
+                        .requestMatchers("/getMyInvestments").authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
                         .realmName("extra")

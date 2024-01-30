@@ -43,7 +43,6 @@ public class Expense extends Transaction {
     public ExpenseDTO asDto(){
         return new ExpenseDTO(
                 this.id,
-                this.user.getId(),
                 this.concept,
                 this.amount,
                 this.date,

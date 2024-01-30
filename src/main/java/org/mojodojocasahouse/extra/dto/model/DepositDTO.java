@@ -1,18 +1,15 @@
 package org.mojodojocasahouse.extra.dto.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.sql.Date;
 
 @Data
-public class DepositDTO {
+@EqualsAndHashCode(callSuper = true)
+public class DepositDTO extends TransactionDTO {
 
-    private Long id;
-    private String concept;
-    private BigDecimal amount;
-    private Date date;
-    private CategoryDTO category;
     private Long sourceInvestmentId;
 
     public DepositDTO(Long id,
@@ -21,11 +18,7 @@ public class DepositDTO {
                       Date date,
                       CategoryDTO category,
                       Long sourceInvestmentId) {
-        this.id = id;
-        this.concept = concept;
-        this.amount = amount;
-        this.date = date;
-        this.category = category;
+        super(id, concept, amount, date, category, "deposit");
         this.sourceInvestmentId = sourceInvestmentId;
     }
 

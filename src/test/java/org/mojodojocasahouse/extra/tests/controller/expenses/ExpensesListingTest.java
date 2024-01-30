@@ -84,7 +84,7 @@ public class ExpensesListingTest {
         );
         Category customCategory = new Category("test1", (short) 1, linkedUser);
         List<ExpenseDTO> expectedResponse = List.of(
-                new ExpenseDTO(null, null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), customCategory.asDto())
+                new ExpenseDTO(null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), customCategory.asDto())
         );
 
         // Setup - Expectations
@@ -111,7 +111,7 @@ public class ExpensesListingTest {
         );
         Category customCategory = new Category("test1", (short) 1, linkedUser);
         List<ExpenseDTO> expectedResponse = List.of(
-                new ExpenseDTO(null, null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), customCategory.asDto())
+                new ExpenseDTO(null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), customCategory.asDto())
         );
 
         // Setup - Expectations

@@ -1,11 +1,14 @@
 package org.mojodojocasahouse.extra.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mojodojocasahouse.extra.dto.model.InvestmentDTO;
 import org.mojodojocasahouse.extra.dto.requests.InvestmentAddingRequest;
+import org.mojodojocasahouse.extra.exception.CategoryNotFoundException;
 import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
+import org.mojodojocasahouse.extra.repository.CategoryRepository;
 import org.mojodojocasahouse.extra.repository.DepositRepository;
 import org.mojodojocasahouse.extra.repository.InvestmentRepository;
 import org.mojodojocasahouse.extra.scheduling.InvestmentReturnJob;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -26,11 +30,16 @@ public class DepositService {
     private final DepositRepository depositRepository;
     private final InvestmentRepository investmentRepository;
     private final BudgetRepository budgetRepository;
+    private final CategoryRepository categoryRepository;
 
     private final Scheduler scheduler;
 
 
-    public void depositInvestmentReturn(Investment investment) {
+    public void depositInvestmentReturn(Investment investment) throws CategoryNotFoundException {
+
+        Category reattachedCategory = categoryRepository
+                .findById(investment.getCategory().getId())
+                .orElseThrow(CategoryNotFoundException::new);
 
         // Create expense entity from request data
         Deposit savedDeposit = depositRepository.save(
@@ -39,7 +48,7 @@ public class DepositService {
                         investment.getDepositAmount(),
                         new Date(System.currentTimeMillis()),
                         investment.getUser(),
-                        investment.getCategory(),
+                        reattachedCategory,
                         null,
                         investment
                 )
@@ -48,6 +57,7 @@ public class DepositService {
         addDepositToActiveBudget(savedDeposit);
     }
 
+    @Transactional(Transactional.TxType.REQUIRED)
     public InvestmentDTO createNewInvestment(ExtraUser user, InvestmentAddingRequest request) {
         Category category = getCategoryFromUserAndInvestmentRequest(user, request);
         Investment savedInvestment = createNewInvestmentFromRequestWithCategory(user, request, category);
@@ -60,12 +70,16 @@ public class DepositService {
 
     private Category getCategoryFromUserAndInvestmentRequest(ExtraUser user, InvestmentAddingRequest request) {
         return categoryService
-                .fetchOrCreateCategoryFromUserAndNameAndIconId(user, request.getName(), request.getIconId());
+                .fetchOrCreateCategoryFromUserAndNameAndIconId(user, request.getCategory(), request.getIconId());
     }
 
     private Investment createNewInvestmentFromRequestWithCategory(ExtraUser user,
                                                                   InvestmentAddingRequest request,
-                                                                  Category category) {
+                                                                  Category category) throws CategoryNotFoundException {
+        Category reattachedCategory = categoryRepository
+                .findById(category.getId())
+                .orElseThrow(CategoryNotFoundException::new);
+
         return investmentRepository.save(
                 new Investment(
                         request.getName(),
@@ -75,7 +89,7 @@ public class DepositService {
                         request.getMaxNumberOfDeposits(),
                         request.getDepositIntervalInDays(),
                         user,
-                        category
+                        reattachedCategory
                 )
         );
     }
@@ -116,4 +130,11 @@ public class DepositService {
     }
 
 
+    public List<InvestmentDTO> getInvestmentsOfUser(ExtraUser user) {
+        return investmentRepository
+                .findByUser(user)
+                .stream()
+                .map(Investment::asDto)
+                .collect(Collectors.toList());
+    }
 }

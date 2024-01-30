@@ -4,23 +4,20 @@ import java.math.BigDecimal;
 import java.sql.Date;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
-public class ExpenseDTO {
-    private Long id;
-    private Long userId;
-    private String concept;
-    private BigDecimal amount;
-    private String date;
-    private CategoryDTO category;
+@EqualsAndHashCode(callSuper = true)
+public class ExpenseDTO extends TransactionDTO {
 
-    public ExpenseDTO(Long id, Long userId, String concept, BigDecimal amount, Date date, CategoryDTO category) {
-        this.id = id;
-        this.userId = userId;
-        this.concept = concept;
-        this.amount = amount;
-        this.date = date.toString();
-        this.category = category;
+    public ExpenseDTO(Long id,
+                      String concept,
+                      BigDecimal amount,
+                      Date date,
+                      CategoryDTO category) {
+        super(id, concept, amount, date, category, "expense");
     }
+
+    public ExpenseDTO() {}
 
 }

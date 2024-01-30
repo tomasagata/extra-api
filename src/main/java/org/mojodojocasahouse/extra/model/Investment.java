@@ -39,7 +39,7 @@ public class Investment {
     @JoinColumn(name = "USER_ID", nullable = false)
     private ExtraUser user;
 
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "CATEGORY_ID", nullable = false)
     private Category category;
 

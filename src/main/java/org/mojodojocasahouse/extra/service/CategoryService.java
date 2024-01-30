@@ -37,9 +37,10 @@ public class CategoryService {
     }
 
     public Category fetchOrCreateCategoryFromUserAndNameAndIconId(ExtraUser user, String name, Short iconId){
-        return repository
+        Category result =  repository
                 .getCategoryByOwnerAndNameAndIconId(user, name, iconId)
                 .orElseGet(() -> new Category(name, iconId, user));
+        return repository.save(result); // For good measure
     }
 
 }

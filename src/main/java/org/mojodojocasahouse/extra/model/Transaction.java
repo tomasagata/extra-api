@@ -38,7 +38,7 @@ public abstract class Transaction {
     @JoinColumn(name = "USER_ID", nullable = false)
     protected ExtraUser user;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "CATEGORY_ID", nullable = false)
     protected Category category;
 

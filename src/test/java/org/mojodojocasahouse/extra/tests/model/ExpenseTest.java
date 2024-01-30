@@ -252,7 +252,6 @@ public class ExpenseTest {
         );
         ExpenseDTO unmanagedExpenseDto = new ExpenseDTO(
                 null,
-                null,
                 "Madrid trip",
                 new BigDecimal(100),
                 Date.valueOf("2018-12-9"),
