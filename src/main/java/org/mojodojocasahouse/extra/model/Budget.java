@@ -5,6 +5,7 @@ import org.mojodojocasahouse.extra.dto.model.BudgetDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.mojodojocasahouse.extra.dto.requests.BudgetAddingRequest;
+import org.mojodojocasahouse.extra.validation.constraint.ValidDateRange;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -14,6 +15,10 @@ import java.util.Set;
 @Entity
 @Getter
 @Table(name = "BUDGETS")
+@ValidDateRange(
+        fromDateField = "startingDate",
+        untilDateField = "limitDate"
+)
 public class Budget {
 
     @Id
@@ -55,8 +60,8 @@ public class Budget {
                 user,
                 budgetAddingRequest.getName(),
                 budgetAddingRequest.getLimitAmount(),
-                budgetAddingRequest.getLimitDate(),
                 budgetAddingRequest.getStartingDate(),
+                budgetAddingRequest.getLimitDate(),
                 category
         );
     }
@@ -94,9 +99,9 @@ public class Budget {
     public BigDecimal getCurrentAmount() {
         BigDecimal sum = BigDecimal.ZERO;
         for( Transaction transaction: transactions) {
-            sum = sum.add(transaction.getAmount());
+            sum = sum.add(transaction.getSignedAmount());
         }
-        return sum;
+        return sum.negate();
     }
 
     public void add(Transaction transaction) {

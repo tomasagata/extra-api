@@ -2,6 +2,7 @@ package org.mojodojocasahouse.extra.controller;
 import java.security.Principal;
 import java.util.Optional;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.mojodojocasahouse.extra.dto.model.BudgetDTO;
@@ -53,6 +54,7 @@ public class BudgetController {
     }
 
     @PostMapping("/getActiveBudgets")
+    @Transactional(Transactional.TxType.REQUIRED)
     public ResponseEntity<Object> getActiveBudgets(Principal principal, @Valid @RequestBody ActiveBudgetRequest request){
         ExtraUser user = userService.getUserByPrincipal(principal);
 

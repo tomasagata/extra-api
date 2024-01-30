@@ -48,6 +48,11 @@ public abstract class Transaction {
     @Setter
     protected Budget linkedBudget;
 
+    @Column(name = "SIGNED_AMOUNT", nullable = true)
+    protected BigDecimal signedAmount;
+
     public abstract TransactionDTO asDto();
+
+    public abstract BigDecimal getSignedAmount();
 
 }

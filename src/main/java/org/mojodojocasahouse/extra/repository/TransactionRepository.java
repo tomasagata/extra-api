@@ -57,9 +57,12 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("categories") List<String> categories,
             @Param("maxDate") Date maxDate);
 
-    @Query( "SELECT YEAR(t.date) AS year, SUM(t.amount) AS amount FROM Transaction t " +
-            "WHERE t.user = :user " +
-            "AND t.category.name IN :categories " +
+    @Query( "SELECT " +
+                "YEAR(t.date) AS year, " +
+                "SUM(t.signedAmount) AS amount " +
+            "FROM Transaction t " +
+                "WHERE t.user = :user " +
+                "AND t.category.name IN :categories " +
             "AND t.date BETWEEN :minDate AND :maxDate " +
             "GROUP BY YEAR(t.date) " +
             "ORDER BY YEAR(t.date) ASC")
@@ -69,7 +72,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("minDate") Date minDate,
             @Param("maxDate") Date maxDate);
 
-    @Query( "SELECT YEAR(t.date) AS year, SUM(t.amount) AS amount FROM Transaction t " +
+    @Query( "SELECT YEAR(t.date) AS year, SUM(t.signedAmount) AS amount FROM Transaction t " +
             "WHERE t.user = :user " +
             "AND t.category.name IN :categories " +
             "GROUP BY YEAR(t.date) " +
@@ -78,7 +81,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("user") ExtraUser user,
             @Param("categories") List<String> categories);
 
-    @Query( "SELECT YEAR(t.date) AS year, SUM(t.amount) AS amount FROM Transaction t " +
+    @Query( "SELECT YEAR(t.date) AS year, SUM(t.signedAmount) AS amount FROM Transaction t " +
             "WHERE t.user = :user " +
             "AND t.category.name IN :categories " +
             "AND t.date >= :minDate " +
@@ -89,7 +92,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
             @Param("categories") List<String> categories,
             @Param("minDate") Date minDate);
 
-    @Query( "SELECT YEAR(t.date) AS year, SUM(t.amount) AS amount FROM Transaction t " +
+    @Query( "SELECT YEAR(t.date) AS year, SUM(t.signedAmount) AS amount FROM Transaction t " +
             "WHERE t.user = :user " +
             "AND t.category.name IN :categories " +
             "AND t.date <= :maxDate " +
@@ -112,7 +115,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     @Query( "SELECT t FROM Transaction t " +
             "WHERE t.user = :user " +
-            "AND t.category.name = :category " +
+            "AND t.category = :category " +
             "AND t.date BETWEEN :minDate AND :maxDate")
     List<Transaction> getTransactionsByUserAndCategoryAndDateInterval(
             @Param("user") ExtraUser user,

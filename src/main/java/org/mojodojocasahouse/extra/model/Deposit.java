@@ -35,6 +35,7 @@ public class Deposit extends Transaction {
         this.category = category;
         this.linkedBudget = linkedBudget;
         this.sourceInvestment = sourceInvestment;
+        this.signedAmount = amount;
     }
 
     @Override
@@ -49,4 +50,8 @@ public class Deposit extends Transaction {
         );
     }
 
+    @Override
+    public BigDecimal getSignedAmount() {
+        return this.signedAmount;
+    }
 }

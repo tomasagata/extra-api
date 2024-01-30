@@ -23,6 +23,7 @@ public class Expense extends Transaction {
         this.amount = amount;
         this.date = date;
         this.category = category;
+        this.signedAmount = amount.negate();
     }
 
     public void update(String concept, BigDecimal amount, Date date, Category category) {
@@ -50,4 +51,10 @@ public class Expense extends Transaction {
                 this.category.asDto()
         );
     }
+
+    @Override
+    public BigDecimal getSignedAmount() {
+        return this.signedAmount;
+    }
+
 }

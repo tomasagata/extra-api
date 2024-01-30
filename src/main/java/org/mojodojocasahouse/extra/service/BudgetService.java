@@ -1,5 +1,6 @@
 package org.mojodojocasahouse.extra.service;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import java.sql.Date;
@@ -14,7 +15,6 @@ import org.mojodojocasahouse.extra.exception.BudgetNotFoundException;
 import org.mojodojocasahouse.extra.exception.ConflictingBudgetException;
 import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
-import org.mojodojocasahouse.extra.repository.ExpenseRepository;
 import org.mojodojocasahouse.extra.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +28,7 @@ public class BudgetService {
 
     private final CategoryService categoryService;
 
+    @Transactional(Transactional.TxType.REQUIRED)
     public ApiResponse addBudget(
             ExtraUser user,
             BudgetAddingRequest budgetAddingRequest) throws ConflictingBudgetException {
@@ -44,9 +45,9 @@ public class BudgetService {
         this.verifyNoOverlappingBudgets(newBudget);
 
         // Save new budget
-        budgetRepository.save(newBudget);
+        Budget savedBudget = budgetRepository.save(newBudget);
 
-        this.updateTransactionsWithBudget(newBudget);
+        this.updateTransactionsWithBudget(savedBudget);
 
         return new ApiResponse("Budget added successfully!");
     }
@@ -99,6 +100,8 @@ public class BudgetService {
                 budget.getStartingDate(),
                 budget.getLimitDate()
         );
+
+        log.debug("Found " + unlinkedTransactions.size() + " unlinked transactions");
 
         for( Transaction transaction: unlinkedTransactions){
             transaction.setLinkedBudget(budget);

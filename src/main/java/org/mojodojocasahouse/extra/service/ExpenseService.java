@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ public class ExpenseService {
 
     private final CategoryService categoryService;
 
+    @Transactional(Transactional.TxType.REQUIRED)
     public ApiResponse addExpense(ExtraUser user, ExpenseAddingRequest request) {
 
         // Get existing Category or create new one if it doesn't exist
@@ -192,9 +194,11 @@ public class ExpenseService {
         List<Budget> activeBudget = budgetRepository
                 .findActiveBudgetByUserAndCategoryAndDate(expense.getUser(), expense.getCategory(),expense.getDate());
         if (!activeBudget.isEmpty()){
+            log.debug("Found an active budget");
             Budget foundBudget = activeBudget.stream().findFirst().get();
             expense.setLinkedBudget(foundBudget);
         }
+        log.debug("No active budget found");
     }
 
     public void removeExpenseFromActiveBudget(Expense expense) {
