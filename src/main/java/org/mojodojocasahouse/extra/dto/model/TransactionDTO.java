@@ -1,5 +1,6 @@
 package org.mojodojocasahouse.extra.dto.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -11,6 +12,8 @@ public class TransactionDTO {
     protected Long id;
     protected String concept;
     protected BigDecimal amount;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     protected Date date;
     protected CategoryDTO category;
     protected String type;
