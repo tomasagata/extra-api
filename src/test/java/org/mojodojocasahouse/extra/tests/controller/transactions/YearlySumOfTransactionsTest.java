@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.tests.controller.expenses;
+package org.mojodojocasahouse.extra.tests.controller.transactions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -6,9 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.TransactionController;
+import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
 import org.mojodojocasahouse.extra.dto.requests.FilteringRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
-import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
@@ -42,7 +42,7 @@ import static org.mockito.BDDMockito.given;
         DelegatingBasicAuthenticationEntryPoint.class,
         ExtraUserDetailsService.class
 })
-public class YearlySumOfExpensesTest {
+public class YearlySumOfTransactionsTest {
 
     @Autowired
     private MockMvc mvc;
@@ -55,13 +55,13 @@ public class YearlySumOfExpensesTest {
     public AuthenticationService authService;
 
     @MockBean
-    public ExtraUserRepository userRepository;
-
-    @MockBean
     public ExpenseService expenseService;
 
     @MockBean
     public TransactionService transactionService;
+
+    @MockBean
+    public ExtraUserRepository userRepository;
 
     @Autowired
     public TransactionController controller;
@@ -91,11 +91,11 @@ public class YearlySumOfExpensesTest {
         // Setup - Expectations
         given(authService.getUserByPrincipal(any()))
                 .willReturn(linkedUser);
-        given(expenseService.getYearlySumOfExpensesOfUserByCategoriesAndDateRanges(any(), any(), isNull(), isNull()))
+        given(transactionService.getYearlySumOfTransactionsOfUserByCategoriesAndDateRanges(any(), any(), isNull(), isNull()))
                 .willReturn(expectedResponse);
 
         // exercise
-        MockHttpServletResponse response = getYearlySumOfExpenses();
+        MockHttpServletResponse response = getYearlySumOfTransactions();
 
         // Verify
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -124,11 +124,11 @@ public class YearlySumOfExpensesTest {
         // Setup - Expectations
         given(authService.getUserByPrincipal(any()))
                 .willReturn(linkedUser);
-        given(expenseService.getYearlySumOfExpensesOfUserByCategoriesAndDateRanges(any(), any(), any(Date.class), any(Date.class)))
+        given(transactionService.getYearlySumOfTransactionsOfUserByCategoriesAndDateRanges(any(), any(), any(Date.class), any(Date.class)))
                 .willReturn(expectedResponse);
 
         // exercise
-        MockHttpServletResponse response = getYearlySumOfExpensesWithArguments(request);
+        MockHttpServletResponse response = getYearlySumOfTransactionsWithArguments(request);
 
         // Verify
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -136,17 +136,17 @@ public class YearlySumOfExpensesTest {
     }
 
 
-    private MockHttpServletResponse getYearlySumOfExpenses() throws Exception {
+    private MockHttpServletResponse getYearlySumOfTransactions() throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
-                        post("/getYearlySumOfExpenses")
+                        post("/getYearlySumOfTransactions")
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();
     }
 
-    private MockHttpServletResponse getYearlySumOfExpensesWithArguments(FilteringRequest request) throws Exception {
+    private MockHttpServletResponse getYearlySumOfTransactionsWithArguments(FilteringRequest request) throws Exception {
         return mvc.perform(
                         MockMvcRequestBuilders
-                                .post("/getYearlySumOfExpenses")
+                                .post("/getYearlySumOfTransactions")
                                 .content(asJsonString(request))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.ALL))
@@ -161,5 +161,6 @@ public class YearlySumOfExpensesTest {
             throw new RuntimeException(e);
         }
     }
+
 
 }

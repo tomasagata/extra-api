@@ -111,6 +111,63 @@ public class BudgetListingActiveTests {
         Assertions.assertThat(response.getContentAsString()).isEqualTo(asJsonString(expectedResponse));
     }
 
+    @Test
+    @WithMockUser
+    public void testListingActiveBudgetsWhenThereIsNotASingleOneActiveReturnsSuccessfulButNullResponse() throws Exception {
+        // Setup - data
+        ExtraUser linkedUser = new ExtraUser(
+                "M",
+                "J",
+                "mj@me.com",
+                "Somepassword"
+        );
+        Category customCategory = new Category("test", (short) 1, linkedUser);
+        ActiveBudgetRequest request = new ActiveBudgetRequest(
+                customCategory.asDto(),
+                Date.valueOf("2020-12-09")
+        );
+
+        // Setup - Expectations
+        given(authService.getUserByPrincipal(any())).willReturn(linkedUser);
+        given(categoryService.getCategoryByUserAndNameAndIconId(any(), any(), any())).willReturn(Optional.of(customCategory));
+        given(budgetService.getActiveBudgetByCategoryAndDate(any(), any(), any())).willReturn(null);
+
+        // exercise
+        MockHttpServletResponse response = getAllBudgets(request);
+
+        // Verify
+        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(response.getContentLength()).isEqualTo(0);
+    }
+
+    @Test
+    @WithMockUser
+    public void testListingActiveBudgetsByCategoryWhenNotASingleOneIsActiveReturnsNullResponse() throws Exception {
+        // Setup - data
+        ExtraUser linkedUser = new ExtraUser(
+                "M",
+                "J",
+                "mj@me.com",
+                "Somepassword"
+        );
+        Category customCategory = new Category("test", (short) 1, linkedUser);
+        ActiveBudgetRequest request = new ActiveBudgetRequest(
+                customCategory.asDto(),
+                Date.valueOf("2020-12-09")
+        );
+
+        // Setup - Expectations
+        given(authService.getUserByPrincipal(any())).willReturn(linkedUser);
+        given(categoryService.getCategoryByUserAndNameAndIconId(any(), any(), any())).willReturn(Optional.empty());
+
+        // exercise
+        MockHttpServletResponse response = getAllBudgets(request);
+
+        // Verify
+        Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+        Assertions.assertThat(response.getContentLength()).isEqualTo(0);
+    }
+
     private MockHttpServletResponse getAllBudgets(ActiveBudgetRequest request) throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
                         post("/getActiveBudgets")

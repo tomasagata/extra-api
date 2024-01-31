@@ -24,30 +24,6 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    public List<Map<String, String>> getSumOfTransactionsOfUserByCategoriesAndDateRanges(ExtraUser user,
-                                                                                     List<String> categories,
-                                                                                     Date from, Date until) {
-        List<String> filteringCategories = categories;
-
-        if(filteringCategories == null || filteringCategories.isEmpty()){
-            filteringCategories = categoryService.getAllCategoryNamesOfUser(user);
-        }
-
-        if (from == null && until == null){
-            return transactionRepository
-                    .getSumOfTransactionsByCategories(user, filteringCategories);
-        } else if (from == null) {
-            return transactionRepository
-                    .getSumOfTransactionsOfUserBeforeGivenDate(user, filteringCategories, until);
-        } else if (until == null) {
-            return transactionRepository
-                    .getSumOfTransactionsOfUserAfterGivenDate(user, filteringCategories, from);
-        }
-
-        return transactionRepository
-                .getSumOfTransactionsOfUserByCategoryAndDateInterval(user, filteringCategories, from, until);
-    }
-
     public List<TransactionDTO> getTransactionsOfUserByCategoriesAndDateRanges(ExtraUser user,
                                                                                List<String> categories,
                                                                                Date from, Date until) {

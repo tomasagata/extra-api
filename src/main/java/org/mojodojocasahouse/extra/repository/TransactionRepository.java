@@ -14,49 +14,6 @@ import java.util.Map;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
-    @Query( "SELECT t.category.name AS category, SUM(t.amount) AS amount FROM Transaction t " +
-            "WHERE t.user = :user " +
-            "AND t.category.name IN :categories " +
-            "AND t.date BETWEEN :minDate AND :maxDate " +
-            "GROUP BY t.category " +
-            "ORDER BY SUM(t.amount) DESC")
-    List<Map<String, String>> getSumOfTransactionsOfUserByCategoryAndDateInterval(
-            @Param("user") ExtraUser user,
-            @Param("categories") List<String> categories,
-            @Param("minDate") Date minDate,
-            @Param("maxDate") Date maxDate);
-
-    @Query( "SELECT t.category.name AS category, SUM(t.amount) AS amount FROM Transaction t " +
-            "WHERE t.user = :user " +
-            "AND t.category.name IN :categories " +
-            "GROUP BY t.category " +
-            "ORDER BY SUM(t.amount) DESC")
-    List<Map<String, String>> getSumOfTransactionsByCategories(
-            @Param("user") ExtraUser user,
-            @Param("categories") List<String> categories);
-
-    @Query( "SELECT t.category.name AS category, SUM(t.amount) AS amount FROM Transaction t " +
-            "WHERE t.user = :user " +
-            "AND t.category.name IN :categories " +
-            "AND t.date >= :minDate " +
-            "GROUP BY t.category " +
-            "ORDER BY SUM(t.amount) DESC")
-    List<Map<String, String>> getSumOfTransactionsOfUserAfterGivenDate(
-            @Param("user") ExtraUser user,
-            @Param("categories") List<String> categories,
-            @Param("minDate") Date minDate);
-
-    @Query( "SELECT t.category.name AS category, SUM(t.amount) AS amount FROM Transaction t " +
-            "WHERE t.user = :user " +
-            "AND t.category.name IN :categories " +
-            "AND t.date <= :maxDate " +
-            "GROUP BY t.category " +
-            "ORDER BY SUM(t.amount) DESC")
-    List<Map<String, String>> getSumOfTransactionsOfUserBeforeGivenDate(
-            @Param("user") ExtraUser user,
-            @Param("categories") List<String> categories,
-            @Param("maxDate") Date maxDate);
-
     @Query( "SELECT " +
                 "YEAR(t.date) AS year, " +
                 "SUM(t.signedAmount) AS amount " +

@@ -128,68 +128,6 @@ public class ExpenseService {
                 .getSumOfExpensesOfUserByCategoryAndDateInterval(user, filteringCategories, from, until);
     }
 
-    public List<ExpenseDTO> getExpensesOfUserByCategoriesAndDateRanges(ExtraUser user,
-                                                                       List<String> categories,
-                                                                       Date from, Date until) {
-        List<String> filteringCategories = categories;
-
-        if(filteringCategories == null || filteringCategories.isEmpty()){
-            filteringCategories = categoryService.getAllCategoryNamesOfUser(user);
-        }
-
-        if (from == null && until == null){
-            return expenseRepository
-                    .getExpensesOfUserByCategory(user, filteringCategories)
-                    .stream()
-                    .map(Expense::asDto)
-                    .collect(Collectors.toList());
-        } else if (from == null) {
-            return expenseRepository
-                    .getExpensesOfUserBeforeGivenDate(user, filteringCategories, until)
-                    .stream()
-                    .map(Expense::asDto)
-                    .collect(Collectors.toList());
-        } else if (until == null) {
-            return expenseRepository
-                    .getExpensesOfUserAfterGivenDate(user, filteringCategories, from)
-                    .stream()
-                    .map(Expense::asDto)
-                    .collect(Collectors.toList());
-        }
-
-        return expenseRepository
-                .getExpensesOfUserByCategoriesAndDateInterval(user, filteringCategories, from, until)
-                .stream()
-                .map(Expense::asDto)
-                .collect(Collectors.toList());
-    }
-
-    public List<Map<String, String>> getYearlySumOfExpensesOfUserByCategoriesAndDateRanges(ExtraUser user,
-                                                                                               List<String> categories,
-                                                                                               Date from,
-                                                                                               Date until) {
-        List<String> filteringCategories = categories;
-
-        if(filteringCategories == null || filteringCategories.isEmpty()){
-            filteringCategories = categoryService.getAllCategoryNamesOfUser(user);
-        }
-
-        if (from == null && until == null){
-            return expenseRepository
-                    .getYearlySumOfExpensesByCategories(user, filteringCategories);
-        } else if (from == null) {
-            return expenseRepository
-                    .getYearlySumOfExpensesOfUserBeforeGivenDate(user, filteringCategories, until);
-        } else if (until == null) {
-            return expenseRepository
-                    .getYearlySumOfExpensesOfUserAfterGivenDate(user, filteringCategories, from);
-        }
-
-        return expenseRepository
-                .getYearlySumOfExpensesOfUserByCategoryAndDateInterval(user, filteringCategories, from, until);
-
-    }
-
     public void addExpenseToActiveBudget(Expense expense) {
         List<Budget> activeBudget = budgetRepository
                 .findActiveBudgetByUserAndCategoryAndDate(expense.getUser(), expense.getCategory(),expense.getDate());

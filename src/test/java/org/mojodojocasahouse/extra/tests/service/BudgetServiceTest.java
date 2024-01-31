@@ -125,6 +125,14 @@ public class BudgetServiceTest {
         );
         Category existingOrNewCategory = new Category("test", (short) 1, user);
         List<Transaction> overlappingExpenses = new ArrayList<>();
+        Budget savedBudget = new Budget(
+                user,
+                "test budget",
+                BigDecimal.TEN,
+                Date.valueOf("2023-09-11"),
+                Date.valueOf("2023-09-11"),
+                existingOrNewCategory
+        );
         ApiResponse expectedResponse = new ApiResponse(
                 "Budget added successfully!"
         );
@@ -136,6 +144,9 @@ public class BudgetServiceTest {
         given(
                 transactionRepository.getTransactionsByUserAndCategoryAndDateInterval(any(), any(), any(), any())
         ).willReturn(overlappingExpenses);
+        given(
+                budgetRepository.save(any())
+        ).willReturn(savedBudget);
 
         // exercise
         ApiResponse actualResponse = budgetService.addBudget(user, request);
@@ -168,6 +179,14 @@ public class BudgetServiceTest {
                 existingExpense1,
                 existingExpense2
         );
+        Budget savedBudget = new Budget(
+                user,
+                "test budget",
+                BigDecimal.TEN,
+                Date.valueOf("2023-09-11"),
+                Date.valueOf("2023-09-11"),
+                existingOrNewCategory
+        );
         ApiResponse expectedResponse = new ApiResponse(
                 "Budget added successfully!"
         );
@@ -179,6 +198,9 @@ public class BudgetServiceTest {
         given(
                 transactionRepository.getTransactionsByUserAndCategoryAndDateInterval(any(), any(), any(), any())
         ).willReturn(overlappingExpenses);
+        given(
+                budgetRepository.save(any())
+        ).willReturn(savedBudget);
 
         // exercise
         ApiResponse actualResponse = budgetService.addBudget(user, request);

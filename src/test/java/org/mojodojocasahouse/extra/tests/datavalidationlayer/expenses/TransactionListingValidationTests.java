@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.TransactionController;
-import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.model.TransactionDTO;
 import org.mojodojocasahouse.extra.dto.requests.FilteringRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
@@ -27,10 +27,8 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
+import java.sql.Date;
 import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.isNull;
 
 @WebMvcTest(TransactionController.class)
 @Import({
@@ -38,23 +36,23 @@ import static org.mockito.ArgumentMatchers.isNull;
         DelegatingBasicAuthenticationEntryPoint.class,
         ExtraUserDetailsService.class
 })
-public class ExpenseListingValidationTests {
+public class TransactionListingValidationTests {
 
     @Autowired
     private MockMvc mvc;
 
     private JacksonTester<ApiError> jsonApiError;
 
-    private JacksonTester<List<ExpenseDTO>> jsonExpenseDtoList;
+    private JacksonTester<List<TransactionDTO>> jsonExpenseDtoList;
 
     @MockBean
     public AuthenticationService authService;
 
     @MockBean
-    public ExtraUserRepository userRepository;
+    public ExpenseService expenseService;
 
     @MockBean
-    public ExpenseService expenseService;
+    public ExtraUserRepository userRepository;
 
     @MockBean
     public TransactionService transactionService;
@@ -69,7 +67,7 @@ public class ExpenseListingValidationTests {
 
     @Test
     @WithMockUser
-    public void testListingExpensesWithInvalidDateRangesReturnsErrorResponse() throws Exception {
+    public void testListingTransactionsWithInvalidCategoriesReturnsErrorResponse() throws Exception {
         // Setup - data
         FilteringRequest request = new FilteringRequest(
                 null, null, List.of("some_invalid_category_value_!@#$#^%$%&*&")
@@ -81,7 +79,29 @@ public class ExpenseListingValidationTests {
         );
 
         // exercise
-        MockHttpServletResponse response = getExpensesWithArguments(request);
+        MockHttpServletResponse response = getTransactionsWithArguments(request);
+
+        // Verify
+        assertThatResponseReturnsError(response, expectedResponse);
+    }
+
+    @Test
+    @WithMockUser
+    public void testListingTransactionsWithInvalidDateRangesReturnsErrorResponse() throws Exception {
+        // Setup - data
+        FilteringRequest request = new FilteringRequest(
+                Date.valueOf("2024-01-01"),
+                Date.valueOf("2023-01-01"),
+                null
+        );
+        ApiError expectedResponse = new ApiError(
+                HttpStatus.BAD_REQUEST,
+                "Data validation error",
+                "filteringRequest: Date ranges are invalid!"
+        );
+
+        // exercise
+        MockHttpServletResponse response = getTransactionsWithArguments(request);
 
         // Verify
         assertThatResponseReturnsError(response, expectedResponse);
@@ -89,17 +109,10 @@ public class ExpenseListingValidationTests {
 
 
 
-    private MockHttpServletResponse getExpenses() throws Exception {
-        return mvc.perform(MockMvcRequestBuilders.
-                        get("/getMyExpenses")
-                        .accept(MediaType.ALL))
-                .andReturn().getResponse();
-    }
-
-    private MockHttpServletResponse getExpensesWithArguments(Object request) throws Exception {
+    private MockHttpServletResponse getTransactionsWithArguments(Object request) throws Exception {
         return mvc.perform(
                         MockMvcRequestBuilders
-                                .post("/getMyExpenses")
+                                .post("/getMyTransactions")
                                 .content(asJsonString(request))
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.ALL))

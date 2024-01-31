@@ -1,4 +1,4 @@
-package org.mojodojocasahouse.extra.tests.controller.expenses;
+package org.mojodojocasahouse.extra.tests.controller.transactions;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -6,9 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mojodojocasahouse.extra.configuration.SecurityConfiguration;
 import org.mojodojocasahouse.extra.controller.TransactionController;
+import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
+import org.mojodojocasahouse.extra.dto.model.TransactionDTO;
 import org.mojodojocasahouse.extra.dto.requests.FilteringRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
-import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
 import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
@@ -33,7 +34,8 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
 
 @WebMvcTest(TransactionController.class)
@@ -42,26 +44,26 @@ import static org.mockito.BDDMockito.given;
         DelegatingBasicAuthenticationEntryPoint.class,
         ExtraUserDetailsService.class
 })
-public class ExpensesListingTest {
+public class TransactionListingTest {
 
     @Autowired
     private MockMvc mvc;
 
     private JacksonTester<ApiError> jsonApiError;
 
-    private JacksonTester<List<ExpenseDTO>> jsonExpenseDtoList;
+    private JacksonTester<List<TransactionDTO>> jsonExpenseDtoList;
 
     @MockBean
     public AuthenticationService authService;
-
-    @MockBean
-    public ExtraUserRepository userRepository;
 
     @MockBean
     public ExpenseService expenseService;
 
     @MockBean
     public TransactionService transactionService;
+
+    @MockBean
+    public ExtraUserRepository userRepository;
 
     @Autowired
     public TransactionController controller;
@@ -72,9 +74,10 @@ public class ExpensesListingTest {
     }
 
 
+
     @Test
     @WithMockUser
-    public void testListingExpensesWithNoDateRangesCallsServiceMethodWithNullReturnsAllExpenses() throws Exception {
+    public void testListingTransactionsWithNoDateRangesCallsServiceMethodWithNullReturnsAllExpenses() throws Exception {
         // Setup - data
         ExtraUser linkedUser = new ExtraUser(
                 "M",
@@ -83,13 +86,15 @@ public class ExpensesListingTest {
                 "Somepassword"
         );
         Category customCategory = new Category("test1", (short) 1, linkedUser);
-        List<ExpenseDTO> expectedResponse = List.of(
+        List<TransactionDTO> expectedResponse = List.of(
                 new ExpenseDTO(null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), customCategory.asDto())
         );
 
         // Setup - Expectations
-        given(authService.getUserByPrincipal(any())).willReturn(linkedUser);
-        given(expenseService.getExpensesOfUserByCategoriesAndDateRanges(any(), any(), isNull(), isNull())).willReturn(expectedResponse);
+        given(authService.getUserByPrincipal(any()))
+                .willReturn(linkedUser);
+        given(transactionService.getTransactionsOfUserByCategoriesAndDateRanges(any(), any(), isNull(), isNull()))
+                .willReturn(expectedResponse);
 
         // exercise
         MockHttpServletResponse response = getExpenses();
@@ -101,7 +106,7 @@ public class ExpensesListingTest {
 
     @Test
     @WithMockUser
-    public void testListingExpensesWithRangesCallsServiceMethodWithDateRangesAndReturnsAllExpensesWithinThoseRanges() throws Exception {
+    public void testListingTransactionsWithRangesCallsServiceMethodWithDateRangesAndReturnsAllExpensesWithinThoseRanges() throws Exception {
         // Setup - data
         ExtraUser linkedUser = new ExtraUser(
                 "M",
@@ -110,18 +115,18 @@ public class ExpensesListingTest {
                 "Somepassword"
         );
         Category customCategory = new Category("test1", (short) 1, linkedUser);
-        List<ExpenseDTO> expectedResponse = List.of(
+        List<TransactionDTO> expectedResponse = List.of(
                 new ExpenseDTO(null, "A concept", new BigDecimal("10.12"), Date.valueOf("2022-12-09"), customCategory.asDto())
         );
 
         // Setup - Expectations
         given(authService.getUserByPrincipal(any()))
                 .willReturn(linkedUser);
-        given(expenseService.getExpensesOfUserByCategoriesAndDateRanges(any(), any(), any(Date.class), any(Date.class)))
+        given(transactionService.getTransactionsOfUserByCategoriesAndDateRanges(any(), any(), any(Date.class), any(Date.class)))
                 .willReturn(expectedResponse);
 
         // exercise
-        MockHttpServletResponse response = getExpensesWithArguments();
+        MockHttpServletResponse response = getTransactionsWithArguments();
 
         // Verify
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -131,12 +136,12 @@ public class ExpensesListingTest {
 
     private MockHttpServletResponse getExpenses() throws Exception {
         return mvc.perform(MockMvcRequestBuilders.
-                        post("/getMyExpenses")
+                        post("/getMyTransactions")
                         .accept(MediaType.ALL))
                 .andReturn().getResponse();
     }
 
-    private MockHttpServletResponse getExpensesWithArguments() throws Exception {
+    private MockHttpServletResponse getTransactionsWithArguments() throws Exception {
         FilteringRequest request = new FilteringRequest(
                 Date.valueOf("2022-12-09"),
                 Date.valueOf("2022-12-10"),
@@ -145,11 +150,11 @@ public class ExpensesListingTest {
 
 
         return mvc.perform(
-                MockMvcRequestBuilders
-                        .post("/getMyExpenses")
-                        .content(asJsonString(request))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.ALL))
+                        MockMvcRequestBuilders
+                                .post("/getMyTransactions")
+                                .content(asJsonString(request))
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.ALL))
                 .andReturn()
                 .getResponse();
     }
@@ -161,6 +166,7 @@ public class ExpensesListingTest {
             throw new RuntimeException(e);
         }
     }
+
 
 
 }
