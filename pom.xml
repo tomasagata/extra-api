@@ -129,10 +129,10 @@
 					<formats>XML,CSV</formats>
 					<excludes>
 						<exclude>org/mojodojocasahouse/extra/ExtraApplication.class</exclude>
-						<exclude>org/mojodojocasahouse/extra/dto/*</exclude>
-						<exclude>org/mojodojocasahouse/extra/security/*</exclude>
-						<exclude>org/mojodojocasahouse/extra/configuration/*</exclude>
-						<exclude>org/mojodojocasahouse/extra/exception/*</exclude>
+						<exclude>org/mojodojocasahouse/extra/dto/**</exclude>
+						<exclude>org/mojodojocasahouse/extra/security/**</exclude>
+						<exclude>org/mojodojocasahouse/extra/configuration/**</exclude>
+						<exclude>org/mojodojocasahouse/extra/exception/**</exclude>
 					</excludes>
 				</configuration>
 				<executions>
