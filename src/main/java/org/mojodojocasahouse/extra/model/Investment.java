@@ -15,7 +15,7 @@ public class Investment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
     @Column(name = "NAME", nullable = false)
     private String name;

@@ -16,6 +16,8 @@ import org.mojodojocasahouse.extra.controller.TransactionController;
 import org.mojodojocasahouse.extra.dto.responses.ApiError;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.dto.requests.ExpenseAddingRequest;
+import org.mojodojocasahouse.extra.model.Budget;
+import org.mojodojocasahouse.extra.model.Category;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.security.DelegatingBasicAuthenticationEntryPoint;
@@ -103,7 +105,6 @@ public class ExpensesAddingTest {
         Assertions.assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
         Assertions.assertThat(response.getContentAsString()).isEqualTo(jsonApiResponse.write(expectedResponse).getJson());
     }
-
 
 
     private MockHttpServletResponse postExpenseAddToControllerNoCookie(ExpenseAddingRequest request) throws Exception {

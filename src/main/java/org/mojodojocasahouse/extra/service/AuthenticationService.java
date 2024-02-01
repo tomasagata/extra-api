@@ -227,7 +227,7 @@ public class AuthenticationService {
         return new ApiResponse("Device registered successfully");
     }
 
-    public ApiResponse unregisterUserDevice(ExtraUser user, DeviceRegisteringRequest request) {
+    public ApiResponse unregisterUserDevice(DeviceRegisteringRequest request) {
         Optional<UserDevice> foundDevice =  deviceRepository.findByFcmToken(request.getToken());
 
         if (foundDevice.isEmpty()) {

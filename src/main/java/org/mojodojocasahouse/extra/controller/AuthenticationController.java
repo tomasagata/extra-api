@@ -126,8 +126,7 @@ public class AuthenticationController {
     public ResponseEntity<Object> unregisterDeviceForPushNotifications(
             Principal principal,
             @Valid @RequestBody DeviceRegisteringRequest request) {
-        ExtraUser user = userService.getUserByPrincipal(principal);
-        ApiResponse response = userService.unregisterUserDevice(user, request);
+        ApiResponse response = userService.unregisterUserDevice(request);
 
         return new ResponseEntity<>(
                 response,

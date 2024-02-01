@@ -96,7 +96,7 @@ public class DeviceRegistrationTest {
 
         // Setup - expectations
         given(service.getUserByPrincipal(any())).willReturn(user);
-        given(service.unregisterUserDevice(any(), any())).willReturn(expectedResponse);
+        given(service.unregisterUserDevice(any())).willReturn(expectedResponse);
 
         // Exercise
         MockHttpServletResponse response = postDeviceDeregistrationRequest(request);

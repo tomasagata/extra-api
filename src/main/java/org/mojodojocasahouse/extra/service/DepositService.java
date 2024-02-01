@@ -38,10 +38,6 @@ public class DepositService {
 
     public void depositInvestmentReturn(Investment investment) throws CategoryNotFoundException {
 
-        Category reattachedCategory = categoryRepository
-                .findById(investment.getCategory().getId())
-                .orElseThrow(CategoryNotFoundException::new);
-
         // Create expense entity from request data
         Deposit savedDeposit = depositRepository.save(
                 new Deposit(
@@ -49,7 +45,7 @@ public class DepositService {
                         investment.getDepositAmount(),
                         new Date(System.currentTimeMillis()),
                         investment.getUser(),
-                        reattachedCategory,
+                        investment.getCategory(),
                         null,
                         investment
                 )
@@ -78,9 +74,6 @@ public class DepositService {
     private Investment createNewInvestmentFromRequestWithCategory(ExtraUser user,
                                                                   InvestmentAddingRequest request,
                                                                   Category category) throws CategoryNotFoundException {
-        Category reattachedCategory = categoryRepository
-                .findById(category.getId())
-                .orElseThrow(CategoryNotFoundException::new);
 
         return investmentRepository.save(
                 new Investment(
@@ -91,7 +84,7 @@ public class DepositService {
                         request.getMaxNumberOfDeposits(),
                         request.getDepositIntervalInDays(),
                         user,
-                        reattachedCategory
+                        category
                 )
         );
     }

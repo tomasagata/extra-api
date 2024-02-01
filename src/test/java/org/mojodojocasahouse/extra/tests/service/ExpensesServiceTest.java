@@ -14,9 +14,7 @@ import org.mojodojocasahouse.extra.dto.model.ExpenseDTO;
 import org.mojodojocasahouse.extra.dto.requests.ExpenseAddingRequest;
 import org.mojodojocasahouse.extra.dto.requests.ExpenseEditingRequest;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
-import org.mojodojocasahouse.extra.model.Category;
-import org.mojodojocasahouse.extra.model.Expense;
-import org.mojodojocasahouse.extra.model.ExtraUser;
+import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.BudgetRepository;
 import org.mojodojocasahouse.extra.repository.ExpenseRepository;
 import org.mojodojocasahouse.extra.service.BudgetService;
@@ -26,6 +24,7 @@ import org.springframework.boot.test.json.JacksonTester;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -148,6 +147,58 @@ public class ExpensesServiceTest {
     }
 
     @Test
+    public void testAddingAnExpenseToExistingUserWithActiveBudgetLinksItToTheBudget() {
+        // Setup - data
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        Category customCategory = new Category("test", (short) 1, user);
+        ExpenseAddingRequest request = new ExpenseAddingRequest(
+                "A Concept",
+                new BigDecimal("10.12"),
+                Date.valueOf("2023-09-19"),
+                customCategory.getName(),
+                customCategory.getIconId()
+        );
+        List<Budget> activeBudgets = List.of(
+                new Budget(
+                        user,
+                        "test budget",
+                        BigDecimal.TEN,
+                        Date.valueOf("2023-01-01"),
+                        Date.valueOf("2024-01-01"),
+                        customCategory
+                )
+        );
+        ApiResponse expectedResponse = new ApiResponse(
+                "Expense added successfully!"
+        );
+        Expense savedExpense = new Expense(
+                user,
+                "A concept",
+                new BigDecimal("10.12"),
+                Date.valueOf("2023-09-19"),
+                customCategory
+        );
+
+        // Setup - expectations
+        given(expenseRepository.save(any()))
+                .willReturn(savedExpense);
+        given(budgetRepository.findActiveBudgetByUserAndCategoryAndDate(any(),any(),any()))
+                .willReturn(activeBudgets);
+
+        // exercise
+        ApiResponse actualResponse = expenseService.addExpense(user, request);
+
+        // verify
+        Assertions.assertThat(actualResponse).isEqualTo(expectedResponse);
+        Assertions.assertThat(savedExpense.getLinkedBudget()).isNotNull();
+    }
+
+    @Test
     public void testExpenseCanBeEdited(){
         ExtraUser user = new ExtraUser(
                 "Michael",
@@ -203,6 +254,24 @@ public class ExpensesServiceTest {
         expenseRepository.save(savedExpense1);
         Long id = (long) 0;
         Assertions.assertThat(expenseService.isOwner(user, id)).isEqualTo(false);
+    }
+
+    @Test
+    public void testExpenseExistsReturnsExactlyWhatTheDatabaseSays() {
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        Category customCategory = new Category("test", (short) 1, user);
+        Expense savedExpense1 = new Expense(user,"Another Concept", new BigDecimal("10.11"), Date.valueOf("2023-09-11"), customCategory);
+
+        given(expenseRepository.existsById(any())).willReturn(true);
+
+        Boolean exists = expenseService.existsById(savedExpense1.getId());
+
+        Assertions.assertThat(exists).isEqualTo(true);
     }
 
     @Test
@@ -470,6 +539,59 @@ public class ExpensesServiceTest {
         // Verify
         verify(categoryService, times(1)).getAllCategoryNamesOfUser(any(ExtraUser.class));
         Assertions.assertThat(results).isEqualTo(expectedResults);
+
+    }
+
+    @Test
+    public void testCreatingDownPaymentExpenseForInvestmentSavesItAndAddsItToExistingBudget() {
+        // Setup - data
+        ExtraUser user = new ExtraUser(
+                "Michael",
+                "Jackson",
+                "mj@me.com",
+                "Somepassword1!"
+        );
+        Category customCategory = new Category("test", (short) 1, user);
+        Investment investment = new Investment(
+                "test investment",
+                BigDecimal.TEN,
+                Timestamp.valueOf("2023-10-10 00:00:00"),
+                BigDecimal.ONE,
+                30,
+                1,
+                user,
+                customCategory
+        );
+        List<Budget> activeBudgets = List.of(
+                new Budget(
+                        user,
+                        "test budget",
+                        BigDecimal.TEN,
+                        Date.valueOf("2023-01-01"),
+                        Date.valueOf("2024-01-01"),
+                        customCategory
+                )
+        );
+        Expense savedExpense = new Expense(
+                investment.getUser(),
+                investment.getName(),
+                investment.getDownPaymentAmount(),
+                Date.valueOf("2023-10-10"),
+                investment.getCategory()
+        );
+
+        // Setup - expectations
+        given(expenseRepository.save(any()))
+                .willReturn(savedExpense);
+        given(budgetRepository.findActiveBudgetByUserAndCategoryAndDate(any(),any(),any()))
+                .willReturn(activeBudgets);
+
+        // exercise
+        expenseService.createDownPaymentExpense(investment);
+
+        // verify
+        verify(expenseRepository, times(1)).save(any());
+        Assertions.assertThat(savedExpense.getLinkedBudget()).isNotNull();
 
     }
 

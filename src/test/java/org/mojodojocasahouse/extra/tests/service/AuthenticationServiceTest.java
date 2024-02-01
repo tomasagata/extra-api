@@ -4,16 +4,14 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.mojodojocasahouse.extra.dto.requests.ForgotPasswordRequest;
-import org.mojodojocasahouse.extra.dto.requests.PasswordResetRequest;
-import org.mojodojocasahouse.extra.dto.requests.UserChangePasswordRequest;
-import org.mojodojocasahouse.extra.dto.requests.UserRegistrationRequest;
+import org.mojodojocasahouse.extra.dto.requests.*;
 import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.exception.EmailException;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidPasswordResetTokenException;
 import org.mojodojocasahouse.extra.model.ExtraUser;
 import org.mojodojocasahouse.extra.model.PasswordResetToken;
+import org.mojodojocasahouse.extra.model.UserDevice;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +19,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mojodojocasahouse.extra.repository.PasswordResetTokenRepository;
+import org.mojodojocasahouse.extra.repository.UserDeviceRepository;
 import org.mojodojocasahouse.extra.service.AuthenticationService;
 import org.mojodojocasahouse.extra.testmodels.TestPasswordResetToken;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -51,6 +51,9 @@ public class AuthenticationServiceTest {
 
     @Mock
     private PasswordResetTokenRepository tokenRepo;
+
+    @Mock
+    private UserDeviceRepository deviceRepository;
 
     @InjectMocks
     private AuthenticationService serv;
@@ -316,6 +319,83 @@ public class AuthenticationServiceTest {
                 .isThrownBy(() -> serv.resetPassword(request))
                 .isInstanceOf(InvalidPasswordResetTokenException.class);
 
+    }
+
+    @Test
+    public void testRegisteringANeverRegisteredUserDeviceReturnsSuccessfulApiResponseObject() {
+        DeviceRegisteringRequest request = new DeviceRegisteringRequest(
+                "some_new_token"
+        );
+        ExtraUser user = new ExtraUser(
+                "Some",
+                "User",
+                "mj@me.com",
+                "curr_pass_hashed"
+        );
+        ApiResponse expectedResponse = new ApiResponse("Device registered successfully");
+
+        given(deviceRepository.save(any())).willReturn(null);
+
+        ApiResponse response = serv.registerUserDevice(user, request);
+
+        Assertions.assertThat(response).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    public void testRegisteringAnAlreadyRegisteredUserDeviceReturnsErrorApiResponseObject() {
+        DeviceRegisteringRequest request = new DeviceRegisteringRequest(
+                "some_used_token"
+        );
+        ExtraUser user = new ExtraUser(
+                "Some",
+                "User",
+                "mj@me.com",
+                "curr_pass_hashed"
+        );
+        ApiResponse expectedResponse = new ApiResponse("Device is already registered");
+
+        given(deviceRepository.save(any())).willThrow(new DataIntegrityViolationException(""));
+
+        ApiResponse response = serv.registerUserDevice(user, request);
+
+        Assertions.assertThat(response).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    public void testUnregisteringANeverRegisteredUserDeviceReturnsErrorApiResponseObject() {
+        DeviceRegisteringRequest request = new DeviceRegisteringRequest(
+                "some_new_token"
+        );
+        ApiResponse expectedResponse = new ApiResponse("Device is not registered");
+
+        given(deviceRepository.findByFcmToken(any())).willReturn(Optional.empty());
+
+        ApiResponse response = serv.unregisterUserDevice(request);
+
+        Assertions.assertThat(response).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    public void testUnregisteringARegisteredUserDeviceReturnsSuccessfulApiResponseObject() {
+        DeviceRegisteringRequest request = new DeviceRegisteringRequest(
+                "some_used_token"
+        );
+        ExtraUser user = new ExtraUser(
+                "Some",
+                "User",
+                "mj@me.com",
+                "curr_pass_hashed"
+        );
+        Optional<UserDevice> existingDevice = Optional.of(
+                new UserDevice("some_used_token", user)
+        );
+        ApiResponse expectedResponse = new ApiResponse("Device was removed successfully");
+
+        given(deviceRepository.findByFcmToken(any())).willReturn(existingDevice);
+
+        ApiResponse response = serv.unregisterUserDevice(request);
+
+        Assertions.assertThat(response).isEqualTo(expectedResponse);
     }
 
 }
