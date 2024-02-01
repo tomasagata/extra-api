@@ -2,6 +2,7 @@ package org.mojodojocasahouse.extra.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Slf4j
@@ -161,7 +163,7 @@ public class AuthenticationService {
                 "                                            password has been generated for you. To reset your password, click the\n" +
                 "                                            following link and follow the instructions.\n" +
                 "                                        </p>\n" +
-                "                                        <a href=\"extra://reset-password/" + token.getId().toString() + "\"\n" +
+                "                                        <a href=\"http://extra/reset-password/" + token.getId().toString() + "\"\n" +
                 "                                            style=\"background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;\">Reset\n" +
                 "                                            Password</a>\n" +
                 "                                    </td>\n" +
@@ -215,19 +217,31 @@ public class AuthenticationService {
         return new ApiResponse("Password changed successfully");
     }
 
+    @Transactional(Transactional.TxType.REQUIRED)
     public ApiResponse registerUserDevice(ExtraUser user, DeviceRegisteringRequest request) {
-        try {
+        Optional<UserDevice> foundDevice = deviceRepository.findByFcmToken(request.getToken());
+
+        if (foundDevice.isPresent()) {
+            log.debug("Device is already registered, updating user information");
+            UserDevice device = foundDevice.get();
+            device.setUser(user);
+            device.setModified(new Timestamp(System.currentTimeMillis()));
+        } else {
+            log.debug("Device not registered. Registering...");
             deviceRepository.save(
                     new UserDevice(request.getToken(), user)
             );
-        } catch (DataIntegrityViolationException e) {
-            return new ApiResponse("Device is already registered");
         }
 
         return new ApiResponse("Device registered successfully");
     }
 
-    public ApiResponse unregisterUserDevice(DeviceRegisteringRequest request) {
+    @Transactional(Transactional.TxType.REQUIRED)
+    public ApiResponse unregisterUserDevice(DeviceUnregisteringRequest request) {
+        if (request.getToken() == null) {
+            return new ApiResponse("Device is not registered");
+        }
+
         Optional<UserDevice> foundDevice =  deviceRepository.findByFcmToken(request.getToken());
 
         if (foundDevice.isEmpty()) {

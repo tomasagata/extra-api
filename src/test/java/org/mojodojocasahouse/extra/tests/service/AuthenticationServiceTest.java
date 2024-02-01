@@ -334,6 +334,7 @@ public class AuthenticationServiceTest {
         );
         ApiResponse expectedResponse = new ApiResponse("Device registered successfully");
 
+        given(deviceRepository.findByFcmToken(any())).willReturn(Optional.empty());
         given(deviceRepository.save(any())).willReturn(null);
 
         ApiResponse response = serv.registerUserDevice(user, request);
@@ -342,29 +343,54 @@ public class AuthenticationServiceTest {
     }
 
     @Test
-    public void testRegisteringAnAlreadyRegisteredUserDeviceReturnsErrorApiResponseObject() {
+    public void testRegisteringAnAlreadyRegisteredUserDeviceUnregistersItFromOldAccountAndIntoNewAccount() {
         DeviceRegisteringRequest request = new DeviceRegisteringRequest(
                 "some_used_token"
         );
-        ExtraUser user = new ExtraUser(
-                "Some",
+        ExtraUser oldUser = new ExtraUser(
+                "Old",
                 "User",
-                "mj@me.com",
-                "curr_pass_hashed"
+                "old@me.com",
+                "hashed_pass_1"
         );
-        ApiResponse expectedResponse = new ApiResponse("Device is already registered");
+        ExtraUser newUser = new ExtraUser(
+                "New",
+                "User",
+                "new@me.com",
+                "hashed_pass_2"
+        );
+        UserDevice existingDevice = new UserDevice(
+                request.getToken(),
+                oldUser
+        );
+        ApiResponse expectedResponse = new ApiResponse("Device registered successfully");
 
-        given(deviceRepository.save(any())).willThrow(new DataIntegrityViolationException(""));
+        given(deviceRepository.findByFcmToken(any())).willReturn(Optional.of(existingDevice));
 
-        ApiResponse response = serv.registerUserDevice(user, request);
+
+        ApiResponse response = serv.registerUserDevice(newUser, request);
 
         Assertions.assertThat(response).isEqualTo(expectedResponse);
     }
 
     @Test
-    public void testUnregisteringANeverRegisteredUserDeviceReturnsErrorApiResponseObject() {
-        DeviceRegisteringRequest request = new DeviceRegisteringRequest(
-                "some_new_token"
+    public void testUnregisteringANeverRegisteredUserDeviceReturnsSuccessfulResponse() {
+        // If a device never registered, its token is null.
+        DeviceUnregisteringRequest request = new DeviceUnregisteringRequest(
+                null
+        );
+        ApiResponse expectedResponse = new ApiResponse("Device is not registered");
+
+        ApiResponse response = serv.unregisterUserDevice(request);
+
+        Assertions.assertThat(response).isEqualTo(expectedResponse);
+    }
+
+    @Test
+    public void testUnregisteringAnAlreadyUnregisteredUserDeviceReturnsSuccessfulResponse() {
+        // If a device already unregistered, its token is not on the database.
+        DeviceUnregisteringRequest request = new DeviceUnregisteringRequest(
+                "some_already_unregistered_token"
         );
         ApiResponse expectedResponse = new ApiResponse("Device is not registered");
 
@@ -377,7 +403,7 @@ public class AuthenticationServiceTest {
 
     @Test
     public void testUnregisteringARegisteredUserDeviceReturnsSuccessfulApiResponseObject() {
-        DeviceRegisteringRequest request = new DeviceRegisteringRequest(
+        DeviceUnregisteringRequest request = new DeviceUnregisteringRequest(
                 "some_used_token"
         );
         ExtraUser user = new ExtraUser(

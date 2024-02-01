@@ -61,7 +61,7 @@ public class SecurityConfiguration {
                         .requestMatchers("/error").permitAll()
                         .requestMatchers("/getActiveBudgets").authenticated()
                         .requestMatchers("/addInvestment").authenticated()
-                        .requestMatchers("/unregisterDevice").authenticated()
+                        .requestMatchers("/unregisterDevice").permitAll()
                         .requestMatchers("/registerDevice").authenticated()
                         .requestMatchers("/getMyInvestments").authenticated()
                         .requestMatchers("/getMyTransactions").authenticated()

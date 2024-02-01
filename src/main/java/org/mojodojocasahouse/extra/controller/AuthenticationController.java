@@ -124,8 +124,7 @@ public class AuthenticationController {
 
     @PostMapping(path = "/unregisterDevice")
     public ResponseEntity<Object> unregisterDeviceForPushNotifications(
-            Principal principal,
-            @Valid @RequestBody DeviceRegisteringRequest request) {
+            @Valid @RequestBody DeviceUnregisteringRequest request) {
         ApiResponse response = userService.unregisterUserDevice(request);
 
         return new ResponseEntity<>(

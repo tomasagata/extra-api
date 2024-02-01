@@ -2,6 +2,7 @@ package org.mojodojocasahouse.extra.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 
@@ -17,10 +18,12 @@ public class UserDevice {
     private String fcmToken;
 
     @Column(name = "MODIFIED_TIMESTAMP", nullable = false)
+    @Setter
     private Timestamp modified;
 
     @ManyToOne
     @JoinColumn(name = "USER_ID", nullable = false)
+    @Setter
     private ExtraUser user;
 
     public UserDevice(String fcmToken, ExtraUser user) {
