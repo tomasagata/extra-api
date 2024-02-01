@@ -1,6 +1,7 @@
 package org.mojodojocasahouse.extra.dto.requests;
 
 import jakarta.annotation.Nullable;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
@@ -17,14 +18,14 @@ import java.util.List;
 )
 public class FilteringRequest {
 
-    @Nullable
     private List<
+            @NotNull(message = "Category names in category field cannot be null") // The list itself can be null but not the objects inside.
             @Size(max = 50, message = "Category cannot exceed 50 characters")
             @Pattern(regexp = "^[A-Za-z\\d\\s-]+$", message = "Category must only contain letters or numbers")
             String> categories;
-    @Nullable
+
     private Date from;
-    @Nullable
+
     private Date until;
 
     public FilteringRequest() {

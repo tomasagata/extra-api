@@ -12,6 +12,7 @@ public class ActiveBudgetRequest {
     @NotNull(message = "Category is mandatory")
     private CategoryDTO category;
 
+    @NotNull(message = "Date is mandatory")
     private Date date;
 
     public ActiveBudgetRequest(CategoryDTO category, Date date) {

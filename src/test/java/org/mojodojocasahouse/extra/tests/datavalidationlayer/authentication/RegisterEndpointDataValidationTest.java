@@ -100,7 +100,10 @@ public class RegisterEndpointDataValidationTest {
         ApiError apiError = new ApiError(
                 HttpStatus.BAD_REQUEST,
                 "Data validation error",
-                "firstName: First name must not be left blank or contain special characters or numbers"
+                List.of(
+                        "firstName: First name is mandatory",
+                        "firstName: First name must not be left blank or contain special characters or numbers"
+                )
         );
 
         // exercise
@@ -169,7 +172,10 @@ public class RegisterEndpointDataValidationTest {
         ApiError apiError = new ApiError(
                 HttpStatus.BAD_REQUEST,
                 "Data validation error",
-                "lastName: Last name must not be left blank or contain special characters or numbers"
+                List.of(
+                        "lastName: Last name is mandatory",
+                        "lastName: Last name must not be left blank or contain special characters or numbers"
+                )
         );
 
         // exercise
@@ -340,6 +346,8 @@ public class RegisterEndpointDataValidationTest {
                 HttpStatus.BAD_REQUEST,
                 "Data validation error",
                 List.of(
+                        "password: Password is mandatory",
+                        "passwordRepeat: Repeating password is mandatory",
                         "password: Password must contain eight characters, one letter, one number and one of the following: @$!%*#?"
                 )
         );

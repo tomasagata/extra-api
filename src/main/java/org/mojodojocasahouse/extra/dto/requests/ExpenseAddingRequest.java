@@ -8,6 +8,8 @@ import java.sql.Date;
 
 @Data
 public class ExpenseAddingRequest {
+
+    @NotBlank(message = "Concept is mandatory")
     @Size(max = 100, message = "Concept cannot exceed 100 characters")
     @Pattern(regexp = "^[A-Za-z\\d\\s]+$", message = "Concept must only contain letters or numbers")
     private String concept;
@@ -17,7 +19,7 @@ public class ExpenseAddingRequest {
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0.01")
     private BigDecimal amount;
 
-    @PastOrPresent(message = "Date must be in the past or present")
+    @NotNull(message = "Date is mandatory")
     private Date date;
 
     @NotNull(message = "Category is mandatory")

@@ -7,8 +7,7 @@ import lombok.Data;
 @Data
 public class CategoryDTO {
 
-    @Column(name = "NAME", nullable = false)
-    @NotNull(message = "Category name is mandatory")
+    @NotBlank(message = "Category name is mandatory")
     @Size(max = 50, message = "Category name cannot exceed 50 characters")
     @Pattern(regexp = "^([A-Za-z\\d]+(\\s[A-Za-z\\d])?)*$",
             message = "Category name must only contain letters, numbers or spaces")

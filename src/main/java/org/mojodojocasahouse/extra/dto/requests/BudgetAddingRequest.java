@@ -12,6 +12,7 @@ import java.sql.Date;
         untilDateField = "limitDate"
 )
 public class BudgetAddingRequest {
+    @NotBlank(message = "Name is mandatory")
     @Size(max = 100, message = "Name cannot exceed 100 characters")
     @Pattern(regexp = "^[A-Za-z\\d\\s]+$", message = "Name must only contain letters or numbers")
     private String name;
@@ -21,8 +22,10 @@ public class BudgetAddingRequest {
     @DecimalMin(value = "0.01", message = "Amount must be greater than 0.01")
     private BigDecimal limitAmount;
 
+    @NotNull(message = "limitDate is mandatory")
     private Date limitDate;
 
+    @NotNull(message = "startingDate is mandatory")
     private Date startingDate;
 
     @NotNull(message = "Category is mandatory")

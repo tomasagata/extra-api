@@ -9,12 +9,12 @@ import org.mojodojocasahouse.extra.validation.constraint.FieldsValueMatch;
 @FieldsValueMatch(field = "password", fieldMatch = "passwordRepeat", message = "Passwords must match")
 public class UserRegistrationRequest {
 
-    @NotNull(message = "First name is mandatory")
+    @NotBlank(message = "First name is mandatory")
     @Size(max = 100, message = "First name cannot exceed 100 characters in length")
     @Pattern(regexp = "^[a-zA-Z ,.'-]+$", message = "First name must not be left blank or contain special characters or numbers")
     private String firstName;
 
-    @NotNull(message = "Last name is mandatory")
+    @NotBlank(message = "Last name is mandatory")
     @Size(max = 100, message = "Last name cannot exceed 100 characters in length")
     @Pattern(regexp = "^[a-zA-Z ,.'-]+$", message = "Last name must not be left blank or contain special characters or numbers")
     private String lastName;
@@ -25,12 +25,12 @@ public class UserRegistrationRequest {
     private String email;
 
 
-    @NotNull(message = "Password is mandatory")
+    @NotBlank(message = "Password is mandatory")
     @Size(max = 100, message = "Password cannot exceed 100 characters in length")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?]{8,}$", message = "Password must contain eight characters, one letter, one number and one of the following: @$!%*#?")
     private String password;
 
-    @NotNull(message = "Repeating password is mandatory")
+    @NotBlank(message = "Repeating password is mandatory")
     @Size(max = 100)
     private String passwordRepeat;
 

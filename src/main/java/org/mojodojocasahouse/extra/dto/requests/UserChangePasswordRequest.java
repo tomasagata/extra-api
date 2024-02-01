@@ -12,15 +12,15 @@ import org.mojodojocasahouse.extra.validation.constraint.FieldsValueMatch;
         message = "New password and new password repeat must match"
 )
 public class UserChangePasswordRequest {
-    @NotNull(message = "Current password is mandatory")
+    @NotBlank(message = "Current password is mandatory")
     @Pattern(regexp = "^([A-Za-z]|\\d|[@$!%*#?])+$", message = "Passwords can only contain letters, numbers or the following: @$!%*#?")
     private String currentPassword;
 
-    @NotNull(message = "New password is mandatory")
+    @NotBlank(message = "New password is mandatory")
     @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?]{8,}$", message = "New password must contain eight characters: one letter, one number and one of the following: @$!%*#?")
     private String newPassword;
 
-    @NotNull(message = "New password repeat is mandatory")
+    @NotBlank(message = "New password repeat is mandatory")
     private String newPasswordRepeat;
 
 
