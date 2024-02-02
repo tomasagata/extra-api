@@ -2,17 +2,23 @@ package org.mojodojocasahouse.extra.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.mojodojocasahouse.extra.dto.*;
+import org.checkerframework.checker.units.qual.A;
+import org.mojodojocasahouse.extra.dto.requests.*;
+import org.mojodojocasahouse.extra.dto.responses.ApiResponse;
 import org.mojodojocasahouse.extra.exception.EmailException;
 import org.mojodojocasahouse.extra.exception.ExistingUserEmailException;
 import org.mojodojocasahouse.extra.exception.InvalidPasswordResetTokenException;
 import org.mojodojocasahouse.extra.model.*;
 import org.mojodojocasahouse.extra.repository.ExtraUserRepository;
 import org.mojodojocasahouse.extra.repository.PasswordResetTokenRepository;
+import org.mojodojocasahouse.extra.repository.UserDeviceRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.sql.Timestamp;
 import java.util.Optional;
 
 @Slf4j
@@ -27,13 +34,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final ExtraUserRepository userRepository;
-
     private final PasswordEncoder passwordEncoder;
 
     private final JavaMailSender mailSender;
 
+    private final ExtraUserRepository userRepository;
     private final PasswordResetTokenRepository tokenRepository;
+    private final UserDeviceRepository deviceRepository;
 
 
     public ApiResponse registerUser(UserRegistrationRequest userRegistrationRequest)
@@ -71,9 +78,11 @@ public class AuthenticationService {
         String newPassword = passwordEncoder.encode(userChangePasswordRequest.getNewPassword());
 
         if(!passwordEncoder.matches(userChangePasswordRequest.getCurrentPassword(), user.getPassword())){
+            log.debug("Passwords don't match");
             throw new BadCredentialsException("Bad credentials");
         }
 
+        log.debug("Authentication success, changing password...");
         user.setPassword(newPassword);
         userRepository.save(user);
 
@@ -93,7 +102,7 @@ public class AuthenticationService {
 
             try {
                 sendEmail(user, token);
-            } catch (MessagingException ex) {
+            } catch (MailException | MessagingException ex) {
                 throw new EmailException(ex.getMessage());
             }
         }
@@ -104,7 +113,7 @@ public class AuthenticationService {
         return new ApiResponse("If user is registered, an email was sent. Check inbox");
     }
 
-    private void sendEmail(ExtraUser user, PasswordResetToken token) throws MessagingException {
+    private void sendEmail(ExtraUser user, PasswordResetToken token) throws MailException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message);
 
@@ -156,7 +165,7 @@ public class AuthenticationService {
                 "                                            password has been generated for you. To reset your password, click the\n" +
                 "                                            following link and follow the instructions.\n" +
                 "                                        </p>\n" +
-                "                                        <a href=\"extra://reset-password/" + token.getId().toString() + "\"\n" +
+                "                                        <a href=\"http://extra/reset-password/" + token.getId().toString() + "\"\n" +
                 "                                            style=\"background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;\">Reset\n" +
                 "                                            Password</a>\n" +
                 "                                    </td>\n" +
@@ -208,6 +217,41 @@ public class AuthenticationService {
         userRepository.save(changingUser);
 
         return new ApiResponse("Password changed successfully");
+    }
+
+    @Transactional(Transactional.TxType.REQUIRED)
+    public ApiResponse registerUserDevice(ExtraUser user, DeviceRegisteringRequest request) {
+        Optional<UserDevice> foundDevice = deviceRepository.findByFcmToken(request.getToken());
+
+        if (foundDevice.isPresent()) {
+            log.debug("Device is already registered, updating user information");
+            UserDevice device = foundDevice.get();
+            device.setUser(user);
+            device.setModified(new Timestamp(System.currentTimeMillis()));
+        } else {
+            log.debug("Device not registered. Registering...");
+            deviceRepository.save(
+                    new UserDevice(request.getToken(), user)
+            );
+        }
+
+        return new ApiResponse("Device registered successfully");
+    }
+
+    @Transactional(Transactional.TxType.REQUIRED)
+    public ApiResponse unregisterUserDevice(DeviceUnregisteringRequest request) {
+        if (request.getToken() == null) {
+            return new ApiResponse("Device is not registered");
+        }
+
+        Optional<UserDevice> foundDevice =  deviceRepository.findByFcmToken(request.getToken());
+
+        if (foundDevice.isEmpty()) {
+            return new ApiResponse("Device is not registered");
+        }
+
+        deviceRepository.delete(foundDevice.get());
+        return new ApiResponse("Device was removed successfully");
     }
 
 }

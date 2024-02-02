@@ -10,6 +10,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -32,7 +33,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                .csrf(csrf -> csrf.disable())
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/getMyExpenses").authenticated()
                         .requestMatchers("/getMyExpensesByCategory").authenticated()
@@ -46,10 +47,25 @@ public class SecurityConfiguration {
                         .requestMatchers("/auth/forgotten").permitAll()
                         .requestMatchers("/auth/forgotten/reset").permitAll()
                         .requestMatchers("/register*").permitAll()
-                        .requestMatchers("/editExpense").authenticated()
+                        .requestMatchers("/editExpense/{id}").authenticated()
                         .requestMatchers("/expenses/{id}").authenticated()
                         .requestMatchers("/getSumOfExpenses").authenticated()
+                        .requestMatchers("/getYearlySumOfExpenses").authenticated()
                         .requestMatchers("/getMyExpensesFrom").authenticated()
+                        .requestMatchers("/addBudget").authenticated()
+                        .requestMatchers("/allBudgets").authenticated()
+                        .requestMatchers("/deleteBudget/{id}").authenticated()
+                        .requestMatchers("/editBudget/{id}").authenticated()
+                        .requestMatchers("/budget/{id}").authenticated()
+                        .requestMatchers("/getAllCategoriesWithIcons").authenticated()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/getActiveBudgets").authenticated()
+                        .requestMatchers("/addInvestment").authenticated()
+                        .requestMatchers("/unregisterDevice").permitAll()
+                        .requestMatchers("/registerDevice").authenticated()
+                        .requestMatchers("/getMyInvestments").authenticated()
+                        .requestMatchers("/getMyTransactions").authenticated()
+                        .requestMatchers("/getYearlySumOfTransactions").authenticated()
                 )
                 .httpBasic(httpBasic -> httpBasic
                         .realmName("extra")

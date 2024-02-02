@@ -35,3 +35,5 @@ build/
 ### Secrets ###
 **/src/main/resources/**/secrets.properties
 **/src/test/resources/**/secrets.properties
+**/src/main/resources/**/*.json
+**/src/test/resources/**/*.json
