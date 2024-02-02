@@ -9,5 +9,6 @@ import org.springframework.core.io.Resource;
 @Setter
 @ConfigurationProperties(prefix = "gcp.firebase")
 public class FirebaseProperties {
-    private Resource serviceAccount;
+    // Base64 encoded firebase-service-account.json
+    private String serviceAccount;
 }

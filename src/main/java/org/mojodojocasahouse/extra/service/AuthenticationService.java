@@ -78,9 +78,11 @@ public class AuthenticationService {
         String newPassword = passwordEncoder.encode(userChangePasswordRequest.getNewPassword());
 
         if(!passwordEncoder.matches(userChangePasswordRequest.getCurrentPassword(), user.getPassword())){
+            log.debug("Passwords don't match");
             throw new BadCredentialsException("Bad credentials");
         }
 
+        log.debug("Authentication success, changing password...");
         user.setPassword(newPassword);
         userRepository.save(user);
 
