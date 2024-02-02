@@ -12,6 +12,7 @@ import org.springframework.security.converter.RsaKeyConverters;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.interfaces.RSAPrivateKey;
 
 @Configuration
@@ -45,7 +46,7 @@ public class FirebaseConfiguration {
 
                 RSAPrivateKey privateKey = RsaKeyConverters
                         .pkcs8()
-                        .convert(new ByteArrayInputStream(firebaseProperties.getPrivateKey().getBytes()));
+                        .convert(new ByteArrayInputStream(firebaseProperties.getPrivateKey().getBytes(StandardCharsets.UTF_8)));
 
                 return ServiceAccountCredentials.newBuilder()
                         .setProjectId(firebaseProperties.getProjectId())
