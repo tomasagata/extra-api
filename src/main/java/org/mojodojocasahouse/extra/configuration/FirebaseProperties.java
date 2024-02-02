@@ -7,7 +7,11 @@ import org.springframework.core.io.Resource;
 
 @Getter
 @Setter
-@ConfigurationProperties(prefix = "gcp.firebase")
+@ConfigurationProperties(prefix = "gcp.firebase.service-account")
 public class FirebaseProperties {
-    private Resource serviceAccount;
+    private String projectId;
+    private String privateKeyId;
+    private String privateKey;
+    private String clientEmail;
+    private String clientId;
 }
