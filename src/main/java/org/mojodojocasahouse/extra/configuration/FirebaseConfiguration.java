@@ -5,6 +5,7 @@ import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +13,7 @@ import org.springframework.security.converter.RsaKeyConverters;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.interfaces.RSAPrivateKey;
 
@@ -42,19 +44,13 @@ public class FirebaseConfiguration {
     @Bean
     GoogleCredentials googleCredentials() {
         try {
-            if (firebaseProperties.getProjectId() != null) {
+            if (firebaseProperties.getServiceAccount() != null) {
 
-                RSAPrivateKey privateKey = RsaKeyConverters
-                        .pkcs8()
-                        .convert(new ByteArrayInputStream(firebaseProperties.getPrivateKey().getBytes(StandardCharsets.UTF_8)));
+                InputStream stream = new ByteArrayInputStream(
+                        Base64.decodeBase64(firebaseProperties.getServiceAccount())
+                );
 
-                return ServiceAccountCredentials.newBuilder()
-                        .setProjectId(firebaseProperties.getProjectId())
-                        .setPrivateKeyId(firebaseProperties.getPrivateKeyId())
-                        .setPrivateKey(privateKey)
-                        .setClientEmail(firebaseProperties.getClientEmail())
-                        .setClientId(firebaseProperties.getClientId())
-                        .build();
+                return GoogleCredentials.fromStream(stream);
             }
             else {
                 // Use standard credentials chain. Useful when running inside GKE
